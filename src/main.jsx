@@ -4,8 +4,9 @@ import { BrowserRouter, HashRouter } from "react-router-dom";
 import App from './App.jsx';
 import './index.css';
 
-// BrowserRouter en dev, HashRouter en GitHub Pages
-const Router = import.meta.env.DEV ? BrowserRouter : HashRouter;
+// Detectar entorno GitHub Pages (producción)
+const isGitHub = window.location.hostname.includes('github.io');
+const Router = isGitHub ? HashRouter : BrowserRouter;
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>

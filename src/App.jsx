@@ -16,7 +16,7 @@ export default function App() {
             to="/"
             className="text-xl font-bold tracking-tight text-[#1A1A1A]"
           >
-            TCT <span className="text-[#0D3B66]">Sistemas</span>
+            TCT <span className="text-[#0D3B66]">Services</span>
           </NavLink>
           <nav className="flex gap-2 flex-wrap">
             <NavLink to="/" className={({ isActive }) =>
