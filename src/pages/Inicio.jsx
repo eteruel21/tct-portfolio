@@ -7,7 +7,7 @@ export default function Inicio() {
     <section
       className="relative min-h-[90vh] flex items-center justify-center text-center text-white"
       style={{
-        backgroundImage: `linear-gradient(to bottom, rgba(0,0,0,.55), rgba(0,0,0,.55)), url(${BASE}images/fondo_inicio.jpg)`,
+        backgroundImage: `url(${BASE}images/fondo_inicio.jpg)`,
         backgroundSize: "cover",
         backgroundPosition: "center",
       }}
