@@ -20,7 +20,7 @@ export default function Inicio() {
         {/* Logo */}
         <img
           src={`${BASE}images/logo_tct.png`}
-          alt="Logo TCT Sistemas"
+          alt="Logo TCT Services"
           className="mx-auto w-48 md:w-60 mb-6"
         />
 
