@@ -105,7 +105,7 @@ export default function PortfolioGaleria() {
       <header className="sticky top-0 z-20 bg-white/90 backdrop-blur border-b">
         <div className="max-w-7xl mx-auto px-4 py-4 flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
           <div>
-            <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-[#1A1A1A]">TCT Services</h1>
+            <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-[#1A1A1A]">Que Deseas?</h1>
             <p className="text-sm md:text-base text-[#2C3E50]">Tecnología que protege, controla y automatiza tu mundo.</p>
           </div>
           <div className="flex flex-wrap gap-2">
