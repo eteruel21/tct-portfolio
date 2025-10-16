@@ -58,7 +58,7 @@ export default function Nosotros() {
 
       <div className="text-center mt-12">
         <p className="text-gray-600 text-sm">
-          © {new Date().getFullYear()} TCT Sistemas · Panamá
+          © {new Date().getFullYear()} TCT Services · Panamá
         </p>
       </div>
     </section>
