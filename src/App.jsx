@@ -1,4 +1,4 @@
-import { Routes, Route, NavLink } from "react-router-dom";
+import { Routes, Route, NavLink, Navigate } from "react-router-dom";
 import Inicio from "./pages/Inicio.jsx";
 import Cotizador from "./pages/Cotizador.jsx";
 import PortfolioGaleria from "./PortfolioGaleria.jsx";
@@ -57,9 +57,9 @@ export default function App() {
           <Route path="/faqs" element={<Page title="Preguntas Frecuentes" />} />
           <Route path="/contacto" element={<Page title="Contacto" />} />
           <Route path="/legal" element={<Page title="Legal" />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </main>
-
       {/* ======= PIE DE PÁGINA ======= */}
       <footer className="border-t bg-[#F9FAFB]">
         <div className="max-w-7xl mx-auto px-4 py-6 text-center text-sm text-[#2C3E50]">
