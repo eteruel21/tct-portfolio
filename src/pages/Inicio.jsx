@@ -1,9 +1,12 @@
+const BASE = import.meta.env.BASE_URL; // "/" en dev, "/tct-portfolio/" en Pages
+
 export default function Inicio() {
   return (
     <section
       className="relative min-h-[90vh] flex items-center justify-center text-center text-white"
       style={{
-        backgroundImage: "url('./images/fondo_inicio.jpg')",
+        backgroundImage:
+          `linear-gradient(to bottom, rgba(0,0,0,.55), rgba(0,0,0,.55)), url(${BASE}images/fondo_inicio.jpg)`,
         backgroundSize: "cover",
         backgroundPosition: "center",
       }}
@@ -15,7 +18,7 @@ export default function Inicio() {
       <div className="relative z-10 px-4 max-w-3xl">
         {/* Logo */}
         <img
-          src="/images/logo_tct.png"
+          src={`${BASE}images/logo_tct.png`} 
           alt="Logo TCT Sistemas"
           className="mx-auto w-48 md:w-60 mb-6"
         />

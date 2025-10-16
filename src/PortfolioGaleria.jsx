@@ -1,3 +1,5 @@
+const BASE = import.meta.env.BASE_URL;
+
 import React, { useMemo, useState, useEffect, useCallback } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 
@@ -21,7 +23,7 @@ const items = [
     categorias: ["parking"],
     fecha: "2024-06-10",
     ubicacion: "Panamá",
-    src: "/images/Sistema_de_parking.jpg",
+    src: `${BASE}images/Sistema_de_parking.jpg`,
   },
   {
     id: "parking-bar-01",
@@ -29,7 +31,7 @@ const items = [
     categorias: ["parking"],
     fecha: "2024-06-10",
     ubicacion: "Panamá",
-    src: "/images/Barreras.png",
+    src: `${BASE}images/Barreras.png`,
   },
   {
     id: "parking-tiq-01",
@@ -37,7 +39,7 @@ const items = [
     categorias: ["parking"],
     fecha: "2024-06-10",
     ubicacion: "Panamá",
-    src: "/images/Tiquetera.png",
+    src: `${BASE}images/Tiquetera.png`,
   },
   {
     id: "parking-cob-01",
@@ -45,7 +47,7 @@ const items = [
     categorias: ["parking"],
     fecha: "2024-06-10",
     ubicacion: "Panamá",
-    src: "/images/Estacion_de_cobro.png",
+    src: `${BASE}images/Estacion_de_cobro.png`,
   },
 
   // ACCESO
@@ -55,7 +57,7 @@ const items = [
     categorias: ["acceso"],
     fecha: "2024-03-02",
     ubicacion: "Panamá",
-    src: "/images/Control_de_acceso.png",
+    src: `${BASE}images/Control_de_acceso.png`,
   },
   {
     id: "acceso-con-04",
@@ -63,7 +65,7 @@ const items = [
     categorias: ["acceso"],
     fecha: "2024-03-02",
     ubicacion: "Panamá",
-    src: "/images/Integracion_de_control_de_acceso.png",
+    src: `${BASE}images/Integracion_de_control_de_acceso.png`,
   },
 
   // MARCACIÓN
@@ -73,7 +75,7 @@ const items = [
     categorias: ["marcacion"],
     fecha: "2024-05-20",
     ubicacion: "Panamá",
-    src: "/images/marcacion_biometrico_app.png",
+    src: `${BASE}images/marcacion_biometrico_app.png`,
   },
   {
     id: "marc-02",
@@ -81,7 +83,7 @@ const items = [
     categorias: ["marcacion"],
     fecha: "2024-06-02",
     ubicacion: "Costa del Este",
-    src: "/images/marcacion_qr.png",
+    src: `${BASE}images/marcacion_qr.png`,
   },
   {
     id: "marc-03",
@@ -89,7 +91,7 @@ const items = [
     categorias: ["marcacion"],
     fecha: "2024-03-28",
     ubicacion: "Clayton",
-    src: "/images/marcacion_reportes.png",
+    src: `${BASE}images/marcacion_reportes.png`,
   },
 
   // CCTV
@@ -99,7 +101,7 @@ const items = [
     categorias: ["cctv"],
     fecha: "2024-04-20",
     ubicacion: "Ciudad de Panamá",
-    src: "/images/cctv_ip_4k.png",
+    src: `${BASE}images/cctv_ip_4k.png`,
   },
   {
     id: "cctv-02",
@@ -107,7 +109,7 @@ const items = [
     categorias: ["cctv"],
     fecha: "2024-05-10",
     ubicacion: "Costa del Este",
-    src: "/images/cctv_app_movil.png",
+    src: `${BASE}images/cctv_app_movil.png`,
   },
   {
     id: "cctv-04",
@@ -115,7 +117,7 @@ const items = [
     categorias: ["cctv"],
     fecha: "2024-07-08",
     ubicacion: "Clayton",
-    src: "/images/cctv_perimetral_analitica.png",
+    src: `${BASE}images/cctv_perimetral_analitica.png`,
   },
   {
     id: "cctv-06",
@@ -123,7 +125,7 @@ const items = [
     categorias: ["cctv"],
     fecha: "2024-08-15",
     ubicacion: "San Francisco",
-    src: "/images/cctv_integracion_acceso.png",
+    src: `${BASE}images/cctv_integracion_acceso.png`,
   },
 
   // INCENDIO
@@ -133,7 +135,7 @@ const items = [
     categorias: ["incendio"],
     fecha: "2024-04-05",
     ubicacion: "Ciudad de Panamá",
-    src: "/images/incendio_direccionable.png",
+    src: `${BASE}images/incendio_direccionable.png`,
   },
   {
     id: "fire-02",
@@ -141,7 +143,7 @@ const items = [
     categorias: ["incendio"],
     fecha: "2024-04-18",
     ubicacion: "Costa del Este",
-    src: "/images/incendio_detectores_sirenas.png",
+    src: `${BASE}images/incendio_detectores_sirenas.png`,
   },
 
     // ROBO
@@ -151,7 +153,7 @@ const items = [
     categorias: ["robo"],
     fecha: "2024-03-15",
     ubicacion: "Ciudad de Panamá",
-    src: "/images/robo_sensores_perimetrales.png",
+    src: `${BASE}images/robo_sensores_perimetrales.png`,
   },
   {
     id: "robo-02",
@@ -159,7 +161,7 @@ const items = [
     categorias: ["robo"],
     fecha: "2024-04-04",
     ubicacion: "Costa del Este",
-    src: "/images/robo_zonas_particiones.png",
+    src: `${BASE}images/robo_zonas_particiones.png`,
   },
 
   // DOMÓTICA
@@ -169,7 +171,7 @@ const items = [
     categorias: ["domotica"],
     fecha: "2024-07-11",
     ubicacion: "San Francisco",
-    src: "/images/domotica_escenas.jpeg",
+    src: `${BASE}images/domotica_escenas.jpeg`,
   },
   {
     id: "smarthome-02",
@@ -177,7 +179,7 @@ const items = [
     categorias: ["domotica"],
     fecha: "2024-08-05",
     ubicacion: "Brisas del Golf",
-    src: "/images/domotica_cerraduras.jpg",
+    src: `${BASE}images/domotica_cerraduras.jpg`,
   },
    {
     id: "smarthome-03",
@@ -185,7 +187,7 @@ const items = [
     categorias: ["domotica"],
     fecha: "2024-08-05",
     ubicacion: "Brisas del Golf",
-    src: "/images/casa_inteligente.png",
+    src: `${BASE}images/casa_inteligente.png`,
   },
 ];
 
