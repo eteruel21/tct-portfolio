@@ -63,7 +63,7 @@ export default function App() {
       {/* ======= PIE DE PÁGINA ======= */}
       <footer className="border-t bg-[#F9FAFB]">
         <div className="max-w-7xl mx-auto px-4 py-6 text-center text-sm text-[#2C3E50]">
-          © {new Date().getFullYear()} TCT Servicios de Sistemas Especiales. Panamá.
+          © {new Date().getFullYear()} TCT Services - Servicios de Sistemas Especiales. Panamá.
         </div>
       </footer>
     </div>
