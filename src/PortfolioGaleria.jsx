@@ -162,7 +162,10 @@ export default function PortfolioGaleria() {
                         {it.ubicacion} • {new Date(it.fecha).toLocaleDateString()}
                       </p>
                     </div>
-                    <Link to="/cotizador" className="px-3 py-1.5 text-xs font-semibold rounded-full bg-[#C1121F] text-white hover:bg-[#A10E1A]">
+                    <Link
+                      to={`/cotizador?mensaje=${encodeURIComponent(`Estoy interesado en ${it.titulo}`)}`}
+                      className="px-3 py-1.5 text-xs font-semibold rounded-full bg-[#C1121F] text-white hover:bg-[#A10E1A]"
+                    >
                       Cotizar
                     </Link>
                   </figcaption>
