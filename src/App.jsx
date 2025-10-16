@@ -22,12 +22,9 @@ export default function App() {
             <NavLink to="/" className={({ isActive }) =>
               `${linkBase} ${isActive ? "bg-[#F4F4F4]" : "hover:bg-[#F4F4F4]"}`
             }>Inicio</NavLink>
-            <NavLink to="/soluciones" className={({ isActive }) =>
-              `${linkBase} ${isActive ? "bg-[#F4F4F4]" : "hover:bg-[#F4F4F4]"}`
-            }>Soluciones</NavLink>
             <NavLink to="/portafolio" className={({ isActive }) =>
               `${linkBase} ${isActive ? "bg-[#F4F4F4]" : "hover:bg-[#F4F4F4]"}`
-            }>Casos / Portafolio</NavLink>
+            }>Portafolio</NavLink>
             <NavLink to="/cotizador" className={({ isActive }) =>
               `${linkBase} ${isActive
                 ? "bg-[#C1121F] text-white"
@@ -54,7 +51,6 @@ export default function App() {
       <main className="flex-1">
         <Routes>
           <Route path="/" element={<Inicio />} />
-          <Route path="/soluciones" element={<Inicio section="soluciones" />} />
           <Route path="/portafolio" element={<PortfolioGaleria />} />
           <Route path="/cotizador" element={<Cotizador />} />
           <Route path="/nosotros" element={<Page title="Nosotros" />} />
