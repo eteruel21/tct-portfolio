@@ -2,6 +2,7 @@ import { Routes, Route, NavLink, Navigate } from "react-router-dom";
 import Inicio from "./pages/Inicio.jsx";
 import Cotizador from "./pages/Cotizador.jsx";
 import PortfolioGaleria from "./PortfolioGaleria.jsx";
+import Nosotros from "./pages/Nosotros.jsx";
 
 const linkBase =
   "px-3 py-2 rounded-xl text-sm font-semibold transition-colors";
@@ -50,6 +51,7 @@ export default function App() {
       {/* ======= RUTAS ======= */}
       <main className="flex-1">
         <Routes>
+          <Route path="/nosotros" element={<Nosotros />} />
           <Route path="/" element={<Inicio />} />
           <Route path="/portafolio" element={<PortfolioGaleria />} />
           <Route path="/cotizador" element={<Cotizador />} />
