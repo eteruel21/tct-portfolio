@@ -1,3 +1,5 @@
+import { Link } from "react-router-dom";
+
 const BASE = import.meta.env.BASE_URL; // "/" en dev, "/tct-portfolio/" en Pages
 
 export default function Inicio() {
@@ -5,8 +7,7 @@ export default function Inicio() {
     <section
       className="relative min-h-[90vh] flex items-center justify-center text-center text-white"
       style={{
-        backgroundImage:
-          `linear-gradient(to bottom, rgba(0,0,0,.55), rgba(0,0,0,.55)), url(${BASE}images/fondo_inicio.jpg)`,
+        backgroundImage: `linear-gradient(to bottom, rgba(0,0,0,.55), rgba(0,0,0,.55)), url(${BASE}images/fondo_inicio.jpg)`,
         backgroundSize: "cover",
         backgroundPosition: "center",
       }}
@@ -18,33 +19,34 @@ export default function Inicio() {
       <div className="relative z-10 px-4 max-w-3xl">
         {/* Logo */}
         <img
-          src={`${BASE}images/logo_tct.png`} 
+          src={`${BASE}images/logo_tct.png`}
           alt="Logo TCT Sistemas"
           className="mx-auto w-48 md:w-60 mb-6"
         />
 
         {/* Texto principal */}
         <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight">
-          Sistemas Especiales que Protegen, Controlan y Automatizan, tu Hogar o tu Empresa
+          Sistemas Especiales que Protegen, Controlan y Automatizan tu Hogar o tu Empresa
         </h1>
         <p className="mt-4 text-lg md:text-xl text-gray-200">
-          Sistema de Parking · Control de Acceso · CCTV · Alarma de Incendio · Alarma de Robo · Automatización
+          Sistema de Parking · Control de Acceso · CCTV · Alarma de Incendio ·
+          Alarma de Robo · Automatización
         </p>
 
         {/* Botones */}
         <div className="mt-8 flex flex-wrap gap-4 justify-center">
-          <a
-            href="/cotizador"
+          <Link
+            to="/cotizador"
             className="px-6 py-3 bg-[#C1121F] hover:bg-[#A10E1A] rounded-2xl font-semibold"
           >
             Cotizar ahora
-          </a>
-          <a
-            href="/portafolio"
+          </Link>
+          <Link
+            to="/portafolio"
             className="px-6 py-3 bg-[#0D3B66] hover:bg-[#1B4F72] rounded-2xl font-semibold"
           >
             Ver proyectos
-          </a>
+          </Link>
         </div>
       </div>
     </section>
