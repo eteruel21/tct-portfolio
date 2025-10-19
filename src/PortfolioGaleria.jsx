@@ -154,7 +154,7 @@ export default function PortfolioGaleria() {
                   <img
                     src={it.src}
                     alt={it.titulo}
-                    className="w-full h-56 object-cover cursor-pointer hover:scale-[1.03] transition-transform duration-300"
+                    className="w-full h-50 object-cover cursor-pointer hover:scale-[1.03] transition-transform duration-300"
                     loading="lazy"
                     onClick={() => open(idx)}
                     role="button"
