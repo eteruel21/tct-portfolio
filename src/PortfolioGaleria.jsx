@@ -136,7 +136,6 @@ export default function PortfolioGaleria() {
           </div>
         </div>
       </header>
-
       <main className="max-w-7xl mx-auto px-4 py-8">
         {!hasData ? (
           <p className="text-center text-[#2C3E50]">Sin resultados.</p>
@@ -154,13 +153,12 @@ export default function PortfolioGaleria() {
                   <img
                     src={it.src}
                     alt={it.titulo}
-                    className="w-full h-50 object-cover cursor-pointer hover:scale-[1.03] transition-transform duration-300"
+                    className="w-full h-56 object-cover cursor-pointer hover:scale-[1.03] transition-transform duration-300"
                     loading="lazy"
                     onClick={() => open(idx)}
                     role="button"
                     aria-label={`Abrir ${it.titulo}`}
                   />
-
                   <figcaption className="p-4 flex flex-col justify-between flex-grow">
                     <div>
                       <h3 className="font-semibold text-[#1A1A1A] text-base md:text-lg">
@@ -170,7 +168,6 @@ export default function PortfolioGaleria() {
                         {it.ubicacion} • {new Date(it.fecha).toLocaleDateString()}
                       </p>
                     </div>
-
                     <div className="mt-3">
                       <Link
                         to={`/cotizador?mensaje=${encodeURIComponent(
@@ -188,7 +185,6 @@ export default function PortfolioGaleria() {
           </ul>
         )}
       </main>
-
       {openIndex >= 0 && hasData && (
         <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4" onClick={close} role="dialog" aria-modal="true">
           <div className="relative max-w-5xl w-full" onClick={(e) => e.stopPropagation()}>
@@ -207,7 +203,6 @@ export default function PortfolioGaleria() {
           </div>
         </div>
       )}
-
       <footer className="max-w-7xl mx-auto px-4 pb-12 text-center">
         <Link to="/cotizador" className="inline-block mt-6 px-6 py-3 rounded-2xl bg-[#0D3B66] text-white font-semibold hover:bg-[#1B4F72]">
           ¿Proyecto similar? Hablemos

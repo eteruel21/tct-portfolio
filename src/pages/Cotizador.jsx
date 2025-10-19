@@ -1,6 +1,9 @@
 import { useSearchParams } from "react-router-dom";
 import { useState, useEffect } from "react";
 
+// Cambia este número por el tuyo (sin símbolos ni espacios)
+const WHATSAPP_NUMBER = "50768608608";
+
 export default function Cotizador() {
   const [searchParams] = useSearchParams();
   const mensajeInicial = searchParams.get("mensaje") || "";
@@ -24,7 +27,20 @@ export default function Cotizador() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("Formulario enviado:", formData);
+
+    const texto = `
+*Solicitud de cotización* 🧾
+
+*Nombre:* ${formData.nombre}
+*Correo:* ${formData.email}
+*Teléfono:* ${formData.telefono || "No indicado"}
+
+*Mensaje:*
+${formData.mensaje}
+    `;
+
+    const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(texto)}`;
+    window.open(url, "_blank", "noopener,noreferrer");
   };
 
   return (
@@ -45,6 +61,7 @@ export default function Cotizador() {
             required
           />
         </div>
+
         <div>
           <label className="block text-sm font-semibold mb-1">Correo electrónico</label>
           <input
@@ -56,6 +73,7 @@ export default function Cotizador() {
             required
           />
         </div>
+
         <div>
           <label className="block text-sm font-semibold mb-1">Teléfono</label>
           <input
@@ -64,8 +82,10 @@ export default function Cotizador() {
             value={formData.telefono}
             onChange={handleChange}
             className="w-full border rounded-lg px-3 py-2"
+            placeholder="+507 6xx-xxxx"
           />
         </div>
+
         <div>
           <label className="block text-sm font-semibold mb-1">Mensaje</label>
           <textarea
@@ -75,12 +95,16 @@ export default function Cotizador() {
             className="w-full border rounded-lg px-3 py-2 h-32"
             required
           />
+          <p className="text-xs text-gray-500 mt-1">
+            Este campo se llena automáticamente si vienes desde un proyecto.
+          </p>
         </div>
+
         <button
           type="submit"
-          className="w-full bg-[#C1121F] text-white py-3 rounded-xl font-semibold hover:bg-[#A10E1A]"
+          className="w-full bg-[#25D366] text-white py-3 rounded-xl font-semibold hover:bg-[#1EBE59]"
         >
-          Enviar solicitud
+          Enviar por WhatsApp
         </button>
       </form>
     </section>
