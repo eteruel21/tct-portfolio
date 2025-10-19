@@ -2,7 +2,7 @@ import { useSearchParams } from "react-router-dom";
 import { useState, useEffect } from "react";
 
 // Cambia este número por el tuyo (sin símbolos ni espacios)
-const WHATSAPP_NUMBER = "50768608608";
+const WHATSAPP_NUMBER = "50761163672";
 
 export default function Cotizador() {
   const [searchParams] = useSearchParams();
