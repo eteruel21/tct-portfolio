@@ -3,6 +3,7 @@ import Inicio from "./pages/Inicio.jsx";
 import Cotizador from "./pages/Cotizador.jsx";
 import PortfolioGaleria from "./PortfolioGaleria.jsx";
 import Nosotros from "./pages/Nosotros.jsx";
+import ProyectoDetalle from "./pages/ProyectoDetalle.jsx";
 
 const linkBase =
   "px-3 py-2 rounded-xl text-sm font-semibold transition-colors";
@@ -51,6 +52,10 @@ export default function App() {
       {/* ======= RUTAS ======= */}
       <main className="flex-1">
         <Routes>
+          <Route path="/" element={<Inicio />} />
+          <Route path="/portafolio" element={<PortfolioGaleria />} />
+          <Route path="/proyecto/:id" element={<ProyectoDetalle />} /> {/* nueva */}
+          <Route path="/cotizador" element={<Cotizador />} />
           <Route path="/nosotros" element={<Nosotros />} />
           <Route path="/" element={<Inicio />} />
           <Route path="/portafolio" element={<PortfolioGaleria />} />
