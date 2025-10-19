@@ -141,33 +141,46 @@ export default function PortfolioGaleria() {
         {!hasData ? (
           <p className="text-center text-[#2C3E50]">Sin resultados.</p>
         ) : (
-          <ul className="columns-1 sm:columns-2 lg:columns-3 gap-4 [&_li]:mb-4" aria-label="Galería de proyectos">
+          <ul
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 py-6"
+            aria-label="Galería de proyectos"
+          >
             {data.map((it, idx) => (
-              <li key={it.id} className="break-inside-avoid">
-                <figure className="group overflow-hidden rounded-2xl border border-[#E5E7EB] shadow-sm">
+              <li
+                key={it.id}
+                className="rounded-2xl overflow-hidden border border-gray-200 shadow-md bg-white hover:shadow-lg transition-all"
+              >
+                <figure className="flex flex-col h-full">
                   <img
                     src={it.src}
                     alt={it.titulo}
-                    className="w-full h-auto object-cover group-hover:scale-[1.02] transition"
+                    className="w-full h-56 object-cover cursor-pointer hover:scale-[1.03] transition-transform duration-300"
                     loading="lazy"
-                    sizes="(min-width:1024px) 33vw, (min-width:640px) 50vw, 100vw"
                     onClick={() => open(idx)}
                     role="button"
                     aria-label={`Abrir ${it.titulo}`}
                   />
-                  <figcaption className="p-3 flex items-center justify-between bg-white">
+
+                  <figcaption className="p-4 flex flex-col justify-between flex-grow">
                     <div>
-                      <h3 className="font-semibold text-[#1A1A1A]">{it.titulo}</h3>
-                      <p className="text-xs text-[#2C3E50] opacity-80">
+                      <h3 className="font-semibold text-[#1A1A1A] text-base md:text-lg">
+                        {it.titulo}
+                      </h3>
+                      <p className="text-xs text-[#2C3E50] opacity-80 mt-1">
                         {it.ubicacion} • {new Date(it.fecha).toLocaleDateString()}
                       </p>
                     </div>
-                    <Link
-                      to={`/cotizador?mensaje=${encodeURIComponent(`Estoy interesado en ${it.titulo}`)}`}
-                      className="px-3 py-1.5 text-xs font-semibold rounded-full bg-[#C1121F] text-white hover:bg-[#A10E1A]"
-                    >
-                      Cotizar
-                    </Link>
+
+                    <div className="mt-3">
+                      <Link
+                        to={`/cotizador?mensaje=${encodeURIComponent(
+                          `Hola, estoy interesado en el proyecto: ${it.titulo}`
+                        )}`}
+                        className="px-3 py-1.5 text-xs font-semibold rounded-full bg-[#C1121F] text-white hover:bg-[#A10E1A]"
+                      >
+                        Cotizar
+                      </Link>
+                    </div>
                   </figcaption>
                 </figure>
               </li>
