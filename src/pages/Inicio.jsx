@@ -45,7 +45,7 @@ export default function Inicio() {
             to="/portafolio"
             className="px-6 py-3 bg-[#0D3B66] hover:bg-[#1B4F72] rounded-2xl font-semibold"
           >
-            Ver proyectos
+            Explorar soluciones
           </Link>
         </div>
       </div>
