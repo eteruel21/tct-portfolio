@@ -10,8 +10,8 @@ export default function App() {
   return (
     <div className="min-h-screen flex flex-col bg-white">
       {/* MENÚ SUPERIOR */}
-        <header className="sticky top-0 z-30 bg-white/95 backdrop-blur border-b">
-          <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
+        <header className="sticky top-0 z-35 bg-white/95 backdrop-blur border-b">
+          <div className="max-w-7xl mx-auto px-4 h-20 flex items-center justify-between">
             {/* Logo principal permanece igual */}
             <NavLink
               to="/"
