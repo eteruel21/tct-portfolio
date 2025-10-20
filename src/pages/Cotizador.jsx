@@ -5,6 +5,15 @@ export default function Cotizador() {
   const [searchParams] = useSearchParams();
   const mensajeInicial = searchParams.get("mensaje") || "";
   const BASE = import.meta.env.BASE_URL || "/"; // agrega esto
+  
+  // Detectar si es móvil
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
 
   const [formData, setFormData] = useState({
     nombre: "",
@@ -63,21 +72,21 @@ export default function Cotizador() {
 
       {/* Contenedor principal */}
       <div
-        className="
+        className={`
           relative z-10 max-w-3xl w-full 
           bg-white/75 backdrop-blur-lg 
           p-10 rounded-2xl 
           border border-white/40 
           shadow-[0_10px_30px_rgba(255,255,255,0.2)] 
           transform translate-y-10 opacity-0
-          animate-fadeInUp
+          ${isMobile ? "animate-fadeInUpSlow" : "animate-fadeInUp"}
           md:hover:translate-y-2 
           md:hover:shadow-[0_20px_60px_rgba(13,59,102,0.45)] 
           transition-all duration-500 ease-out 
           hover:border-[#0D3B66]/60
-        "
+        `}
       >
-        {/* Encabezado */}
+      {/* Encabezado */}
         <h1 className="text-3xl font-bold mb-3 text-[#0D3B66] text-center">
           Solicitud de Cotización
         </h1>
@@ -103,13 +112,8 @@ export default function Cotizador() {
           method="POST"
           className="space-y-4 bg-white shadow-md rounded-xl p-6 border border-gray-200"
         >
+          <input type="hidden" name="_next" value="https://eteruel21.github.io/tct-portfolio/gracias.html" />
           <input type="hidden" name="_captcha" value="false" />
-          <input type="hidden" name="_template" value="table" />
-          <input
-            type="hidden"
-            name="_next"
-            value="https://eteruel21.github.io/tct-portfolio/gracias.html"
-          />
 
           {/* Nombre */}
           <div>
