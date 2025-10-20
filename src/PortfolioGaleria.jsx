@@ -153,9 +153,7 @@ export default function PortfolioGaleria() {
           </div>
 
           <div className="flex flex-wrap gap-2">
-            {[...CATEGORIAS]
-              .sort((a, b) => a.label.localeCompare(b.label))
-              .map((c) => (
+            {CATEGORIAS.map((c) => (
               <button
                 key={c.id}
                 onClick={() => setCat(c.id)}

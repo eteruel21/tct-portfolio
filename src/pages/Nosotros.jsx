@@ -24,7 +24,7 @@ export default function Nosotros() {
 
         {/* Título principal */}
         <h1 className="text-4xl md:text-5xl font-extrabold mb-4 text-white">
-          TCT Sistemas
+          TCT Services
         </h1>
         <p className="text-lg md:text-xl text-gray-200 mb-12">
           Tecnología que protege, controla y automatiza tu mundo.
