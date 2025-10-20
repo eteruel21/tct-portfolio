@@ -10,37 +10,44 @@ export default function App() {
   return (
     <div className="min-h-screen flex flex-col bg-white">
       {/* MENÚ SUPERIOR */}
-      <header className="sticky top-0 z-30 bg-white/95 backdrop-blur border-b">
-        <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
-          <NavLink to="/" className="text-xl font-bold tracking-tight text-[#1A1A1A]">
-            TCT <span className="text-[#0D3B66]">Services</span>
-          </NavLink>
-          <nav className="flex gap-2 flex-wrap">
-            <NavLink to="/" className={({ isActive }) =>
-              `${linkBase} ${isActive ? "bg-[#F4F4F4]" : "hover:bg-[#F4F4F4]"}`
-            }>Inicio</NavLink>
-            <NavLink to="/portafolio" className={({ isActive }) =>
-              `${linkBase} ${isActive ? "bg-[#F4F4F4]" : "hover:bg-[#F4F4F4]"}`
-            }>Portafolio</NavLink>
-            <NavLink to="/cotizador" className={({ isActive }) =>
-              `${linkBase} ${isActive ? "bg-[#C1121F] text-white" : "bg-[#0D3B66] text-white hover:bg-[#1B4F72]"}`
-            }>Cotizador</NavLink>
-            <NavLink to="/nosotros" className={({ isActive }) =>
-              `${linkBase} ${isActive ? "bg-[#F4F4F4]" : "hover:bg-[#F4F4F4]"}`
-            }>Nosotros</NavLink>
-            <NavLink to="/faqs" className={({ isActive }) =>
-              `${linkBase} ${isActive ? "bg-[#F4F4F4]" : "hover:bg-[#F4F4F4]"}`
-            }>FAQs</NavLink>
-            <NavLink to="/contacto" className={({ isActive }) =>
-              `${linkBase} ${isActive ? "bg-[#F4F4F4]" : "hover:bg-[#F4F4F4]"}`
-            }>Contacto</NavLink>
-            <NavLink to="/legal" className={({ isActive }) =>
-              `${linkBase} ${isActive ? "bg-[#F4F4F4]" : "hover:bg-[#F4F4F4]"}`
-            }>Legal</NavLink>
-          </nav>
-        </div>
-      </header>
+        <header className="sticky top-0 z-30 bg-white/95 backdrop-blur border-b">
+          <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
+            {/* Logo principal permanece igual */}
+            <NavLink
+              to="/"
+              className="text-xl font-bold tracking-tight text-[#1A1A1A]"
+            >
+              TCT <span className="text-[#0D3B66]">Services</span>
+            </NavLink>
 
+            {/* Menú de navegación con estilo igual al botón Cotizador */}
+            <nav className="flex gap-2 flex-wrap">
+              {[
+                { path: "/", label: "Inicio" },
+                { path: "/portafolio", label: "Portafolio" },
+                { path: "/cotizador", label: "Cotizador" },
+                { path: "/nosotros", label: "Nosotros" },
+                { path: "/faqs", label: "FAQs" },
+                { path: "/contacto", label: "Contacto" },
+                { path: "/legal", label: "Legal" },
+              ].map(({ path, label }) => (
+                <NavLink
+                  key={path}
+                  to={path}
+                  className={({ isActive }) =>
+                    `${linkBase} ${
+                      isActive
+                        ? "bg-[#C1121F] text-white"
+                        : "bg-[#0D3B66] text-white hover:bg-[#1B4F72]"
+                    }`
+                  }
+                >
+                  {label}
+                </NavLink>
+              ))}
+            </nav>
+          </div>
+        </header>
       {/* RUTAS */}
       <main className="flex-1">
         <Routes>
