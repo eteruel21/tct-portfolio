@@ -3,7 +3,9 @@ import Inicio from "./pages/Inicio.jsx";
 import Cotizador from "./pages/Cotizador.jsx";
 import PortfolioGaleria from "./PortfolioGaleria.jsx";
 import Nosotros from "./pages/Nosotros.jsx";
+import { useState } from "react";
 
+const [menuOpen, setMenuOpen] = useState(false);
 const linkBase = "px-3 py-2 rounded-xl text-sm font-semibold transition-colors";
 
 export default function App() {
@@ -12,41 +14,87 @@ export default function App() {
       {/* MENÚ SUPERIOR */}
         <header className="sticky top-0 z-30 bg-white/95 backdrop-blur border-b">
           <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
-            {/* Logo principal permanece igual */}
             <NavLink
               to="/"
-              className="text-xl font-bold tracking-tight text-[#1A1A1A]"
+              className="text-xl font-bold tracking-tight text-[#1A1A1A] flex-shrink-0"
             >
               TCT <span className="text-[#0D3B66]">Services</span>
             </NavLink>
 
-            {/* Menú de navegación con estilo igual al botón Cotizador */}
-            <nav className="flex gap-2 flex-wrap">
+            {/* BOTÓN MENÚ MÓVIL */}
+            <button
+              onClick={() => setMenuOpen((m) => !m)}
+              className="md:hidden text-[#0D3B66] font-bold text-xl focus:outline-none"
+              aria-label="Abrir menú"
+            >
+              ☰
+            </button>
+
+            {/* NAV NORMAL (desktop) */}
+            <nav className="hidden md:flex gap-2 flex-wrap">
               {[
-                { path: "/", label: "Inicio" },
-                { path: "/portafolio", label: "Portafolio" },
-                { path: "/cotizador", label: "Cotizador" },
-                { path: "/nosotros", label: "Nosotros" },
-                { path: "/faqs", label: "FAQs" },
-                { path: "/contacto", label: "Contacto" },
-                { path: "/legal", label: "Legal" },
-              ].map(({ path, label }) => (
+                { to: "/", label: "Inicio" },
+                { to: "/portafolio", label: "Portafolio" },
+                { to: "/cotizador", label: "Cotizador", special: true },
+                { to: "/nosotros", label: "Nosotros" },
+                { to: "/faqs", label: "FAQs" },
+                { to: "/contacto", label: "Contacto" },
+                { to: "/legal", label: "Legal" },
+              ].map((link) => (
                 <NavLink
-                  key={path}
-                  to={path}
+                  key={link.to}
+                  to={link.to}
                   className={({ isActive }) =>
                     `${linkBase} ${
-                      isActive
-                        ? "bg-[#C1121F] text-white"
-                        : "bg-[#0D3B66] text-white hover:bg-[#1B4F72]"
+                      link.special
+                        ? isActive
+                          ? "bg-[#C1121F] text-white"
+                          : "bg-[#0D3B66] text-white hover:bg-[#1B4F72]"
+                        : isActive
+                        ? "bg-[#F4F4F4]"
+                        : "hover:bg-[#F4F4F4]"
                     }`
                   }
                 >
-                  {label}
+                  {link.label}
                 </NavLink>
               ))}
             </nav>
           </div>
+
+          {/* MENÚ MÓVIL DESPLEGABLE */}
+          {menuOpen && (
+            <nav className="md:hidden bg-white border-t flex flex-col text-center py-2">
+              {[
+                { to: "/", label: "Inicio" },
+                { to: "/portafolio", label: "Portafolio" },
+                { to: "/cotizador", label: "Cotizador", special: true },
+                { to: "/nosotros", label: "Nosotros" },
+                { to: "/faqs", label: "FAQs" },
+                { to: "/contacto", label: "Contacto" },
+                { to: "/legal", label: "Legal" },
+              ].map((link) => (
+                <NavLink
+                  key={link.to}
+                  to={link.to}
+                  onClick={() => setMenuOpen(false)}
+                  className={({ isActive }) =>
+                    `py-2 text-sm font-semibold ${
+                      link.special
+                        ? isActive
+                          ? "bg-[#C1121F] text-white"
+                          : "text-[#0D3B66] hover:bg-[#EAEAEA]"
+                        : isActive
+                        ? "bg-[#F4F4F4]"
+                        : "hover:bg-[#EAEAEA]"
+                    }`
+                  }
+                >
+                  {link.label}
+                </NavLink>
+              ))}
+            </nav>
+          )}
         </header>
       {/* RUTAS */}
       <main className="flex-1">
