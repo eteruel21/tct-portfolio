@@ -5,7 +5,7 @@ export default defineConfig({
   plugins: [react()],
   base: "/",
   preview: {
-    allowedHosts: ["*"], // ← permite cualquier host
+    allowedHosts: [],
     host: "0.0.0.0",
     port: process.env.PORT || 3000
   }
