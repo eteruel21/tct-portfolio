@@ -1,3 +1,4 @@
+// ...existing code...
 import React, { useMemo, useState, useEffect } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 
@@ -104,25 +105,34 @@ function classNames(...c) {
 }
 
 export default function PortfolioGaleria() {
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const initialCat = searchParams.get("cat") || "todas";
+  const initialSub = searchParams.get("sub") || "todas";
 
   const [cat, setCat] = useState(initialCat);
-  const [sub, setSub] = useState("todas");
+  const [sub, setSub] = useState(initialSub);
   const [q, setQ] = useState("");
   const [orden, setOrden] = useState("recientes");
+  const [scrollY, setScrollY] = useState(0);
 
-  // reset sub al cambiar cat
-  useEffect(() => setSub("todas"), [cat]);
-
-  // sync querystring con cat y sub
   useEffect(() => {
-    const sp = new URLSearchParams(window.location.search);
-    cat === "todas" ? sp.delete("cat") : sp.set("cat", cat);
-    sub === "todas" ? sp.delete("sub") : sp.set("sub", sub);
-    const qs = sp.toString();
-    window.history.replaceState({}, "", qs ? `?${qs}` : window.location.pathname);
-  }, [cat, sub]);
+    const handleScroll = () => setScrollY(window.scrollY);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []); 
+
+  // reset sub al cambiar cat (mantener si la query indica otra cosa no deseada)
+  useEffect(() => {
+    setSub("todas");
+  }, [cat]);
+
+  // sync querystring con cat y sub usando router
+  useEffect(() => {
+    const params = {};
+    if (cat && cat !== "todas") params.cat = cat;
+    if (sub && sub !== "todas") params.sub = sub;
+    setSearchParams(params, { replace: true });
+  }, [cat, sub, setSearchParams]);
 
   const data = useMemo(() => {
     let arr = [...items];
@@ -138,14 +148,24 @@ export default function PortfolioGaleria() {
 
   const info = CATEGORIA_INFO[cat];
 
+  const makeSafeMessage = (text) => encodeURIComponent(String(text).replace(/\s+/g, " ").trim());
+
   return (
     <div className="min-h-screen bg-white">
       {/* Header con selector de categoría */}
-      <header className="sticky top-0 z-20 bg-white/90 backdrop-blur border-b">
-        <div className="max-w-7xl mx-auto px-4 py-4 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+      <header
+        className={`sticky top-0 z-30 transition-all duration-500 backdrop-blur ${
+          scrollY > 80
+            ? "bg-white/0 opacity-0 pointer-events-none"
+            : "bg-white/70 opacity-100 border-b border-gray-200"
+        }`}
+      >
+        <div className="max-w-7xl mx-auto px-4 py-4 flex flex-col gap-3 md:flex-row md:items-center md:justify-between transition-all duration-500">
           <div>
             <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-[#1A1A1A]">
-              {cat === "todas" ? "Elige un servicio" : CATEGORIAS.find((c) => c.id === cat)?.label}
+              {cat === "todas"
+                ? "Elige un servicio"
+                : CATEGORIAS.find((c) => c.id === cat)?.label}
             </h1>
             <p className="text-sm md:text-base text-[#2C3E50]">
               Tecnología que protege, controla y automatiza tu mundo.
@@ -158,8 +178,10 @@ export default function PortfolioGaleria() {
                 key={c.id}
                 onClick={() => setCat(c.id)}
                 className={classNames(
-                  "px-3 py-1.5 rounded-full text-sm border",
-                  cat === c.id ? "bg-[#C1121F] text-white border-[#C1121F]" : "bg-white text-[#2C3E50] hover:bg-[#F4F4F4] border-[#BDC3C7]"
+                  "px-3 py-1.5 rounded-full text-sm border transition-all",
+                  cat === c.id
+                    ? "bg-[#C1121F] text-white border-[#C1121F]"
+                    : "bg-white/70 text-[#2C3E50] hover:bg-white/90 border-[#BDC3C7]"
                 )}
                 aria-pressed={cat === c.id}
               >
@@ -175,6 +197,7 @@ export default function PortfolioGaleria() {
               value={q}
               onChange={(e) => setQ(e.target.value)}
               className="w-64 px-3 py-2 rounded-xl border border-[#BDC3C7] focus:outline-none focus:ring-2 focus:ring-[#0D3B66]"
+              aria-label="Buscar proyectos o ubicaciones"
             />
             <select
               value={orden}
@@ -229,32 +252,40 @@ export default function PortfolioGaleria() {
           <p className="text-center text-[#2C3E50]">Sin resultados.</p>
         ) : (
           <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 py-2" aria-label="Galería de proyectos">
-            {data.map((it) => (
-              <li key={it.id} className="rounded-2xl overflow-hidden border border-gray-200 shadow-md bg-white hover:shadow-lg transition-all">
-                <figure className="flex flex-col h-full">
-                  <img
-                    src={it.src}
-                    alt={it.titulo}
-                    className="w-full h-56 object-cover"
-                    loading="lazy"
-                  />
-                  <figcaption className="p-4 flex flex-col gap-2 flex-grow">
-                    <h3 className="font-semibold text-[#1A1A1A] text-base md:text-lg">{it.titulo}</h3>
-                    <p className="text-xs text-[#2C3E50] opacity-80">
-                      {it.subcat ? `${it.subcat} • ` : ""}{it.ubicacion} • {new Date(it.fecha).toLocaleDateString()}
-                    </p>
-                    <div className="mt-auto">
-                      <Link
-                        to={`/cotizador?mensaje=${encodeURIComponent(`Hola, estoy interesado en: ${it.titulo} (${it.subcat || "General"})`)}`}
-                        className="px-3 py-1.5 text-xs font-semibold rounded-full bg-[#C1121F] text-white hover:bg-[#A10E1A]"
-                      >
-                        Cotizar
-                      </Link>
-                    </div>
-                  </figcaption>
-                </figure>
-              </li>
-            ))}
+            {data.map((it) => {
+              // fecha segura
+              const dateObj = new Date(it.fecha);
+              const fechaTexto = isNaN(dateObj.getTime()) ? it.fecha : dateObj.toLocaleDateString();
+
+              const msg = `Hola, estoy interesado en: ${it.titulo} (${it.subcat || "General"})`;
+              return (
+                <li key={it.id} className="rounded-2xl overflow-hidden border border-gray-200 shadow-md bg-white hover:shadow-lg transition-all">
+                  <figure className="flex flex-col h-full">
+                    <img
+                      src={it.src}
+                      alt={it.titulo}
+                      className="w-full h-56 object-cover"
+                      loading="lazy"
+                      onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = `${BASE}images/placeholder.png`; }}
+                    />
+                    <figcaption className="p-4 flex flex-col gap-2 flex-grow">
+                      <h3 className="font-semibold text-[#1A1A1A] text-base md:text-lg">{it.titulo}</h3>
+                      <p className="text-xs text-[#2C3E50] opacity-80">
+                        {it.subcat ? `${it.subcat} • ` : ""}{it.ubicacion} • {fechaTexto}
+                      </p>
+                      <div className="mt-auto">
+                        <Link
+                          to={`/cotizador?mensaje=${makeSafeMessage(msg)}`}
+                          className="px-3 py-1.5 text-xs font-semibold rounded-full bg-[#C1121F] text-white hover:bg-[#A10E1A]"
+                        >
+                          Cotizar
+                        </Link>
+                      </div>
+                    </figcaption>
+                  </figure>
+                </li>
+              );
+            })}
           </ul>
         )}
       </main>
@@ -267,3 +298,4 @@ export default function PortfolioGaleria() {
     </div>
   );
 }
+// ...existing code...
