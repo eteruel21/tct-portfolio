@@ -10,9 +10,9 @@
   "update": "git add . && git commit -m \"Actualización automática\" && git push origin main",
   "deploy": "vite build && gh-pages -d dist",
   "start": "vite"
- },
+  },
   "engines": {
-    "node": ">=18"
+  "node": "22.20.0"
   },
   "dependencies": {
     "react": "^19.1.1",
