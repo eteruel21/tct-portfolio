@@ -154,10 +154,10 @@ export default function PortfolioGaleria() {
     <div className="min-h-screen bg-white">
       {/* Header con selector de categoría */}
       <header
-        className={`sticky top-0 z-30 transition-all duration-500 backdrop-blur ${
-          scrollY > 80
+        className={`sticky top-0 z-30 transition-all duration-1000 backdrop-blur ${
+          scrollY > 10
             ? "bg-white/0 opacity-0 pointer-events-none"
-            : "bg-white/70 opacity-100 border-b border-gray-200"
+            : "bg-white/70 opacity-80 border-b border-gray-200"
         }`}
       >
         <div className="max-w-7xl mx-auto px-4 py-4 flex flex-col gap-3 md:flex-row md:items-center md:justify-between transition-all duration-500">

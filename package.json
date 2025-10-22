@@ -9,7 +9,7 @@
   "preview": "vite preview",
   "update": "git add . && git commit -m \"Actualización automática\" && git push origin main",
   "deploy": "vite build && gh-pages -d dist",
-  "start": "vite"
+  "start": "vite preview"
   },
   "engines": {
   "node": "22.20.0"
