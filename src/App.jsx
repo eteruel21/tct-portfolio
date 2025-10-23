@@ -3,6 +3,7 @@ import Inicio from "./pages/Inicio.jsx";
 import Cotizador from "./pages/Cotizador.jsx";
 import PortfolioGaleria from "./PortfolioGaleria.jsx";
 import Nosotros from "./pages/Nosotros.jsx";
+import FAQs from "./pages/FAQs.jsx";
 import { useState } from "react";
 import { motion } from "framer-motion";
 
@@ -100,7 +101,7 @@ export default function App() {
             <Route path="/portafolio" element={<PortfolioGaleria />} />
             <Route path="/cotizador" element={<Cotizador />} />
             <Route path="/nosotros" element={<Nosotros />} />
-            <Route path="/faqs" element={<Page title="FAQs" />} />
+            <Route path="/faqs" element={<FAQs />} />
             <Route path="/contacto" element={<Page title="Contacto" />} />
             <Route path="/legal" element={<Page title="Legal" />} />
             <Route path="*" element={<Navigate to="/" replace />} />
