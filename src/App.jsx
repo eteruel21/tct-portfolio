@@ -97,7 +97,7 @@ export default function App() {
           <Route path="/portafolio" element={<PortfolioGaleria />} />
           <Route path="/cotizador" element={<Cotizador />} />
           <Route path="/nosotros" element={<Nosotros />} />
-          <Route path="/faqs" element={<Page title="Preguntas Frecuentes" />} />
+          <Route path="/faqs" element={<FAQs />} />
           <Route path="/contacto" element={<Page title="Contacto" />} />
           <Route path="/legal" element={<Page title="Legal" />} />
           <Route path="*" element={<Navigate to="/" replace />} />
