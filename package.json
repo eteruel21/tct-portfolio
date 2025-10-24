@@ -3,16 +3,16 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
- "scripts": {
+  "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview --host 0.0.0.0 --port ${PORT:-5173}",
+    "preview": "vite preview --host 0.0.0.0 --port 5173",
+    "start": "vite preview --host 0.0.0.0 --port=$PORT",
     "update": "git add . && git commit -m \"Actualización automática\" && git push origin main",
-    "deploy": "vite build && gh-pages -d dist",
-    "start": "vite preview --host 0.0.0.0 --port=${PORT}"
+    "deploy": "vite build && gh-pages -d dist"
   },
   "engines": {
-  "node": "22.20.0"
+    "node": "22.20.0"
   },
   "dependencies": {
     "framer-motion": "^12.23.24",
