@@ -3,9 +3,10 @@ import react from "@vitejs/plugin-react";
 
 export default defineConfig({
   plugins: [react()],
-  base: "/tct-portfolio/",
+  base: "/", // 👈 usa raíz para dominios propios
   preview: {
     host: "0.0.0.0",
-    port: 5173, // valor por defecto, no dependas de process.env.PORT aquí
+    port: 5173,
   },
 });
+
