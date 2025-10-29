@@ -24,9 +24,10 @@ export default function Contacto() {
         data.append("_captcha", "false"); // sin verificación
         data.append("_template", "box"); // diseño más bonito del correo
 
-        await fetch("https://formsubmit.co/contacto@tctservices-pty.com", {
+        await fetch("https://formsubmit.co/ajax/contacto@tctservices-pty.com", {
         method: "POST",
-        body: data,
+        headers: { "Content-Type": "application/json", Accept: "application/json" },
+        body: JSON.stringify(formData),
         });
 
         setEnviado(true);
