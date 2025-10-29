@@ -73,7 +73,7 @@ export default function App() {
                         hover:bg-[#A10E1A] transition relative overflow-hidden 
                         animate-pulseLight"
             >
-              🚧 Construcción
+              🚧 CONSTRUCCIÓN
             </NavLink>
           </div>
 
