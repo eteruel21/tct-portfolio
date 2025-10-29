@@ -56,14 +56,28 @@ export default function App() {
       {/* MENÚ SUPERIOR */}
       <header className="sticky top-0 z-30 bg-white/95 backdrop-blur border-b">
         <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
-          <NavLink
-            to="/"
-            className="text-xl font-bold tracking-tight text-[#1A1A1A] flex-shrink-0"
-          >
-            TCT <span className="text-[#0D3B66]">Services</span>
-          </NavLink>
+          {/* === LOGO + BOTÓN CONSTRUCCIÓN === */}
+          <div className="flex items-center gap-3">
+            <NavLink
+              to="/"
+              className="text-xl font-bold tracking-tight text-[#1A1A1A]"
+            >
+              TCT <span className="text-[#0D3B66]">Services</span>
+            </NavLink>
 
-          {/* Botón menú móvil */}
+            {/* BOTÓN CONSTRUCCIÓN con animación */}
+            <NavLink
+              to="/construccion"
+              className="hidden md:inline-flex items-center px-4 py-1.5 rounded-full 
+                        bg-[#C1121F] text-white text-sm font-semibold shadow-md 
+                        hover:bg-[#A10E1A] transition relative overflow-hidden 
+                        animate-pulseLight"
+            >
+              🚧 Construcción
+            </NavLink>
+          </div>
+
+          {/* BOTÓN MENÚ MÓVIL */}
           <button
             onClick={() => setMenuOpen(!menuOpen)}
             className="md:hidden text-[#0D3B66] font-bold text-xl focus:outline-none"
@@ -72,15 +86,24 @@ export default function App() {
             {menuOpen ? "✕" : "☰"}
           </button>
 
-          {/* Menú Desktop */}
+          {/* MENÚ DESKTOP */}
           <nav className="hidden md:flex gap-2 flex-wrap">
             {visibleLinks.map((link) => renderLink(link))}
           </nav>
         </div>
 
-        {/* Menú Móvil */}
+        {/* MENÚ MÓVIL */}
         {menuOpen && (
           <nav className="md:hidden bg-white border-t flex flex-col text-center py-2 animate-fadeIn">
+            {/* Botón construcción dentro del menú móvil */}
+            <NavLink
+              to="/construccion"
+              onClick={() => setMenuOpen(false)}
+              className="py-2 text-sm font-semibold rounded-xl mx-6 my-1 bg-[#C1121F] text-white hover:bg-[#A10E1A]"
+            >
+              🚧 Construcción
+            </NavLink>
+
             {visibleLinks.map((link) => renderLink(link, true))}
           </nav>
         )}

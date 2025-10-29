@@ -47,7 +47,7 @@ export default function Inicio() {
             to="/construccion"
             className="px-6 py-3 bg-[#2E8B57] hover:bg-[#256B44] rounded-2xl font-semibold"
           >
-            🧱 Construcción
+            🚧 CONSTRUCCIÓN
           </Link>
         </div>
       </div>
