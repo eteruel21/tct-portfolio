@@ -1,4 +1,4 @@
-import { Routes, Route, NavLink, Navigate } from "react-router-dom";
+import { Routes, Route, NavLink, Navigate, useLocation } from "react-router-dom";
 import { useState } from "react";
 import { motion } from "framer-motion";
 import Inicio from "./pages/Inicio.jsx";
@@ -6,8 +6,9 @@ import Cotizador from "./pages/Cotizador.jsx";
 import PortfolioGaleria from "./PortfolioGaleria.jsx";
 import Nosotros from "./pages/Nosotros.jsx";
 import FAQs from "./pages/FAQs.jsx";
+import Construccion from "./pages/Construccion.jsx";
 
-const links = [
+const allLinks = [
   { to: "/", label: "Inicio" },
   { to: "/portafolio", label: "Portafolio" },
   { to: "/cotizador", label: "Cotizador" },
@@ -17,11 +18,20 @@ const links = [
   { to: "/legal", label: "Legal" },
 ];
 
-const linkBase =
-  "px-3 py-2 rounded-xl text-sm font-semibold transition-colors";
+const linkBase = "px-3 py-2 rounded-xl text-sm font-semibold transition-colors";
 
 export default function App() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const location = useLocation();
+
+  // Si está en /construccion, filtramos los enlaces visibles
+  const visibleLinks =
+    location.pathname === "/construccion"
+      ? allLinks.filter(
+          (link) =>
+            link.to !== "/portafolio" && link.to !== "/construccion"
+        )
+      : allLinks;
 
   const renderLink = (link, isMobile = false) => (
     <NavLink
@@ -29,10 +39,7 @@ export default function App() {
       to={link.to}
       onClick={() => isMobile && setMenuOpen(false)}
       className={({ isActive }) =>
-        `${isMobile
-          ? "py-2 text-sm font-semibold rounded-xl mx-6 my-1"
-          : linkBase
-        } ${
+        `${isMobile ? "py-2 text-sm font-semibold rounded-xl mx-6 my-1" : linkBase} ${
           isActive
             ? "bg-[#C1121F] text-white"
             : "bg-[#0D3B66] text-white hover:bg-[#1B4F72]"
@@ -45,7 +52,7 @@ export default function App() {
 
   return (
     <div className="min-h-screen flex flex-col bg-white">
-      {/* === MENÚ SUPERIOR === */}
+      {/* MENÚ SUPERIOR */}
       <header className="sticky top-0 z-30 bg-white/95 backdrop-blur border-b">
         <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
           <NavLink
@@ -66,19 +73,19 @@ export default function App() {
 
           {/* Menú Desktop */}
           <nav className="hidden md:flex gap-2 flex-wrap">
-            {links.map((link) => renderLink(link))}
+            {visibleLinks.map((link) => renderLink(link))}
           </nav>
         </div>
 
         {/* Menú Móvil */}
         {menuOpen && (
           <nav className="md:hidden bg-white border-t flex flex-col text-center py-2 animate-fadeIn">
-            {links.map((link) => renderLink(link, true))}
+            {visibleLinks.map((link) => renderLink(link, true))}
           </nav>
         )}
       </header>
 
-      {/* === RUTAS CON ANIMACIÓN === */}
+      {/* RUTAS CON ANIMACIÓN */}
       <main className="flex-1">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -93,12 +100,13 @@ export default function App() {
             <Route path="/faqs" element={<FAQs />} />
             <Route path="/contacto" element={<Page title="Contacto" />} />
             <Route path="/legal" element={<Page title="Legal" />} />
+            <Route path="/construccion" element={<Construccion />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </motion.div>
       </main>
 
-      {/* === PIE DE PÁGINA === */}
+      {/* PIE DE PÁGINA */}
       <footer className="border-t bg-[#F9FAFB]">
         <div className="max-w-7xl mx-auto px-4 py-6 text-center text-sm text-[#2C3E50]">
           © {new Date().getFullYear()} TCT Services — Servicios de Sistemas Especiales, Panamá.
@@ -108,7 +116,7 @@ export default function App() {
   );
 }
 
-/* Página genérica temporal */
+// Página genérica temporal
 function Page({ title }) {
   return (
     <div className="max-w-7xl mx-auto px-4 py-16 text-center">
