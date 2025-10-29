@@ -1,20 +1,51 @@
 import { Routes, Route, NavLink, Navigate } from "react-router-dom";
+import { useState } from "react";
+import { motion } from "framer-motion";
 import Inicio from "./pages/Inicio.jsx";
 import Cotizador from "./pages/Cotizador.jsx";
 import PortfolioGaleria from "./PortfolioGaleria.jsx";
 import Nosotros from "./pages/Nosotros.jsx";
 import FAQs from "./pages/FAQs.jsx";
-import { useState } from "react";
-import { motion } from "framer-motion";
 
-const linkBase = "px-3 py-2 rounded-xl text-sm font-semibold transition-colors";
+const links = [
+  { to: "/", label: "Inicio" },
+  { to: "/portafolio", label: "Portafolio" },
+  { to: "/cotizador", label: "Cotizador" },
+  { to: "/nosotros", label: "Nosotros" },
+  { to: "/faqs", label: "FAQs" },
+  { to: "/contacto", label: "Contacto" },
+  { to: "/legal", label: "Legal" },
+];
+
+const linkBase =
+  "px-3 py-2 rounded-xl text-sm font-semibold transition-colors";
 
 export default function App() {
   const [menuOpen, setMenuOpen] = useState(false);
 
+  const renderLink = (link, isMobile = false) => (
+    <NavLink
+      key={link.to}
+      to={link.to}
+      onClick={() => isMobile && setMenuOpen(false)}
+      className={({ isActive }) =>
+        `${isMobile
+          ? "py-2 text-sm font-semibold rounded-xl mx-6 my-1"
+          : linkBase
+        } ${
+          isActive
+            ? "bg-[#C1121F] text-white"
+            : "bg-[#0D3B66] text-white hover:bg-[#1B4F72]"
+        }`
+      }
+    >
+      {link.label}
+    </NavLink>
+  );
+
   return (
     <div className="min-h-screen flex flex-col bg-white">
-      {/* MENÚ SUPERIOR */}
+      {/* === MENÚ SUPERIOR === */}
       <header className="sticky top-0 z-30 bg-white/95 backdrop-blur border-b">
         <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
           <NavLink
@@ -24,77 +55,35 @@ export default function App() {
             TCT <span className="text-[#0D3B66]">Services</span>
           </NavLink>
 
+          {/* Botón menú móvil */}
           <button
-            onClick={() => setMenuOpen((m) => !m)}
+            onClick={() => setMenuOpen(!menuOpen)}
             className="md:hidden text-[#0D3B66] font-bold text-xl focus:outline-none"
             aria-label="Abrir menú"
           >
             {menuOpen ? "✕" : "☰"}
           </button>
 
+          {/* Menú Desktop */}
           <nav className="hidden md:flex gap-2 flex-wrap">
-            {[
-              { to: "/", label: "Inicio" },
-              { to: "/portafolio", label: "Portafolio" },
-              { to: "/cotizador", label: "Cotizador" },
-              { to: "/nosotros", label: "Nosotros" },
-              { to: "/faqs", label: "FAQs" },
-              { to: "/contacto", label: "Contacto" },
-              { to: "/legal", label: "Legal" },
-            ].map((link) => (
-              <NavLink
-                key={link.to}
-                to={link.to}
-                className={({ isActive }) =>
-                  `${linkBase} ${
-                    isActive
-                      ? "bg-[#C1121F] text-white"
-                      : "bg-[#0D3B66] text-white hover:bg-[#1B4F72]"
-                  }`
-                }
-              >
-                {link.label}
-              </NavLink>
-            ))}
+            {links.map((link) => renderLink(link))}
           </nav>
         </div>
 
+        {/* Menú Móvil */}
         {menuOpen && (
-          <nav className="md:hidden bg-white border-t flex flex-col text-center py-2">
-            {[
-              { to: "/", label: "Inicio" },
-              { to: "/portafolio", label: "Portafolio" },
-              { to: "/cotizador", label: "Cotizador" },
-              { to: "/nosotros", label: "Nosotros" },
-              { to: "/faqs", label: "FAQs" },
-              { to: "/contacto", label: "Contacto" },
-              { to: "/legal", label: "Legal" },
-            ].map((link) => (
-              <NavLink
-                key={link.to}
-                to={link.to}
-                onClick={() => setMenuOpen(false)}
-                className={({ isActive }) =>
-                  `py-2 text-sm font-semibold rounded-xl mx-6 my-1 ${
-                    isActive
-                      ? "bg-[#C1121F] text-white"
-                      : "bg-[#0D3B66] text-white hover:bg-[#1B4F72]"
-                  }`
-                }
-              >
-                {link.label}
-              </NavLink>
-            ))}
+          <nav className="md:hidden bg-white border-t flex flex-col text-center py-2 animate-fadeIn">
+            {links.map((link) => renderLink(link, true))}
           </nav>
         )}
       </header>
 
-      {/* RUTAS CON ANIMACIÓN */}
+      {/* === RUTAS CON ANIMACIÓN === */}
       <main className="flex-1">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
+          transition={{ duration: 0.6 }}
         >
           <Routes>
             <Route path="/" element={<Inicio />} />
@@ -109,16 +98,17 @@ export default function App() {
         </motion.div>
       </main>
 
-      {/* PIE */}
+      {/* === PIE DE PÁGINA === */}
       <footer className="border-t bg-[#F9FAFB]">
         <div className="max-w-7xl mx-auto px-4 py-6 text-center text-sm text-[#2C3E50]">
-          © {new Date().getFullYear()} TCT Services - Servicios de Sistemas Especiales. Panamá.
+          © {new Date().getFullYear()} TCT Services — Servicios de Sistemas Especiales, Panamá.
         </div>
       </footer>
     </div>
   );
 }
 
+/* Página genérica temporal */
 function Page({ title }) {
   return (
     <div className="max-w-7xl mx-auto px-4 py-16 text-center">
