@@ -5,6 +5,7 @@ import Inicio from "./pages/Inicio.jsx";
 import Cotizador from "./pages/Cotizador.jsx";
 import PortfolioGaleria from "./PortfolioGaleria.jsx";
 import Nosotros from "./pages/Nosotros.jsx";
+import Contacto from "./pages/Contacto.jsx";
 import FAQs from "./pages/FAQs.jsx";
 import Construccion from "./pages/Construccion.jsx";
 
@@ -98,7 +99,7 @@ export default function App() {
             <Route path="/cotizador" element={<Cotizador />} />
             <Route path="/nosotros" element={<Nosotros />} />
             <Route path="/faqs" element={<FAQs />} />
-            <Route path="/contacto" element={<Page title="Contacto" />} />
+            <Route path="/contacto" element={<Contacto/>} />
             <Route path="/legal" element={<Page title="Legal" />} />
             <Route path="/construccion" element={<Construccion />} />
             <Route path="*" element={<Navigate to="/" replace />} />
