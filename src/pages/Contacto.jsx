@@ -19,17 +19,22 @@ export default function Contacto() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await fetch("https://formsubmit.co/ajax/contacto@tctservices-pty.com", {
+        const data = new FormData();
+        Object.entries(formData).forEach(([key, value]) => data.append(key, value));
+        data.append("_captcha", "false"); // sin verificación
+        data.append("_template", "box"); // diseño más bonito del correo
+
+        await fetch("https://formsubmit.co/contacto@tctservices-pty.com", {
         method: "POST",
-        headers: { "Content-Type": "application/json", Accept: "application/json" },
-        body: JSON.stringify(formData),
-      });
-      setEnviado(true);
-      setFormData({ nombre: "", email: "", telefono: "", mensaje: "" });
+        body: data,
+        });
+
+        setEnviado(true);
+        setFormData({ nombre: "", email: "", telefono: "", mensaje: "" });
     } catch (err) {
-      alert("Error al enviar. Verifica tu conexión.");
+        alert("Error al enviar. Verifica tu conexión o intenta más tarde.");
     }
-  };
+};
 
   return (
     <section className="max-w-5xl mx-auto px-6 py-16">
