@@ -5,8 +5,8 @@ import { Link } from "react-router-dom";
 const BASE = import.meta.env.BASE_URL;
 
 const proyectos = [
-  { id: 1, titulo: "Remodelación de local para restaurante", img: `${BASE}images/obra1.jpg`, ubicacion: "Via España, Panamá" },
-  { id: 2, titulo: "---", img: `${BASE}images/obra2.jpg`, ubicacion: "---" },
+  { id: 1, titulo: "Remodelación de local para restaurante", img: `${BASE}images/obra1.jpg`, ubicacion: "P.H. Kamelia, Via España, Panamá" },
+  { id: 2, titulo: "Adecuación de baño", img: `${BASE}images/obra2.jpg`, ubicacion: "P.H. Kamelia, Via España, Panamá" },
   { id: 3, titulo: "---", img: `${BASE}images/obra3.jpg`, ubicacion: "---" },
   { id: 4, titulo: "---", img: `${BASE}images/obra4.jpg`, ubicacion: "---" },
   { id: 5, titulo: "---", img: `${BASE}images/obra5.jpg`, ubicacion: "---" },
