@@ -4,12 +4,12 @@ import { motion, AnimatePresence } from "framer-motion";
 const BASE = import.meta.env.BASE_URL;
 
 const proyectos = [
-  { id: 1, titulo: "Remodelación de Oficina", img: `${BASE}images/obra1.jpg`, ubicacion: "Ciudad de Panamá" },
-  { id: 2, titulo: "Construcción de Vivienda Unifamiliar", img: `${BASE}images/obra2.jpg`, ubicacion: "La Chorrera" },
-  { id: 3, titulo: "Ampliación de Bodega Industrial", img: `${BASE}images/obra3.jpg`, ubicacion: "Pacora" },
-  { id: 4, titulo: "Diseño y Construcción de Fachada", img: `${BASE}images/obra4.jpg`, ubicacion: "Costa del Este" },
-  { id: 5, titulo: "Instalación de Cubierta Metálica", img: `${BASE}images/obra5.jpg`, ubicacion: "Vista Alegre" },
-  { id: 6, titulo: "Acabados Interiores Modernos", img: `${BASE}images/obra6.jpg`, ubicacion: "San Miguelito" },
+  { id: 1, titulo: "Remodelación de local para restaurante", img: `${BASE}images/obra1.jpg`, ubicacion: "Via España, Panamá" },
+  { id: 2, titulo: "---", img: `${BASE}images/obra2.jpg`, ubicacion: "---" },
+  { id: 3, titulo: "---", img: `${BASE}images/obra3.jpg`, ubicacion: "---" },
+  { id: 4, titulo: "---", img: `${BASE}images/obra4.jpg`, ubicacion: "---" },
+  { id: 5, titulo: "---", img: `${BASE}images/obra5.jpg`, ubicacion: "---" },
+  { id: 6, titulo: "---", img: `${BASE}images/obra6.jpg`, ubicacion: "---" },
 ];
 
 export default function Construccion() {
