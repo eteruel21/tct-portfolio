@@ -10,8 +10,8 @@ const proyectos = [
   { id: 3, titulo: "Acondicionamiento para restaurante", tipo: "imagen", src: `${BASE}images/obra3.jpg`, ubicacion: "P.H. Kamelia, Vía España, Panamá" },
   { id: 4, titulo: "Portón corredizo", tipo: "imagen", src: `${BASE}images/obra4.jpeg`, ubicacion: "Cuatro Altos, Colón" },
   { id: 5, titulo: "Portón y verjas en residencia", tipo: "imagen", src: `${BASE}images/obra5.jpg`, ubicacion: "Villa Lucre, Panamá" },
-  { id: 6, titulo: "Construcción de piscina", img: `${BASE}images/obra6.jpg`, ubicacion: "Capira, Panamá Oeste" },
-  { id: 7, titulo: "Verjas con diseño", img: `${BASE}images/obra7.jpg`, ubicacion: "Burunga, Panamá Oeste" },
+  { id: 6, titulo: "Construcción de piscina", tipo: "imagen", src: `${BASE}images/obra6.jpg`, ubicacion: "Capira, Panamá Oeste" },
+  { id: 7, titulo: "Verjas con diseño", tipo: "imagen", src: `${BASE}images/obra7.jpg`, ubicacion: "Burunga, Panamá Oeste" },
   { id: 8, titulo: "La mejor expericia en estructura", tipo: "video", src: `${BASE}videos/obra8.mp4`, ubicacion: "Villa Las Fuentes, Panamá" },
   { id: 9, titulo: "---", tipo: "video", src: "---", ubicacion: "---" },
 ];

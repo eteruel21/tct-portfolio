@@ -2,8 +2,9 @@ import { Routes, Route, NavLink, Navigate, useLocation } from "react-router-dom"
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
+  FaBars, FaTimes,
   FaHome, FaTools, FaFileContract, FaInfoCircle,
-  FaQuestionCircle, FaEnvelope, FaHammer, FaBars, FaTimes
+  FaQuestionCircle, FaEnvelope, FaHammer
 } from "react-icons/fa";
 
 import Inicio from "./pages/Inicio.jsx";
@@ -14,153 +15,174 @@ import Contacto from "./pages/Contacto.jsx";
 import FAQs from "./pages/FAQs.jsx";
 import Construccion from "./pages/Construccion.jsx";
 
+const links = [
+  { to: "/", label: "Inicio" },
+  { to: "/portafolio", label: "Portafolio" },
+  { to: "/cotizador", label: "Cotizador" },
+  { to: "/nosotros", label: "Nosotros" },
+  { to: "/faqs", label: "FAQs" },
+  { to: "/contacto", label: "Contacto" },
+  { to: "/legal", label: "Legal" },
+];
+
+const linkBase =
+  "px-3 py-2 rounded-xl text-sm font-semibold transition-colors";
+
 export default function App() {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
   const location = useLocation();
 
-  const links = [
-    { to: "/", label: "Inicio", icon: <FaHome /> },
-    { to: "/portafolio", label: "Portafolio", icon: <FaTools /> },
-    { to: "/cotizador", label: "Cotizador", icon: <FaFileContract /> },
-    { to: "/nosotros", label: "Nosotros", icon: <FaInfoCircle /> },
-    { to: "/faqs", label: "FAQs", icon: <FaQuestionCircle /> },
-    { to: "/contacto", label: "Contacto", icon: <FaEnvelope /> },
-    { to: "/legal", label: "Legal", icon: <FaHammer /> },
-  ];
-
-  // Ocultar Portafolio en la vista de Construcción
+  // Filtrar enlaces visibles en la página de construcción
   const visibleLinks =
     location.pathname === "/construccion"
-      ? links.filter((l) => l.to !== "/portafolio")
+      ? links.filter((link) => link.to !== "/portafolio")
       : links;
 
-  // Cerrar sidebar al cambiar ruta
-  useEffect(() => setSidebarOpen(false), [location.pathname]);
+  // Cerrar menú móvil al cambiar de ruta
+  useEffect(() => setMenuOpen(false), [location.pathname]);
+
+  const renderLink = (link, isMobile = false) => (
+    <NavLink
+      key={link.to}
+      to={link.to}
+      onClick={() => isMobile && setMenuOpen(false)}
+      className={({ isActive }) =>
+        `${isMobile ? "py-2 text-sm font-semibold rounded-xl mx-6 my-1" : linkBase
+        } ${isActive
+          ? "bg-[#C1121F] text-white"
+          : "bg-[#0D3B66] text-white hover:bg-[#1B4F72]"
+        }`
+      }
+    >
+      {link.label}
+    </NavLink>
+  );
 
   return (
-    <div className="flex min-h-screen bg-gray-50 overflow-hidden">
-      {/* === SIDEBAR === */}
-      <AnimatePresence>
-        {sidebarOpen && (
-          <motion.aside
-            initial={{ x: "-100%" }}
-            animate={{ x: 0 }}
-            exit={{ x: "-100%" }}
-            transition={{ duration: 0.3 }}
-            className="fixed inset-y-0 left-0 w-64 bg-[#0D3B66] text-white flex flex-col justify-between z-50 shadow-2xl"
-          >
-            {/* Encabezado del Sidebar */}
-            <div>
-              <div className="flex items-center justify-between px-5 py-4 border-b border-white/20">
-                <h1 className="text-2xl font-bold tracking-tight">
-                  TCT <span className="text-[#FFD700]">Services</span>
-                </h1>
-                <button
-                  onClick={() => setSidebarOpen(false)}
-                  className="text-white text-2xl focus:outline-none"
-                >
-                  <FaTimes />
-                </button>
-              </div>
+    <div className="min-h-screen flex flex-col bg-white">
+      {/* === NAVBAR DESKTOP + MOBILE === */}
+      <header className="sticky top-0 z-30 bg-white/95 backdrop-blur border-b">
+        <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
+          {/* === LOGO + BOTÓN CONSTRUCCIÓN === */}
+          <div className="flex items-center gap-3">
+            <NavLink
+              to="/"
+              className="text-xl font-bold tracking-tight text-[#1A1A1A]"
+            >
+              TCT <span className="text-[#0D3B66]">Services</span>
+            </NavLink>
 
-              {/* Botón construcción destacado */}
+            {/* BOTÓN CONSTRUCCIÓN (solo escritorio) */}
+            <NavLink
+              to="/construccion"
+              className="hidden md:inline-flex items-center px-4 py-1.5 rounded-full 
+                        bg-[#C1121F] text-white text-sm font-semibold shadow-md 
+                        hover:bg-[#A10E1A] transition relative overflow-hidden 
+                        animate-pulseLight"
+            >
+              🚧 CONSTRUCCIÓN
+            </NavLink>
+          </div>
+
+          {/* BOTÓN MENÚ MÓVIL */}
+          <button
+            onClick={() => setMenuOpen(!menuOpen)}
+            className="md:hidden text-[#0D3B66] font-bold text-xl focus:outline-none"
+            aria-label="Abrir menú"
+          >
+            {menuOpen ? <FaTimes /> : <FaBars />}
+          </button>
+
+          {/* MENÚ DESKTOP */}
+          <nav className="hidden md:flex gap-2 flex-wrap">
+            {visibleLinks.map((link) => renderLink(link))}
+          </nav>
+        </div>
+
+        {/* MENÚ MÓVIL (sidebar tipo app) */}
+        <AnimatePresence>
+          {menuOpen && (
+            <motion.nav
+              initial={{ x: "100%" }}
+              animate={{ x: 0 }}
+              exit={{ x: "100%" }}
+              transition={{ duration: 0.3 }}
+              className="fixed inset-0 bg-[#0D3B66] text-white flex flex-col justify-center items-center z-50 space-y-5"
+            >
+              <button
+                onClick={() => setMenuOpen(false)}
+                className="absolute top-4 right-5 text-2xl"
+              >
+                <FaTimes />
+              </button>
+
+              {/* BOTÓN CONSTRUCCIÓN dentro del menú móvil */}
               <NavLink
                 to="/construccion"
-                className="flex items-center justify-center gap-2 mx-4 mt-5 mb-3 py-2.5 rounded-xl bg-[#C1121F] text-sm font-semibold shadow-md hover:bg-[#A10E1A] transition animate-pulseLight"
+                onClick={() => setMenuOpen(false)}
+                className="py-2 px-6 text-base font-semibold rounded-full bg-[#C1121F] hover:bg-[#A10E1A] animate-pulseLight"
               >
                 🚧 Construcción
               </NavLink>
 
-              {/* Enlaces del menú */}
-              <nav className="flex flex-col gap-1 px-2">
-                {visibleLinks.map((link) => (
-                  <NavLink
-                    key={link.to}
-                    to={link.to}
-                    className={({ isActive }) =>
-                      `flex items-center gap-3 px-4 py-2 rounded-lg transition-colors ${
-                        isActive
-                          ? "bg-[#C1121F] text-white"
-                          : "text-gray-200 hover:bg-white/10"
-                      }`
-                    }
-                  >
-                    {link.icon}
-                    {link.label}
-                  </NavLink>
-                ))}
-              </nav>
-            </div>
+              {visibleLinks.map((link) => (
+                <NavLink
+                  key={link.to}
+                  to={link.to}
+                  onClick={() => setMenuOpen(false)}
+                  className={({ isActive }) =>
+                    `block text-lg font-semibold px-4 py-2 rounded-lg transition ${
+                      isActive
+                        ? "bg-[#C1121F] text-white"
+                        : "text-white hover:bg-white/20"
+                    }`
+                  }
+                >
+                  {link.label}
+                </NavLink>
+              ))}
+            </motion.nav>
+          )}
+        </AnimatePresence>
+      </header>
 
-            <div className="text-center py-3 text-xs text-gray-300 border-t border-white/10">
-              © {new Date().getFullYear()} TCT Services
-            </div>
-          </motion.aside>
-        )}
-      </AnimatePresence>
+      {/* === RUTAS CON ANIMACIÓN === */}
+      <main className="flex-1">
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+        >
+          <Routes>
+            <Route path="/" element={<Inicio />} />
+            <Route path="/portafolio" element={<PortfolioGaleria />} />
+            <Route path="/cotizador" element={<Cotizador />} />
+            <Route path="/nosotros" element={<Nosotros />} />
+            <Route path="/faqs" element={<FAQs />} />
+            <Route path="/contacto" element={<Contacto />} />
+            <Route path="/construccion" element={<Construccion />} />
+            <Route path="/legal" element={<Page title="Legal" />} />
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </motion.div>
+      </main>
 
-      {/* === CONTENIDO PRINCIPAL === */}
-      <div className="flex-1 flex flex-col">
-        {/* Barra superior */}
-        <header className="sticky top-0 z-30 bg-white shadow-md flex items-center justify-between px-4 py-3">
-          {/* Botón menú solo visible en móvil */}
-          <button
-            onClick={() => setSidebarOpen(true)}
-            className="text-[#0D3B66] text-2xl focus:outline-none lg:hidden"
-          >
-            ☰
-          </button>
+      {/* === PIE DE PÁGINA === */}
+      <footer className="border-t bg-[#F9FAFB]">
+        <div className="max-w-7xl mx-auto px-4 py-6 text-center text-sm text-[#2C3E50]">
+          © {new Date().getFullYear()} TCT Services — Servicios de Sistemas Especiales, Panamá.
+        </div>
+      </footer>
+    </div>
+  );
+}
 
-          {/* Logo */}
-          <h2 className="text-xl font-bold tracking-tight text-[#0D3B66]">
-            TCT <span className="text-[#C1121F]">Services</span>
-          </h2>
-
-          {/* Botones solo visibles en desktop */}
-          <nav className="hidden lg:flex gap-2 flex-wrap items-center">
-            {links.map((link) => (
-              <NavLink
-                key={link.to}
-                to={link.to}
-                className={({ isActive }) =>
-                  `px-3 py-2 rounded-xl text-sm font-semibold transition-colors ${
-                    isActive
-                      ? "bg-[#C1121F] text-white"
-                      : "bg-[#0D3B66] text-white hover:bg-[#1B4F72]"
-                  }`
-                }
-              >
-                {link.label}
-              </NavLink>
-            ))}
-          </nav>
-        </header>
-
-        {/* Contenido principal animado */}
-        <main className="flex-1 overflow-y-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 25 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-          >
-            <Routes>
-              <Route path="/" element={<Inicio />} />
-              <Route path="/portafolio" element={<PortfolioGaleria />} />
-              <Route path="/cotizador" element={<Cotizador />} />
-              <Route path="/nosotros" element={<Nosotros />} />
-              <Route path="/faqs" element={<FAQs />} />
-              <Route path="/contacto" element={<Contacto />} />
-              <Route path="/construccion" element={<Construccion />} />
-              <Route path="*" element={<Navigate to="/" replace />} />
-            </Routes>
-          </motion.div>
-        </main>
-
-        {/* Pie de página */}
-        <footer className="border-t bg-[#F9FAFB] text-center text-sm text-[#2C3E50] py-4">
-          © {new Date().getFullYear()} TCT Services — Panamá.
-        </footer>
-      </div>
+/* === Página genérica temporal === */
+function Page({ title }) {
+  return (
+    <div className="max-w-7xl mx-auto px-4 py-16 text-center">
+      <h1 className="text-3xl font-bold text-[#1A1A1A]">{title}</h1>
+      <p className="mt-3 text-[#2C3E50]">Contenido próximamente.</p>
     </div>
   );
 }
