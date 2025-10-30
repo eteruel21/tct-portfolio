@@ -103,26 +103,37 @@ export default function App() {
       <div className="flex-1 flex flex-col">
         {/* Barra superior */}
         <header className="sticky top-0 z-30 bg-white shadow-md flex items-center justify-between px-4 py-3">
+          {/* Botón menú solo visible en móvil */}
           <button
             onClick={() => setSidebarOpen(true)}
             className="text-[#0D3B66] text-2xl focus:outline-none lg:hidden"
           >
-            <FaBars />
+            ☰
           </button>
 
+          {/* Logo */}
           <h2 className="text-xl font-bold tracking-tight text-[#0D3B66]">
             TCT <span className="text-[#C1121F]">Services</span>
           </h2>
 
-          {/* Botón construcción visible solo en desktop */}
-          <NavLink
-            to="/construccion"
-            className="hidden lg:inline-flex items-center px-4 py-1.5 rounded-full 
-                      bg-[#C1121F] text-white text-sm font-semibold shadow-md 
-                      hover:bg-[#A10E1A] transition animate-pulseLight"
-          >
-            🚧 CONSTRUCCIÓN
-          </NavLink>
+          {/* Botones solo visibles en desktop */}
+          <nav className="hidden lg:flex gap-2 flex-wrap items-center">
+            {links.map((link) => (
+              <NavLink
+                key={link.to}
+                to={link.to}
+                className={({ isActive }) =>
+                  `px-3 py-2 rounded-xl text-sm font-semibold transition-colors ${
+                    isActive
+                      ? "bg-[#C1121F] text-white"
+                      : "bg-[#0D3B66] text-white hover:bg-[#1B4F72]"
+                  }`
+                }
+              >
+                {link.label}
+              </NavLink>
+            ))}
+          </nav>
         </header>
 
         {/* Contenido principal animado */}
