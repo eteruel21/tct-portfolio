@@ -1,5 +1,6 @@
 import { useState, useCallback, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { Link } from "react-router-dom";
 
 const BASE = import.meta.env.BASE_URL;
 
@@ -55,12 +56,12 @@ export default function Construccion() {
             Nuestro compromiso es la excelencia, seguridad y puntualidad en cada obra.
           </p>
 
-          <a
-            href="/cotizador?mensaje=Estoy interesado en los servicios de construcción de TCT Services"
+          <Link
+            to="/cotizador?mensaje=Estoy interesado en los servicios de construcción de TCT Services"
             className="inline-block px-8 py-3 bg-[#C1121F] hover:bg-[#A10E1A] rounded-2xl font-semibold shadow-lg"
           >
             Solicitar Cotización
-          </a>
+          </Link>
         </div>
       </div>
 
