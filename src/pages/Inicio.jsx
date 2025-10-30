@@ -67,7 +67,7 @@ export default function Inicio() {
               ¡Novedad! Servicios de Construcción Profesional
             </h2>
             <p className="text-gray-100 text-base md:text-lg leading-relaxed mb-6">
-              En <span className="text-[#FFD700] font-semibold">TCT Services</span> 
+              En <span className="text-[#FFD700] font-semibold">TCT Services </span> 
               realizamos obras civiles, remodelaciones, estructuras metálicas y mantenimiento integral,
               con calidad, cumplimiento y precisión.
             </p>
