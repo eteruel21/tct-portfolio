@@ -5,12 +5,14 @@ import { Link } from "react-router-dom";
 const BASE = import.meta.env.BASE_URL;
 
 const proyectos = [
-  { id: 1, titulo: "Remodelación de local para restaurante", img: `${BASE}images/obra1.jpg`, ubicacion: "P.H. Kamelia, Via España, Panamá" },
-  { id: 2, titulo: "Adecuación de baño", img: `${BASE}images/obra2.jpg`, ubicacion: "P.H. Kamelia, Via España, Panamá" },
-  { id: 3, titulo: "Acondicionamiento para restaurante", img: `${BASE}images/obra3.jpg`, ubicacion: "P.H. Kamelia, Via España, Panamá" },
-  { id: 4, titulo: "Porton corredizo", img: `${BASE}images/obra4.jpeg`, ubicacion: "Cuatro Altos, Colón" },
-  { id: 5, titulo: "---", img: `${BASE}images/obra5.jpg`, ubicacion: "---" },
-  { id: 6, titulo: "---", img: `${BASE}images/obra6.jpg`, ubicacion: "---" },
+  { id: 1, titulo: "Remodelación de local para restaurante", tipo: "imagen", src: `${BASE}images/obra1.jpg`, ubicacion: "P.H. Kamelia, Vía España, Panamá" },
+  { id: 2, titulo: "Adecuación de baño", tipo: "imagen", src: `${BASE}images/obra2.jpg`, ubicacion: "P.H. Kamelia, Vía España, Panamá" },
+  { id: 3, titulo: "Acondicionamiento para restaurante", tipo: "imagen", src: `${BASE}images/obra3.jpg`, ubicacion: "P.H. Kamelia, Vía España, Panamá" },
+  { id: 4, titulo: "Portón corredizo", tipo: "imagen", src: `${BASE}images/obra4.jpeg`, ubicacion: "Cuatro Altos, Colón" },
+  { id: 5, titulo: "Portón y verjas en residencia", tipo: "imagen", src: `${BASE}images/obra5.jpg`, ubicacion: "Villa Lucre, Panamá" },
+  { id: 6, titulo: "Construcción de piscina", img: `${BASE}images/obra6.jpg`, ubicacion: "Capira, Panamá Oeste" },
+  { id: 7, titulo: "---", tipo: "video", src: `${BASE}videos/obra7.mp4`, ubicacion: "---" },
+  { id: 8, titulo: "---", tipo: "video", src: "---", ubicacion: "---" },
 ];
 
 export default function Construccion() {
@@ -20,7 +22,7 @@ export default function Construccion() {
   const next = useCallback(() => setOpenIndex((i) => (i + 1) % proyectos.length), []);
   const prev = useCallback(() => setOpenIndex((i) => (i - 1 + proyectos.length) % proyectos.length), []);
 
-  // Control por teclado
+  // Control de teclado
   useEffect(() => {
     const onKey = (e) => {
       if (e.key === "Escape") close();
@@ -80,15 +82,35 @@ export default function Construccion() {
           {proyectos.map((obra, idx) => (
             <div
               key={obra.id}
-              className="group relative overflow-hidden rounded-2xl shadow-md border border-gray-200 hover:shadow-xl transition"
+              className="group relative overflow-hidden rounded-2xl shadow-md border border-gray-200 hover:shadow-xl transition cursor-pointer"
               onClick={() => setOpenIndex(idx)}
             >
-              <img
-                src={obra.img}
-                alt={obra.titulo}
-                className="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-500 cursor-pointer"
-                loading="lazy"
-              />
+              {obra.tipo === "video" ? (
+                obra.src.includes("youtube") ? (
+                  <iframe
+                    src={obra.src}
+                    title={obra.titulo}
+                    className="w-full h-64 object-cover"
+                    allow="autoplay; encrypted-media"
+                  ></iframe>
+                ) : (
+                  <video
+                    src={obra.src}
+                    muted
+                    loop
+                    autoPlay
+                    playsInline
+                    className="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-500"
+                  />
+                )
+              ) : (
+                <img
+                  src={obra.src}
+                  alt={obra.titulo}
+                  className="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-500"
+                  loading="lazy"
+                />
+              )}
               <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition flex flex-col justify-center items-center text-white p-4 text-center">
                 <h3 className="text-lg font-semibold">{obra.titulo}</h3>
                 <p className="text-sm text-gray-200 mt-1">{obra.ubicacion}</p>
@@ -98,7 +120,7 @@ export default function Construccion() {
         </div>
       </motion.div>
 
-      {/* === Visor (Lightbox) === */}
+      {/* === Lightbox === */}
       <AnimatePresence>
         {openIndex >= 0 && (
           <motion.div
@@ -117,38 +139,37 @@ export default function Construccion() {
               className="relative max-w-5xl w-full"
               onClick={(e) => e.stopPropagation()}
             >
-              <img
-                src={proyectos[openIndex].img}
-                alt={proyectos[openIndex].titulo}
-                className="w-full h-auto rounded-xl"
-              />
+              {proyectos[openIndex].tipo === "video" ? (
+                proyectos[openIndex].src.includes("youtube") ? (
+                  <iframe
+                    src={proyectos[openIndex].src}
+                    className="w-full h-[70vh] rounded-xl"
+                    allowFullScreen
+                  ></iframe>
+                ) : (
+                  <video
+                    src={proyectos[openIndex].src}
+                    controls
+                    autoPlay
+                    className="w-full h-auto rounded-xl"
+                  />
+                )
+              ) : (
+                <img
+                  src={proyectos[openIndex].src}
+                  alt={proyectos[openIndex].titulo}
+                  className="w-full h-auto rounded-xl"
+                />
+              )}
               <div className="text-white mt-3 flex justify-between items-center">
                 <div>
                   <h3 className="text-xl font-semibold">{proyectos[openIndex].titulo}</h3>
                   <p className="text-sm text-gray-300">{proyectos[openIndex].ubicacion}</p>
                 </div>
                 <div className="flex gap-2">
-                  <button
-                    onClick={prev}
-                    className="px-3 py-2 bg-white/10 hover:bg-white/20 rounded"
-                    aria-label="Anterior"
-                  >
-                    ←
-                  </button>
-                  <button
-                    onClick={next}
-                    className="px-3 py-2 bg-white/10 hover:bg-white/20 rounded"
-                    aria-label="Siguiente"
-                  >
-                    →
-                  </button>
-                  <button
-                    onClick={close}
-                    className="px-3 py-2 bg-white/10 hover:bg-white/20 rounded"
-                    aria-label="Cerrar"
-                  >
-                    ✕
-                  </button>
+                  <button onClick={prev} className="px-3 py-2 bg-white/10 hover:bg-white/20 rounded">←</button>
+                  <button onClick={next} className="px-3 py-2 bg-white/10 hover:bg-white/20 rounded">→</button>
+                  <button onClick={close} className="px-3 py-2 bg-white/10 hover:bg-white/20 rounded">✕</button>
                 </div>
               </div>
             </motion.div>
