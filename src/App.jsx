@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   FaBars, FaTimes,
   FaHome, FaTools, FaFileContract, FaInfoCircle,
-  FaQuestionCircle, FaEnvelope, FaHammer
+  FaQuestionCircle, FaEnvelope, FaGavel
 } from "react-icons/fa";
 
 import Inicio from "./pages/Inicio.jsx";
@@ -16,54 +16,31 @@ import FAQs from "./pages/FAQs.jsx";
 import Construccion from "./pages/Construccion.jsx";
 
 const links = [
-  { to: "/", label: "Inicio" },
-  { to: "/portafolio", label: "Portafolio" },
-  { to: "/cotizador", label: "Cotizador" },
-  { to: "/nosotros", label: "Nosotros" },
-  { to: "/faqs", label: "FAQs" },
-  { to: "/contacto", label: "Contacto" },
-  { to: "/legal", label: "Legal" },
+  { to: "/", label: "Inicio", icon: <FaHome /> },
+  { to: "/portafolio", label: "Portafolio", icon: <FaTools /> },
+  { to: "/cotizador", label: "Cotizador", icon: <FaFileContract /> },
+  { to: "/nosotros", label: "Nosotros", icon: <FaInfoCircle /> },
+  { to: "/faqs", label: "FAQs", icon: <FaQuestionCircle /> },
+  { to: "/contacto", label: "Contacto", icon: <FaEnvelope /> },
+  { to: "/legal", label: "Legal", icon: <FaGavel /> },
 ];
-
-const linkBase =
-  "px-3 py-2 rounded-xl text-sm font-semibold transition-colors";
 
 export default function App() {
   const [menuOpen, setMenuOpen] = useState(false);
   const location = useLocation();
 
-  // Filtrar enlaces visibles en la página de construcción
   const visibleLinks =
     location.pathname === "/construccion"
       ? links.filter((link) => link.to !== "/portafolio")
       : links;
 
-  // Cerrar menú móvil al cambiar de ruta
   useEffect(() => setMenuOpen(false), [location.pathname]);
-
-  const renderLink = (link, isMobile = false) => (
-    <NavLink
-      key={link.to}
-      to={link.to}
-      onClick={() => isMobile && setMenuOpen(false)}
-      className={({ isActive }) =>
-        `${isMobile ? "py-2 text-sm font-semibold rounded-xl mx-6 my-1" : linkBase
-        } ${isActive
-          ? "bg-[#C1121F] text-white"
-          : "bg-[#0D3B66] text-white hover:bg-[#1B4F72]"
-        }`
-      }
-    >
-      {link.label}
-    </NavLink>
-  );
 
   return (
     <div className="min-h-screen flex flex-col bg-white">
-      {/* === NAVBAR DESKTOP + MOBILE === */}
+      {/* === NAV DESKTOP === */}
       <header className="sticky top-0 z-30 bg-white/95 backdrop-blur border-b">
         <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
-          {/* === LOGO + BOTÓN CONSTRUCCIÓN === */}
           <div className="flex items-center gap-3">
             <NavLink
               to="/"
@@ -72,13 +49,12 @@ export default function App() {
               TCT <span className="text-[#0D3B66]">Services</span>
             </NavLink>
 
-            {/* BOTÓN CONSTRUCCIÓN (solo escritorio) */}
+            {/* BOTÓN CONSTRUCCIÓN */}
             <NavLink
               to="/construccion"
               className="hidden md:inline-flex items-center px-4 py-1.5 rounded-full 
                         bg-[#C1121F] text-white text-sm font-semibold shadow-md 
-                        hover:bg-[#A10E1A] transition relative overflow-hidden 
-                        animate-pulseLight"
+                        hover:bg-[#A10E1A] transition animate-pulseLight"
             >
               🚧 CONSTRUCCIÓN
             </NavLink>
@@ -87,7 +63,7 @@ export default function App() {
           {/* BOTÓN MENÚ MÓVIL */}
           <button
             onClick={() => setMenuOpen(!menuOpen)}
-            className="md:hidden text-[#0D3B66] font-bold text-xl focus:outline-none"
+            className="md:hidden text-[#0D3B66] text-2xl focus:outline-none"
             aria-label="Abrir menú"
           >
             {menuOpen ? <FaTimes /> : <FaBars />}
@@ -95,58 +71,105 @@ export default function App() {
 
           {/* MENÚ DESKTOP */}
           <nav className="hidden md:flex gap-2 flex-wrap">
-            {visibleLinks.map((link) => renderLink(link))}
+            {visibleLinks.map((link) => (
+              <NavLink
+                key={link.to}
+                to={link.to}
+                className={({ isActive }) =>
+                  `px-3 py-2 rounded-xl text-sm font-semibold transition-colors ${
+                    isActive
+                      ? "bg-[#C1121F] text-white"
+                      : "bg-[#0D3B66] text-white hover:bg-[#1B4F72]"
+                  }`
+                }
+              >
+                {link.label}
+              </NavLink>
+            ))}
           </nav>
         </div>
-
-        {/* MENÚ MÓVIL (sidebar tipo app) */}
-        <AnimatePresence>
-          {menuOpen && (
-            <motion.nav
-              initial={{ x: "100%" }}
-              animate={{ x: 0 }}
-              exit={{ x: "100%" }}
-              transition={{ duration: 0.3 }}
-              className="fixed inset-0 bg-[#0D3B66] text-white flex flex-col justify-center items-center z-50 space-y-5"
-            >
-              <button
-                onClick={() => setMenuOpen(false)}
-                className="absolute top-4 right-5 text-2xl"
-              >
-                <FaTimes />
-              </button>
-
-              {/* BOTÓN CONSTRUCCIÓN dentro del menú móvil */}
-              <NavLink
-                to="/construccion"
-                onClick={() => setMenuOpen(false)}
-                className="py-2 px-6 text-base font-semibold rounded-full bg-[#C1121F] hover:bg-[#A10E1A] animate-pulseLight"
-              >
-                🚧 Construcción
-              </NavLink>
-
-              {visibleLinks.map((link) => (
-                <NavLink
-                  key={link.to}
-                  to={link.to}
-                  onClick={() => setMenuOpen(false)}
-                  className={({ isActive }) =>
-                    `block text-lg font-semibold px-4 py-2 rounded-lg transition ${
-                      isActive
-                        ? "bg-[#C1121F] text-white"
-                        : "text-white hover:bg-white/20"
-                    }`
-                  }
-                >
-                  {link.label}
-                </NavLink>
-              ))}
-            </motion.nav>
-          )}
-        </AnimatePresence>
       </header>
 
-      {/* === RUTAS CON ANIMACIÓN === */}
+      {/* === SIDEBAR MÓVIL === */}
+      <AnimatePresence>
+        {menuOpen && (
+          <>
+            {/* FONDO CON BLUR ELEGANTE */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.25 }}
+              onClick={() => setMenuOpen(false)}
+              className="fixed inset-0 z-40 bg-black/30 backdrop-blur-md"
+            />
+
+            {/* PANEL LATERAL */}
+            <motion.aside
+              initial={{ x: "-100%" }}
+              animate={{ x: 0 }}
+              exit={{ x: "-100%" }}
+              transition={{ duration: 0.3 }}
+              className="fixed left-0 top-0 h-full w-64 bg-[#0D3B66]/95 text-white z-50 
+                         flex flex-col justify-between shadow-2xl backdrop-blur-lg border-r border-white/10"
+            >
+              <div>
+                {/* CABECERA */}
+                <div className="flex items-center justify-between px-5 py-4 border-b border-white/10">
+                  <h1 className="text-2xl font-bold">
+                    TCT <span className="text-[#FFD700]">Services</span>
+                  </h1>
+                  <button
+                    onClick={() => setMenuOpen(false)}
+                    className="text-white text-xl"
+                  >
+                    <FaTimes />
+                  </button>
+                </div>
+
+                {/* BOTÓN CONSTRUCCIÓN */}
+                <NavLink
+                  to="/construccion"
+                  onClick={() => setMenuOpen(false)}
+                  className="flex items-center justify-center gap-2 mx-4 mt-5 mb-3 py-2.5 
+                             rounded-xl bg-[#C1121F] text-sm font-semibold shadow-md 
+                             hover:bg-[#A10E1A] transition animate-pulseLight"
+                >
+                  🚧 Construcción
+                </NavLink>
+
+                {/* ENLACES */}
+                <nav className="flex flex-col gap-1 mt-2">
+                  {visibleLinks.map((link) => (
+                    <NavLink
+                      key={link.to}
+                      to={link.to}
+                      onClick={() => setMenuOpen(false)}
+                      className={({ isActive }) =>
+                        `flex items-center gap-3 px-5 py-2 rounded-lg transition ${
+                          isActive
+                            ? "bg-[#C1121F] text-white"
+                            : "text-gray-200 hover:bg-white/10"
+                        }`
+                      }
+                    >
+                      {link.icon}
+                      {link.label}
+                    </NavLink>
+                  ))}
+                </nav>
+              </div>
+
+              {/* PIE */}
+              <div className="text-center py-3 text-xs text-gray-300 border-t border-white/10">
+                © {new Date().getFullYear()} TCT Services
+              </div>
+            </motion.aside>
+          </>
+        )}
+      </AnimatePresence>
+
+      {/* === CONTENIDO PRINCIPAL === */}
       <main className="flex-1">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -177,7 +200,7 @@ export default function App() {
   );
 }
 
-/* === Página genérica temporal === */
+/* Página temporal */
 function Page({ title }) {
   return (
     <div className="max-w-7xl mx-auto px-4 py-16 text-center">

@@ -1,5 +1,4 @@
-// ...existing code...
-import React, { useMemo, useState, useEffect } from "react";
+import React, { useMemo, useState, useEffect, useRef } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 
 const BASE = import.meta.env.BASE_URL;
@@ -17,7 +16,7 @@ const CATEGORIAS = [
   { id: "domotica", label: "Automatización / Casa Inteligente" },
 ];
 
-// Reseña llamativa por categoría + subcategorías
+// Información por categoría
 const CATEGORIA_INFO = {
   parking: {
     titulo: "Parking que cobra solo, fluye solo y reporta todo",
@@ -63,41 +62,21 @@ const CATEGORIA_INFO = {
   },
 };
 
-// Datos (agrega subcat)
+// Datos
 const items = [
-  // PARKING
   { id:"parking-sw-01", titulo:"Software de manejo de parking", categorias:["parking"], subcat:"Software", fecha:"2024-06-10", ubicacion:"Panamá", src: srcPath("Sistema_de_parking.jpg") },
   { id:"parking-bar-01", titulo:"Barreras de control vehicular", categorias:["parking"], subcat:"Barreras", fecha:"2024-06-10", ubicacion:"Panamá", src: srcPath("Barreras.png") },
   { id:"parking-tiq-01", titulo:"Tiqueteras y receptoras", categorias:["parking"], subcat:"Tiqueteras", fecha:"2024-06-10", ubicacion:"Panamá", src: srcPath("Tiquetera.png") },
   { id:"parking-cob-01", titulo:"Estación de cobro", categorias:["parking"], subcat:"Cobro", fecha:"2024-06-10", ubicacion:"Panamá", src: srcPath("Estacion_de_cobro.png") },
-
-  // ACCESO
   { id:"acceso-lect-03", titulo:"Tipos de lectoras", categorias:["acceso"], subcat:"Lectoras", fecha:"2024-03-02", ubicacion:"Panamá", src: srcPath("Control_de_acceso.png") },
   { id:"acceso-con-04", titulo:"Control con controladora y software", categorias:["acceso"], subcat:"Controladoras", fecha:"2024-03-02", ubicacion:"Panamá", src: srcPath("Integracion_de_control_de_acceso.png") },
-
-  // MARCACIÓN
   { id:"marc-01", titulo:"Reloj biométrico con app", categorias:["marcacion"], subcat:"Biométrico", fecha:"2024-05-20", ubicacion:"Panamá", src: srcPath("marcacion_biometrico_app.png") },
   { id:"marc-02", titulo:"Marcación QR para visitantes", categorias:["marcacion"], subcat:"QR", fecha:"2024-06-02", ubicacion:"Costa del Este", src: srcPath("marcacion_qr.png") },
   { id:"marc-03", titulo:"Integración nómina y reportes", categorias:["marcacion"], subcat:"Reportes", fecha:"2024-03-28", ubicacion:"Clayton", src: srcPath("marcacion_reportes.png") },
-
-  // CCTV
   { id:"cctv-01", titulo:"Sistema CCTV IP 4K con NVR", categorias:["cctv"], subcat:"IP 4K", fecha:"2024-04-20", ubicacion:"Ciudad de Panamá", src: srcPath("cctv_ip_4k.png") },
   { id:"cctv-02", titulo:"Monitoreo remoto con aplicación móvil", categorias:["cctv"], subcat:"App Móvil", fecha:"2024-05-10", ubicacion:"Costa del Este", src: srcPath("cctv_app_movil.png") },
   { id:"cctv-04", titulo:"Videovigilancia perimetral con analítica", categorias:["cctv"], subcat:"Perimetral", fecha:"2024-07-08", ubicacion:"Clayton", src: srcPath("cctv_perimetral_analitica.png") },
   { id:"cctv-06", titulo:"Integración CCTV con control de acceso", categorias:["cctv"], subcat:"Integración", fecha:"2024-08-15", ubicacion:"San Francisco", src: srcPath("cctv_integracion_acceso.png") },
-
-  // INCENDIO
-  { id:"fire-01", titulo:"Alarma de incendio direccionable", categorias:["incendio"], subcat:"Direccionable", fecha:"2024-04-05", ubicacion:"Ciudad de Panamá", src: srcPath("incendio_direccionable.png") },
-  { id:"fire-02", titulo:"Detectores, estrobos y sirenas", categorias:["incendio"], subcat:"Dispositivos", fecha:"2024-04-18", ubicacion:"Costa del Este", src: srcPath("incendio_detectores_sirenas.png") },
-
-  // ROBO
-  { id:"robo-01", titulo:"Alarma con sensores perimetrales", categorias:["robo"], subcat:"Perímetro", fecha:"2024-03-15", ubicacion:"Ciudad de Panamá", src: srcPath("robo_sensores_perimetrales.png") },
-  { id:"robo-02", titulo:"Instalación de cerco eléctrico", categorias:["robo"], subcat:"Sensores", fecha:"2024-04-04", ubicacion:"Costa del Este", src: srcPath("robo_zonas_particiones.png") },
-
-  // DOMÓTICA
-  { id:"smarthome-01", titulo:"Escenas de iluminación y clima", categorias:["domotica"], subcat:"Escenas", fecha:"2024-07-11", ubicacion:"San Francisco", src: srcPath("domotica_escenas.jpeg") },
-  { id:"smarthome-02", titulo:"Cerraduras inteligentes y voz", categorias:["domotica"], subcat:"Cerraduras", fecha:"2024-08-05", ubicacion:"Brisas del Golf", src: srcPath("domotica_cerraduras.jpg") },
-  { id:"smarthome-03", titulo:"Control total desde el teléfono", categorias:["domotica"], subcat:"Control Total", fecha:"2024-08-05", ubicacion:"Brisas del Golf", src: srcPath("casa_inteligente.png") },
 ];
 
 function classNames(...c) {
@@ -106,31 +85,26 @@ function classNames(...c) {
 
 export default function PortfolioGaleria() {
   const [searchParams, setSearchParams] = useSearchParams();
-  const initialCat = searchParams.get("cat") || "todas";
-  const initialSub = searchParams.get("sub") || "todas";
-
-  const [cat, setCat] = useState(initialCat);
-  const [sub, setSub] = useState(initialSub);
+  const [cat, setCat] = useState(searchParams.get("cat") || "todas");
+  const [sub, setSub] = useState(searchParams.get("sub") || "todas");
   const [q, setQ] = useState("");
   const [orden, setOrden] = useState("recientes");
   const [scrollY, setScrollY] = useState(0);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const scrollRef = useRef(null);
 
   useEffect(() => {
     const handleScroll = () => setScrollY(window.scrollY);
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
-  }, []); 
+  }, []);
 
-  // reset sub al cambiar cat (mantener si la query indica otra cosa no deseada)
-  useEffect(() => {
-    setSub("todas");
-  }, [cat]);
+  useEffect(() => setSub("todas"), [cat]);
 
-  // sync querystring con cat y sub usando router
   useEffect(() => {
     const params = {};
-    if (cat && cat !== "todas") params.cat = cat;
-    if (sub && sub !== "todas") params.sub = sub;
+    if (cat !== "todas") params.cat = cat;
+    if (sub !== "todas") params.sub = sub;
     setSearchParams(params, { replace: true });
   }, [cat, sub, setSearchParams]);
 
@@ -146,32 +120,37 @@ export default function PortfolioGaleria() {
     return arr;
   }, [cat, sub, q, orden]);
 
-  const info = CATEGORIA_INFO[cat];
+  // === Rotación automática y scroll ===
+  useEffect(() => {
+    if (window.innerWidth >= 768) return;
+    const interval = setInterval(() => {
+      setCurrentIndex((prev) => (prev + 1) % data.length);
+    }, 30000);
+    return () => clearInterval(interval);
+  }, [data.length]);
 
-  const makeSafeMessage = (text) => encodeURIComponent(String(text).replace(/\s+/g, " ").trim());
+  useEffect(() => {
+    const container = scrollRef.current;
+    if (container && window.innerWidth < 768) {
+      const item = container.children[currentIndex];
+      if (item) item.scrollIntoView({ behavior: "smooth", inline: "center" });
+    }
+  }, [currentIndex]);
+
+  const info = CATEGORIA_INFO[cat];
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Header con selector de categoría */}
+      {/* Cabecera */}
       <header
-        className={`sticky top-0 z-30 transition-all duration-1000 backdrop-blur ${
-          scrollY > 10
-            ? "bg-white/0 opacity-0 pointer-events-none"
-            : "bg-white/70 opacity-80 border-b border-gray-200"
+        className={`sticky top-0 z-30 transition-all duration-700 backdrop-blur ${
+          scrollY > 10 ? "opacity-0 pointer-events-none" : "bg-white/70 border-b border-gray-200"
         }`}
       >
-        <div className="max-w-7xl mx-auto px-4 py-4 flex flex-col gap-3 md:flex-row md:items-center md:justify-between transition-all duration-500">
-          <div>
-            <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-[#1A1A1A]">
-              {cat === "todas"
-                ? "Elige un servicio"
-                : CATEGORIAS.find((c) => c.id === cat)?.label}
-            </h1>
-            <p className="text-sm md:text-base text-[#2C3E50]">
-              Tecnología que protege, controla y automatiza tu mundo.
-            </p>
-          </div>
-
+        <div className="max-w-7xl mx-auto px-4 py-4 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+          <h1 className="text-2xl md:text-3xl font-bold text-[#1A1A1A]">
+            {cat === "todas" ? "Elige un servicio" : CATEGORIAS.find((c) => c.id === cat)?.label}
+          </h1>
           <div className="flex flex-wrap gap-2">
             {CATEGORIAS.map((c) => (
               <button
@@ -181,61 +160,30 @@ export default function PortfolioGaleria() {
                   "px-3 py-1.5 rounded-full text-sm border transition-all",
                   cat === c.id
                     ? "bg-[#C1121F] text-white border-[#C1121F]"
-                    : "bg-white/70 text-[#2C3E50] hover:bg-white/90 border-[#BDC3C7]"
+                    : "bg-white text-[#2C3E50] hover:bg-gray-100 border-[#BDC3C7]"
                 )}
-                aria-pressed={cat === c.id}
               >
                 {c.label}
               </button>
             ))}
           </div>
-
-          <div className="flex gap-2">
-            <input
-              type="search"
-              placeholder="Buscar proyecto o ubicación"
-              value={q}
-              onChange={(e) => setQ(e.target.value)}
-              className="w-64 px-3 py-2 rounded-xl border border-[#BDC3C7] focus:outline-none focus:ring-2 focus:ring-[#0D3B66]"
-              aria-label="Buscar proyectos o ubicaciones"
-            />
-            <select
-              value={orden}
-              onChange={(e) => setOrden(e.target.value)}
-              className="px-3 py-2 rounded-xl border border-[#BDC3C7] text-sm"
-              aria-label="Orden"
-            >
-              <option value="recientes">Más recientes</option>
-              <option value="antiguos">Más antiguos</option>
-            </select>
-          </div>
         </div>
       </header>
 
-      {/* Reseña llamativa + subcategorías */}
+      {/* Subcategorías */}
       {cat !== "todas" && info && (
         <section className="bg-[#0D3B66] text-white">
           <div className="max-w-7xl mx-auto px-4 py-6">
             <h2 className="text-2xl md:text-3xl font-extrabold">{info.titulo}</h2>
             <p className="mt-2 text-white/90">{info.texto}</p>
-
             <div className="mt-4 flex flex-wrap gap-2">
-              <button
-                onClick={() => setSub("todas")}
-                className={classNames(
-                  "px-3 py-1.5 rounded-full text-sm border",
-                  sub === "todas" ? "bg-white text-[#0D3B66] border-white" : "bg-[#0D3B66] text-white border-white/40 hover:bg-[#0B3259]"
-                )}
-              >
-                Todas
-              </button>
-              {info.subcats.map((s) => (
+              {["todas", ...info.subcats].map((s) => (
                 <button
                   key={s}
                   onClick={() => setSub(s)}
                   className={classNames(
                     "px-3 py-1.5 rounded-full text-sm border",
-                    sub === s ? "bg-white text-[#0D3B66] border-white" : "bg-[#0D3B66] text-white border-white/40 hover:bg-[#0B3259]"
+                    sub === s ? "bg-white text-[#0D3B66]" : "bg-transparent text-white border-white/50 hover:bg-[#0B3259]"
                   )}
                 >
                   {s}
@@ -246,36 +194,29 @@ export default function PortfolioGaleria() {
         </section>
       )}
 
-      {/* Grid de items */}
+      {/* Galería adaptable */}
       <main className="max-w-7xl mx-auto px-4 py-8">
         {data.length === 0 ? (
           <p className="text-center text-[#2C3E50]">Sin resultados.</p>
         ) : (
-          <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 py-2" aria-label="Galería de proyectos">
-            {data.map((it) => {
-              // fecha segura
-              const dateObj = new Date(it.fecha);
-              const fechaTexto = isNaN(dateObj.getTime()) ? it.fecha : dateObj.toLocaleDateString();
-
-              const msg = `Hola, estoy interesado en: ${it.titulo} (${it.subcat || "General"})`;
-              return (
-                <li key={it.id} className="rounded-2xl overflow-hidden border border-gray-200 shadow-md bg-white hover:shadow-lg transition-all">
+          <>
+            <ul
+              ref={scrollRef}
+              className="flex md:grid overflow-x-auto md:overflow-visible md:grid-cols-3 snap-x snap-mandatory gap-6 scrollbar-hide scroll-smooth"
+            >
+              {data.map((it) => (
+                <li
+                  key={it.id}
+                  className="flex-shrink-0 w-72 md:w-auto snap-center rounded-2xl overflow-hidden border border-gray-200 shadow-md bg-white hover:shadow-lg transition-all"
+                >
                   <figure className="flex flex-col h-full">
-                    <img
-                      src={it.src}
-                      alt={it.titulo}
-                      className="w-full h-56 object-cover"
-                      loading="lazy"
-                      onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = `${BASE}images/placeholder.png`; }}
-                    />
+                    <img src={it.src} alt={it.titulo} className="w-full h-56 object-cover" loading="lazy" />
                     <figcaption className="p-4 flex flex-col gap-2 flex-grow">
                       <h3 className="font-semibold text-[#1A1A1A] text-base md:text-lg">{it.titulo}</h3>
-                      <p className="text-xs text-[#2C3E50] opacity-80">
-                        {it.subcat ? `${it.subcat} • ` : ""}{it.ubicacion} • {fechaTexto}
-                      </p>
+                      <p className="text-xs text-[#2C3E50] opacity-80">{it.subcat} • {it.ubicacion}</p>
                       <div className="mt-auto">
                         <Link
-                          to={`/cotizador?mensaje=${makeSafeMessage(msg)}`}
+                          to={`/cotizador?mensaje=${encodeURIComponent(`Hola, estoy interesado en: ${it.titulo}`)}`}
                           className="px-3 py-1.5 text-xs font-semibold rounded-full bg-[#C1121F] text-white hover:bg-[#A10E1A]"
                         >
                           Cotizar
@@ -284,18 +225,23 @@ export default function PortfolioGaleria() {
                     </figcaption>
                   </figure>
                 </li>
-              );
-            })}
-          </ul>
+              ))}
+            </ul>
+
+            {/* Indicadores */}
+            <div className="flex justify-center mt-6 gap-2 md:hidden">
+              {data.map((_, i) => (
+                <div
+                  key={i}
+                  className={`w-2.5 h-2.5 rounded-full transition ${
+                    i === currentIndex ? "bg-[#C1121F]" : "bg-gray-300"
+                  }`}
+                />
+              ))}
+            </div>
+          </>
         )}
       </main>
-
-      <footer className="max-w-7xl mx-auto px-4 pb-12 text-center">
-        <Link to="/cotizador" className="inline-block mt-6 px-6 py-3 rounded-2xl bg-[#0D3B66] text-white font-semibold hover:bg-[#1B4F72]">
-          ¿Proyecto similar? Hablemos
-        </Link>
-      </footer>
     </div>
   );
 }
-// ...existing code...

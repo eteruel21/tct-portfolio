@@ -13,7 +13,8 @@ const proyectos = [
   { id: 6, titulo: "Construcción de piscina", tipo: "imagen", src: `${BASE}images/obra6.jpg`, ubicacion: "Capira, Panamá Oeste" },
   { id: 7, titulo: "Verjas con diseño", tipo: "imagen", src: `${BASE}images/obra7.jpg`, ubicacion: "Burunga, Panamá Oeste" },
   { id: 8, titulo: "La mejor expericia en estructura", tipo: "video", src: `${BASE}videos/obra8.mp4`, ubicacion: "Villa Las Fuentes, Panamá" },
-  { id: 9, titulo: "---", tipo: "video", src: "---", ubicacion: "---" },
+  { id: 9, titulo: "Siempre con la mejor efisiciencia", tipo: "imagen", src: `${BASE}images/obra9.jpg`, ubicacion: "San Miguelito, Panamá" },
+  { id: 10, titulo: "Diseño en interior de sala", tipo: "video", src: `${BASE}videos/obra10.mp4`, ubicacion: "Urbanización El Bosque, Panamá" },
 ];
 
 export default function Construccion() {
@@ -38,7 +39,7 @@ export default function Construccion() {
     <section className="min-h-screen text-white relative">
       {/* === Encabezado === */}
       <div
-        className="relative flex flex-col items-center justify-center min-h-[80vh] text-center"
+        className="relative flex flex-col items-center justify-center min-h-[70vh] text-center"
         style={{
           backgroundImage: `url(${BASE}images/fondo_construccion.jpg)`,
           backgroundSize: "cover",
