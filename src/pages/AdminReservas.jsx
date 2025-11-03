@@ -1,16 +1,19 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { FaSearch, FaTrashAlt, FaCalendarCheck } from "react-icons/fa";
+import { FaSearch, FaTrashAlt, FaCalendarCheck, FaFileExcel } from "react-icons/fa";
+import * as XLSX from "xlsx";
 
 export default function AdminReservas() {
   const [reservas, setReservas] = useState([]);
   const [busqueda, setBusqueda] = useState("");
+  const [filtroFecha, setFiltroFecha] = useState("");
   const [clave, setClave] = useState("");
   const [acceso, setAcceso] = useState(false);
   const [cargando, setCargando] = useState(false);
 
-  const CLAVE_ADMIN = "tctadmin2025"; // 🔒 cambia esta clave para tu acceso
+  const CLAVE_ADMIN = "tctadmin2025"; // 🔒 cambia esta clave según tu preferencia
 
+  // --- Obtener reservas desde el backend ---
   const obtenerReservas = async () => {
     try {
       setCargando(true);
@@ -25,6 +28,7 @@ export default function AdminReservas() {
     }
   };
 
+  // --- Eliminar una reserva ---
   const eliminarReserva = async (codigo) => {
     if (!window.confirm(`¿Eliminar reserva ${codigo}?`)) return;
     try {
@@ -40,17 +44,34 @@ export default function AdminReservas() {
     }
   };
 
-  const reservasFiltradas = reservas.filter(
-    (r) =>
+  // --- Filtrar resultados ---
+  const reservasFiltradas = reservas.filter((r) => {
+    const coincideBusqueda =
       r.nombre?.toLowerCase().includes(busqueda.toLowerCase()) ||
       r.email?.toLowerCase().includes(busqueda.toLowerCase()) ||
-      r.codigo?.toLowerCase().includes(busqueda.toLowerCase())
-  );
+      r.codigo?.toLowerCase().includes(busqueda.toLowerCase());
+    const coincideFecha = filtroFecha ? r.fecha === filtroFecha : true;
+    return coincideBusqueda && coincideFecha;
+  });
+
+  // --- Exportar a Excel ---
+  const exportarExcel = () => {
+    if (reservasFiltradas.length === 0) {
+      alert("No hay datos para exportar.");
+      return;
+    }
+
+    const hoja = XLSX.utils.json_to_sheet(reservasFiltradas);
+    const libro = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(libro, hoja, "Reservas");
+    XLSX.writeFile(libro, "Reservas_TCT_Services.xlsx");
+  };
 
   useEffect(() => {
     if (acceso) obtenerReservas();
   }, [acceso]);
 
+  // --- Pantalla de autenticación ---
   if (!acceso) {
     return (
       <section className="min-h-screen bg-[#0D3B66] flex flex-col items-center justify-center text-white">
@@ -82,28 +103,47 @@ export default function AdminReservas() {
     );
   }
 
+  // --- Panel de reservas ---
   return (
     <section className="min-h-screen bg-gradient-to-b from-[#0D3B66] to-[#1B4F72] text-white p-6">
       <motion.div
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
-        className="max-w-5xl mx-auto bg-white/10 backdrop-blur-lg rounded-3xl shadow-xl p-8"
+        className="max-w-6xl mx-auto bg-white/10 backdrop-blur-lg rounded-3xl shadow-xl p-8"
       >
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
-          <h1 className="text-3xl font-bold mb-4 md:mb-0">Reservas registradas</h1>
+        {/* Encabezado */}
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6 gap-4">
+          <h1 className="text-3xl font-bold">Reservas registradas</h1>
 
-          <div className="flex items-center gap-2 bg-white/20 rounded-xl px-3 py-2 w-full md:w-80">
-            <FaSearch className="text-white opacity-70" />
+          <div className="flex flex-wrap gap-3 justify-center md:justify-end">
+            <div className="flex items-center gap-2 bg-white/20 rounded-xl px-3 py-2 w-64">
+              <FaSearch className="text-white opacity-70" />
+              <input
+                type="text"
+                placeholder="Buscar nombre o código"
+                value={busqueda}
+                onChange={(e) => setBusqueda(e.target.value)}
+                className="flex-1 bg-transparent outline-none text-white placeholder-gray-300"
+              />
+            </div>
+
             <input
-              type="text"
-              placeholder="Buscar por nombre o código"
-              value={busqueda}
-              onChange={(e) => setBusqueda(e.target.value)}
-              className="flex-1 bg-transparent outline-none text-white placeholder-gray-300"
+              type="date"
+              value={filtroFecha}
+              onChange={(e) => setFiltroFecha(e.target.value)}
+              className="px-3 py-2 rounded-xl text-black"
             />
+
+            <button
+              onClick={exportarExcel}
+              className="flex items-center gap-2 bg-[#1D8348] hover:bg-[#239B56] px-4 py-2 rounded-xl font-semibold text-white"
+            >
+              <FaFileExcel /> Exportar
+            </button>
           </div>
         </div>
 
+        {/* Tabla de reservas */}
         {cargando ? (
           <p className="text-center text-gray-300">Cargando reservas...</p>
         ) : reservasFiltradas.length === 0 ? (
@@ -119,7 +159,7 @@ export default function AdminReservas() {
                   <th className="py-3 px-4">Teléfono</th>
                   <th className="py-3 px-4">Fecha</th>
                   <th className="py-3 px-4">Hora</th>
-                  <th className="py-3 px-4">Acción</th>
+                  <th className="py-3 px-4 text-right">Acción</th>
                 </tr>
               </thead>
               <tbody>
