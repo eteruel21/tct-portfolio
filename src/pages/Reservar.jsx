@@ -5,48 +5,57 @@ import { FaCalendarAlt, FaCheckCircle } from "react-icons/fa";
 export default function Reservar() {
   const [form, setForm] = useState({
     nombre: "",
+    email: "",
     telefono: "",
     fecha: "",
     hora: "",
   });
 
   const [codigo, setCodigo] = useState("");
-  const [reservas, setReservas] = useState(() =>
-    JSON.parse(localStorage.getItem("reservas") || "[]")
-  );
   const [confirmada, setConfirmada] = useState(false);
+  const [enviando, setEnviando] = useState(false);
 
   const horasDisponibles = Array.from({ length: 9 }, (_, i) => {
     const hora = 8 + i;
     return `${hora.toString().padStart(2, "0")}:00`;
   });
 
+  const generarCodigo = () =>
+    Math.random().toString(36).substring(2, 8).toUpperCase();
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setForm((f) => ({ ...f, [name]: value }));
   };
 
-  const generarCodigo = () =>
-    Math.random().toString(36).substring(2, 8).toUpperCase();
-
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const nuevoCodigo = generarCodigo();
-    const nuevaReserva = { ...form, codigo: nuevoCodigo };
-    const nuevas = [...reservas, nuevaReserva];
-    setReservas(nuevas);
-    localStorage.setItem("reservas", JSON.stringify(nuevas));
-    setCodigo(nuevoCodigo);
-    setConfirmada(true);
-    setForm({ nombre: "", telefono: "", fecha: "", hora: "" });
-  };
+    setEnviando(true);
 
-  const handleModificar = (code) => {
-    const reserva = reservas.find((r) => r.codigo === code);
-    if (!reserva) return alert("Código no encontrado.");
-    setForm(reserva);
-    setCodigo(code);
-    setConfirmada(false);
+    const nuevoCodigo = generarCodigo();
+    setCodigo(nuevoCodigo);
+
+    // Enviar correo con FormSubmit
+    try {
+      await fetch("https://formsubmit.co/ajax/contacto@tctservices-pty.com", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify({
+          ...form,
+          mensaje: `Nueva reserva confirmada:\n\nNombre: ${form.nombre}\nCorreo: ${form.email}\nTeléfono: ${form.telefono}\nFecha: ${form.fecha}\nHora: ${form.hora}\nCódigo: ${nuevoCodigo}`,
+        }),
+      });
+
+      setConfirmada(true);
+      setForm({ nombre: "", email: "", telefono: "", fecha: "", hora: "" });
+    } catch {
+      alert("Error al enviar. Verifica tu conexión o inténtalo más tarde.");
+    } finally {
+      setEnviando(false);
+    }
   };
 
   return (
@@ -75,30 +84,28 @@ export default function Reservar() {
               </h2>
               <p className="text-gray-100">
                 Tu código de reserva es:{" "}
-                <span className="font-mono text-[#FFD700] text-xl">{codigo}</span>
+                <span className="font-mono text-[#FFD700] text-xl">
+                  {codigo}
+                </span>
               </p>
               <p className="text-sm text-gray-300">
-                Guárdalo para modificar o cancelar tu cita.
+                Guarda este código para modificar o cancelar tu cita.
               </p>
+
               <button
                 onClick={() => setConfirmada(false)}
                 className="w-full py-3 bg-[#C1121F] rounded-xl hover:bg-[#A10E1A] font-semibold"
               >
                 Agendar otra cita
               </button>
-
-              <div className="pt-4 border-t border-white/20">
-                <h3 className="font-semibold mb-2">¿Modificar cita?</h3>
-                <CodigoBuscar onBuscar={handleModificar} />
-              </div>
             </motion.div>
           ) : (
             <motion.form
               key="formulario"
+              onSubmit={handleSubmit}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              onSubmit={handleSubmit}
               className="space-y-4 text-left"
             >
               <div>
@@ -106,6 +113,18 @@ export default function Reservar() {
                 <input
                   name="nombre"
                   value={form.nombre}
+                  onChange={handleChange}
+                  required
+                  className="w-full px-3 py-2 rounded-xl text-black"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold mb-1">Correo</label>
+                <input
+                  type="email"
+                  name="email"
+                  value={form.email}
                   onChange={handleChange}
                   required
                   className="w-full px-3 py-2 rounded-xl text-black"
@@ -156,35 +175,19 @@ export default function Reservar() {
 
               <button
                 type="submit"
-                className="w-full py-3 bg-[#FFD700] text-[#0D3B66] rounded-xl font-semibold hover:bg-[#e5c100]"
+                disabled={enviando}
+                className={`w-full py-3 rounded-xl font-semibold transition ${
+                  enviando
+                    ? "bg-gray-400 cursor-not-allowed"
+                    : "bg-[#FFD700] text-[#0D3B66] hover:bg-[#e5c100]"
+                }`}
               >
-                Confirmar cita
+                {enviando ? "Enviando..." : "Confirmar cita"}
               </button>
             </motion.form>
           )}
         </AnimatePresence>
       </motion.div>
     </section>
-  );
-}
-
-function CodigoBuscar({ onBuscar }) {
-  const [code, setCode] = useState("");
-  return (
-    <div className="space-y-2">
-      <input
-        type="text"
-        placeholder="Ingresa tu código"
-        value={code}
-        onChange={(e) => setCode(e.target.value.toUpperCase())}
-        className="w-full px-3 py-2 rounded-xl text-black text-center font-mono"
-      />
-      <button
-        onClick={() => onBuscar(code)}
-        className="w-full py-2 bg-[#FFD700] text-[#0D3B66] rounded-xl font-semibold hover:bg-[#e5c100]"
-      >
-        Modificar cita
-      </button>
-    </div>
   );
 }

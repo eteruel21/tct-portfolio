@@ -14,6 +14,7 @@ import Nosotros from "./pages/Nosotros.jsx";
 import Contacto from "./pages/Contacto.jsx";
 import FAQs from "./pages/FAQs.jsx";
 import Construccion from "./pages/Construccion.jsx";
+import Reservar from "./pages/Reservar.jsx";
 
 const links = [
   { to: "/", label: "Inicio", icon: <FaHome /> },
