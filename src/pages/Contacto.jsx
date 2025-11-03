@@ -20,6 +20,7 @@ export default function Contacto() {
     e.preventDefault();
     try {
         const data = new FormData();
+        console.log(formData);
         Object.entries(formData).forEach(([key, value]) => data.append(key, value));
         data.append("_captcha", "false"); // sin verificación
         data.append("_template", "box"); // diseño más bonito del correo
