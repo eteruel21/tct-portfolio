@@ -16,36 +16,33 @@ export default function Reservar() {
   const [reservaActiva, setReservaActiva] = useState(null);
   const [codigoBusqueda, setCodigoBusqueda] = useState("");
   const [enviando, setEnviando] = useState(false);
+  const [horasDisponibles, setHorasDisponibles] = useState([]);
+  const [ocupadas, setOcupadas] = useState([]);
+  const [cargando, setCargando] = useState(false);
 
-  const horasDisponibles = Array.from({ length: 10 }, (_, i) =>
+  // === Horas disponibles (8:00–17:00) ===
+  const todasLasHoras = Array.from({ length: 10 }, (_, i) =>
     `${(8 + i).toString().padStart(2, "0")}:00`
   );
 
-  const esDiaPermitido = (fecha) => {
-    const dia = new Date(fecha).getDay(); // 0 = domingo, 6 = sábado
-    return dia >= 1 && dia <= 6; // lunes - sábado
-  };
   const generarCodigo = () => Math.random().toString(36).substring(2, 8).toUpperCase();
 
-  const handleFechaChange = (e) => {
-    const valor = e.target.value;
-    if (esDiaPermitido(valor)) {
-      setForm((f) => ({ ...f, fecha: valor }));
-    } else {
-      alert("Solo se permiten reservas de lunes a sábado.");
-    } 
+  // === Validar que la fecha sea lunes–sábado ===
+  const esDiaPermitido = (fecha) => {
+    const dia = new Date(fecha).getDay(); // 0=domingo, 6=sábado
+    return dia >= 1 && dia <= 6;
   };
 
-  // ✅ Buscar reserva existente en la base Cloudflare D1
+  // === Buscar reserva existente ===
   const buscarReserva = async () => {
     try {
       const res = await fetch(`/api/reservas?codigo=${codigoBusqueda.toUpperCase()}`);
       const data = await res.json();
-
       if (data && data.codigo) {
         setReservaActiva(data);
         setForm(data);
         setModo("editar");
+        cargarDisponibilidad(data.fecha);
       } else {
         alert("Código no encontrado.");
       }
@@ -55,7 +52,7 @@ export default function Reservar() {
     }
   };
 
-  // ✅ Cancelar reserva
+  // === Cancelar reserva ===
   const cancelarReserva = async () => {
     if (!reservaActiva) return;
     try {
@@ -74,15 +71,64 @@ export default function Reservar() {
     }
   };
 
+  // === Cargar disponibilidad según fecha ===
+  const cargarDisponibilidad = async (fecha) => {
+    if (!fecha) return;
+    setCargando(true);
+    try {
+      const res = await fetch(`/api/disponibilidad?fecha=${fecha}`);
+      const data = await res.json(); // { ocupadas: ["09:00","13:00"] }
+      setOcupadas(data.ocupadas || []);
+      const libres = todasLasHoras.filter((h) => !data.ocupadas?.includes(h));
+      setHorasDisponibles(libres);
+    } catch (err) {
+      console.error("Error al cargar disponibilidad:", err);
+      alert("No se pudo obtener la disponibilidad.");
+    } finally {
+      setCargando(false);
+    }
+  };
+
+  // === Manejar cambios en los inputs ===
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+
+    // Validar domingos
+    if (name === "fecha") {
+      const dia = new Date(value).getDay();
+      if (dia === 0) {
+        alert("No se pueden agendar citas los domingos.");
+        setForm((f) => ({ ...f, fecha: "" }));
+        return;
+      }
+      setForm((f) => ({ ...f, fecha: value }));
+      cargarDisponibilidad(value);
+    } else {
+      setForm((f) => ({ ...f, [name]: value }));
+    }
+  };
+
+  // === Confirmar datos antes de enviar ===
   const handleSubmit = (e) => {
     e.preventDefault();
+    if (!form.fecha || new Date(form.fecha).getDay() === 0) {
+      alert("No se pueden registrar citas los domingos.");
+      return;
+    }
     setModo("revisar");
   };
 
-  // ✅ Enviar reserva a la API (Cloudflare D1)
+  // === Enviar reserva a Cloudflare D1 ===
   const enviarReserva = async () => {
     setEnviando(true);
     const nuevoCodigo = reservaActiva?.codigo || generarCodigo();
+
+    // Verificar otra vez que no sea domingo
+    if (new Date(form.fecha).getDay() === 0) {
+      alert("No se pueden registrar citas los domingos.");
+      setEnviando(false);
+      return;
+    }
 
     const nuevaReserva = {
       nombre: form.nombre,
@@ -193,6 +239,7 @@ export default function Reservar() {
                 </div>
               ))}
 
+              {/* Campo de fecha con bloqueo de domingos */}
               <div>
                 <label className="block text-sm font-semibold mb-1">Fecha</label>
                 <input
@@ -213,13 +260,21 @@ export default function Reservar() {
                   value={form.hora}
                   onChange={handleChange}
                   required
+                  disabled={cargando || !form.fecha}
                   className="w-full px-3 py-2 rounded-xl text-black"
                 >
-                  <option value="">Seleccionar hora</option>
+                  <option value="">
+                    {cargando ? "Cargando..." : "Seleccionar hora"}
+                  </option>
                   {horasDisponibles.map((h) => (
                     <option key={h}>{h}</option>
                   ))}
                 </select>
+                {ocupadas.length > 0 && (
+                  <p className="text-xs text-gray-300 mt-1">
+                    Horas no disponibles: {ocupadas.join(", ")}
+                  </p>
+                )}
               </div>
 
               <div className="flex gap-2">
