@@ -1,0 +1,7 @@
+name = "tct-portfolio"
+pages_build_output_dir = "./dist"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "tct_reservas"
+database_id = "<AQUÍ_PONES_EL_ID_DE_TU_BD>"
