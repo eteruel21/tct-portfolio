@@ -1,9 +1,8 @@
-export async function onRequestPost({ request, env }) {
+﻿export async function onRequestPost({ request, env }) {
   try {
     const data = await request.json();
     const { nombre, email, telefono, fecha, hora } = data;
 
-    // Validación básica
     if (!nombre || !email || !fecha || !hora) {
       return new Response(
         JSON.stringify({ ok: false, error: "Faltan datos requeridos" }),
@@ -11,10 +10,8 @@ export async function onRequestPost({ request, env }) {
       );
     }
 
-    // Generar código aleatorio
     const codigo = Math.random().toString(36).substring(2, 8).toUpperCase();
 
-    // Guardar en la base D1
     await env.DB.prepare(
       "INSERT INTO reservas (nombre, email, telefono, fecha, hora, codigo) VALUES (?, ?, ?, ?, ?, ?)"
     ).bind(nombre, email, telefono, fecha, hora, codigo).run();
