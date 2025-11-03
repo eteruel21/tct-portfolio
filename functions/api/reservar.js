@@ -1,6 +1,7 @@
-export async function onRequestPost({ request, env }) {
+export async function onRequestPost({ context }) {
+  const { DB } = context.env; 
   try {
-    const data = await request.json();
+    const data = await context.request.json();
     const { nombre, email, telefono, fecha, hora } = data;
 
     if (!nombre || !email || !fecha || !hora) {
@@ -12,10 +13,11 @@ export async function onRequestPost({ request, env }) {
 
     const codigo = Math.random().toString(36).substring(2, 8).toUpperCase();
 
-    await env.DB.prepare(
+    await DB.prepare(
       "INSERT INTO reservas (nombre, email, telefono, fecha, hora, codigo) VALUES (?, ?, ?, ?, ?, ?)"
     )
-      .bind(nombre, email, telefono, fecha, hora, codigo)
+      .bind(
+        data.nombre, data.email, data.telefono, data.fecha, data.hora, codigo)
       .run();
 
     return new Response(JSON.stringify({ ok: true, codigo }), {
