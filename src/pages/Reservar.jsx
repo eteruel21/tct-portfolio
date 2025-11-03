@@ -68,10 +68,10 @@ export default function Reservar() {
     localStorage.setItem("reservas", JSON.stringify(actualizadas));
 
     try {
-      const res = await fetch("/api/reservar", {
+      const res = await fetch(`${window.location.origin}/api/reservar`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...form, codigo: nuevoCodigo }),
+        body: JSON.stringify(formData),
       });
 
       if (!res.ok) throw new Error("Error al guardar en servidor");
