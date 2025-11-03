@@ -1,4 +1,3 @@
-// ...existing code...
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FaCalendarAlt, FaCheckCircle, FaTrashAlt } from "react-icons/fa";
@@ -28,27 +27,42 @@ export default function Reservar() {
     setForm((f) => ({ ...f, [name]: value }));
   };
 
-  const buscarReserva = () => {
-    const reservas = JSON.parse(localStorage.getItem("reservas") || "[]");
-    const encontrada = reservas.find((r) => r.codigo === codigoBusqueda.toUpperCase());
-    if (encontrada) {
-      setReservaActiva(encontrada);
-      setForm(encontrada);
-      setModo("editar");
-    } else {
-      alert("Código no encontrado.");
+  // ✅ Buscar reserva existente en la base Cloudflare D1
+  const buscarReserva = async () => {
+    try {
+      const res = await fetch(`/api/reservas?codigo=${codigoBusqueda.toUpperCase()}`);
+      const data = await res.json();
+
+      if (data && data.codigo) {
+        setReservaActiva(data);
+        setForm(data);
+        setModo("editar");
+      } else {
+        alert("Código no encontrado.");
+      }
+    } catch (err) {
+      console.error("Error al buscar reserva:", err);
+      alert("Error al buscar la reserva.");
     }
   };
 
-  const cancelarReserva = () => {
+  // ✅ Cancelar reserva
+  const cancelarReserva = async () => {
     if (!reservaActiva) return;
-    const reservas = JSON.parse(localStorage.getItem("reservas") || "[]");
-    const nuevas = reservas.filter((r) => r.codigo !== reservaActiva.codigo);
-    localStorage.setItem("reservas", JSON.stringify(nuevas));
-    setReservaActiva(null);
-    setCodigoBusqueda("");
-    setModo("nuevo");
-    alert("Reserva cancelada correctamente.");
+    try {
+      await fetch("/api/reservas", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ codigo: reservaActiva.codigo }),
+      });
+      alert("Reserva cancelada correctamente.");
+      setReservaActiva(null);
+      setCodigoBusqueda("");
+      setModo("nuevo");
+    } catch (err) {
+      console.error("Error al cancelar reserva:", err);
+      alert("No se pudo cancelar la reserva.");
+    }
   };
 
   const handleSubmit = (e) => {
@@ -56,48 +70,42 @@ export default function Reservar() {
     setModo("revisar");
   };
 
+  // ✅ Enviar reserva a la API (Cloudflare D1)
   const enviarReserva = async () => {
     setEnviando(true);
     const nuevoCodigo = reservaActiva?.codigo || generarCodigo();
-    const reservas = JSON.parse(localStorage.getItem("reservas") || "[]");
-    const nueva = { ...form, codigo: nuevoCodigo };
-    const actualizadas = reservaActiva
-      ? reservas.map((r) => (r.codigo === nuevoCodigo ? nueva : r))
-      : [...reservas, nueva];
-    localStorage.setItem("reservas", JSON.stringify(actualizadas));
+
+    const nuevaReserva = {
+      nombre: form.nombre,
+      email: form.email,
+      telefono: form.telefono,
+      fecha: form.fecha,
+      hora: form.hora,
+      codigo: nuevoCodigo,
+    };
 
     try {
-      const res = await fetch("/api/reservar", {
+      const res = await fetch("/api/reservas", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          nombre: form.nombre,
-          email: form.email,
-          telefono: form.telefono,
-          fecha: form.fecha,
-          hora: form.hora,
-          codigo: nuevoCodigo,
-        }),
+        body: JSON.stringify(nuevaReserva),
       });
 
-      if (!res.ok) {
-        const errText = await res.text().catch(() => null);
-        console.error("Error respuesta servidor:", res.status, errText);
-        throw new Error("Error en el envío al servidor");
-      }
+      if (!res.ok) throw new Error("Error en el envío al servidor");
 
       setCodigo(nuevoCodigo);
       setModo("confirmada");
       setReservaActiva(null);
       setForm({ nombre: "", email: "", telefono: "", fecha: "", hora: "" });
     } catch (err) {
-      console.error(err);
+      console.error("Error al enviar reserva:", err);
       alert("Error al enviar la reserva. Intenta nuevamente.");
     } finally {
       setEnviando(false);
     }
   };
 
+  // === INTERFAZ ===
   return (
     <section className="min-h-screen bg-gradient-to-b from-[#0D3B66] to-[#1B4F72] flex flex-col items-center justify-center text-white px-6 py-12">
       <motion.div
@@ -122,7 +130,12 @@ export default function Reservar() {
 
         <AnimatePresence mode="wait">
           {modo === "buscar" && (
-            <motion.div key="buscar" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+            <motion.div
+              key="buscar"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+            >
               <input
                 type="text"
                 placeholder="Ingresa tu código"
@@ -148,10 +161,18 @@ export default function Reservar() {
           )}
 
           {(modo === "nuevo" || modo === "editar") && (
-            <motion.form key="form" onSubmit={handleSubmit} initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4 text-left">
+            <motion.form
+              key="form"
+              onSubmit={handleSubmit}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="space-y-4 text-left"
+            >
               {["nombre", "email", "telefono"].map((c) => (
                 <div key={c}>
-                  <label className="block text-sm font-semibold mb-1 capitalize">{c}</label>
+                  <label className="block text-sm font-semibold mb-1 capitalize">
+                    {c}
+                  </label>
                   <input
                     type={c === "email" ? "email" : "text"}
                     name={c}
@@ -178,7 +199,13 @@ export default function Reservar() {
 
               <div>
                 <label className="block text-sm font-semibold mb-1">Hora</label>
-                <select name="hora" value={form.hora} onChange={handleChange} required className="w-full px-3 py-2 rounded-xl text-black">
+                <select
+                  name="hora"
+                  value={form.hora}
+                  onChange={handleChange}
+                  required
+                  className="w-full px-3 py-2 rounded-xl text-black"
+                >
                   <option value="">Seleccionar hora</option>
                   {horasDisponibles.map((h) => (
                     <option key={h}>{h}</option>
@@ -188,11 +215,18 @@ export default function Reservar() {
 
               <div className="flex gap-2">
                 {modo === "editar" && (
-                  <button type="button" onClick={cancelarReserva} className="flex-1 py-3 bg-red-500 rounded-xl font-semibold hover:bg-red-600">
+                  <button
+                    type="button"
+                    onClick={cancelarReserva}
+                    className="flex-1 py-3 bg-red-500 rounded-xl font-semibold hover:bg-red-600"
+                  >
                     <FaTrashAlt className="inline mr-1" /> Cancelar
                   </button>
                 )}
-                <button type="submit" className="flex-1 py-3 bg-[#FFD700] text-[#0D3B66] rounded-xl font-semibold hover:bg-[#e5c100]">
+                <button
+                  type="submit"
+                  className="flex-1 py-3 bg-[#FFD700] text-[#0D3B66] rounded-xl font-semibold hover:bg-[#e5c100]"
+                >
                   Continuar
                 </button>
               </div>
@@ -200,18 +234,36 @@ export default function Reservar() {
           )}
 
           {modo === "revisar" && (
-            <motion.div key="revisar" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-5 text-left">
-              <h3 className="text-xl font-semibold text-center mb-2">Confirmar datos de cita</h3>
+            <motion.div
+              key="revisar"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="space-y-5 text-left"
+            >
+              <h3 className="text-xl font-semibold text-center mb-2">
+                Confirmar datos de cita
+              </h3>
               {Object.entries(form).map(([k, v]) => (
                 <p key={k} className="text-gray-100">
                   <span className="font-bold capitalize">{k}:</span> {v}
                 </p>
               ))}
               <div className="flex gap-3 mt-4">
-                <button onClick={() => setModo(reservaActiva ? "editar" : "nuevo")} className="flex-1 py-3 bg-gray-300 text-black rounded-xl font-semibold hover:bg-gray-400">
+                <button
+                  onClick={() => setModo(reservaActiva ? "editar" : "nuevo")}
+                  className="flex-1 py-3 bg-gray-300 text-black rounded-xl font-semibold hover:bg-gray-400"
+                >
                   Editar
                 </button>
-                <button onClick={enviarReserva} disabled={enviando} className={`flex-1 py-3 rounded-xl font-semibold ${enviando ? "bg-gray-400 cursor-not-allowed" : "bg-[#C1121F] hover:bg-[#A10E1A]"}`}>
+                <button
+                  onClick={enviarReserva}
+                  disabled={enviando}
+                  className={`flex-1 py-3 rounded-xl font-semibold ${
+                    enviando
+                      ? "bg-gray-400 cursor-not-allowed"
+                      : "bg-[#C1121F] hover:bg-[#A10E1A]"
+                  }`}
+                >
                   {enviando ? "Enviando..." : "Confirmar"}
                 </button>
               </div>
@@ -219,14 +271,25 @@ export default function Reservar() {
           )}
 
           {modo === "confirmada" && (
-            <motion.div key="ok" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6 text-center">
+            <motion.div
+              key="ok"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="space-y-6 text-center"
+            >
               <FaCheckCircle className="text-green-400 text-6xl mx-auto" />
               <h2 className="text-xl font-semibold">¡Cita confirmada!</h2>
               <p className="text-gray-100">
-                Tu código de reserva: <span className="font-mono text-[#FFD700] text-xl">{codigo}</span>
+                Tu código de reserva:{" "}
+                <span className="font-mono text-[#FFD700] text-xl">{codigo}</span>
               </p>
-              <p className="text-sm text-gray-300">Guarda este código para modificar o cancelar más adelante.</p>
-              <button onClick={() => setModo("nuevo")} className="w-full py-3 bg-[#C1121F] rounded-xl hover:bg-[#A10E1A] font-semibold">
+              <p className="text-sm text-gray-300">
+                Guarda este código para modificar o cancelar más adelante.
+              </p>
+              <button
+                onClick={() => setModo("nuevo")}
+                className="w-full py-3 bg-[#C1121F] rounded-xl hover:bg-[#A10E1A] font-semibold"
+              >
                 Nueva reserva
               </button>
             </motion.div>
@@ -236,4 +299,3 @@ export default function Reservar() {
     </section>
   );
 }
-// ...existing code...
