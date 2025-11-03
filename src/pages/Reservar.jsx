@@ -10,15 +10,17 @@ export default function Reservar() {
     fecha: "",
     hora: "",
   });
-
   const [codigo, setCodigo] = useState("");
-  const [modo, setModo] = useState("nuevo"); // nuevo | revisar | confirmada | editar
+  const [modo, setModo] = useState("nuevo");
   const [reservaActiva, setReservaActiva] = useState(null);
   const [codigoBusqueda, setCodigoBusqueda] = useState("");
   const [enviando, setEnviando] = useState(false);
 
-  const horasDisponibles = Array.from({ length: 9 }, (_, i) => `${(8 + i).toString().padStart(2, "0")}:00`);
-  const generarCodigo = () => Math.random().toString(36).substring(2, 8).toUpperCase();
+  const horasDisponibles = Array.from({ length: 9 }, (_, i) =>
+    `${(8 + i).toString().padStart(2, "0")}:00`
+  );
+  const generarCodigo = () =>
+    Math.random().toString(36).substring(2, 8).toUpperCase();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -27,7 +29,9 @@ export default function Reservar() {
 
   const buscarReserva = () => {
     const reservas = JSON.parse(localStorage.getItem("reservas") || "[]");
-    const encontrada = reservas.find((r) => r.codigo === codigoBusqueda.toUpperCase());
+    const encontrada = reservas.find(
+      (r) => r.codigo === codigoBusqueda.toUpperCase()
+    );
     if (encontrada) {
       setReservaActiva(encontrada);
       setForm(encontrada);
@@ -53,43 +57,33 @@ export default function Reservar() {
   const enviarReserva = async () => {
     setEnviando(true);
     const nuevoCodigo = reservaActiva?.codigo || generarCodigo();
+
     const reservas = JSON.parse(localStorage.getItem("reservas") || "[]");
     const nueva = { ...form, codigo: nuevoCodigo };
+
     const actualizadas = reservaActiva
       ? reservas.map((r) => (r.codigo === nuevoCodigo ? nueva : r))
       : [...reservas, nueva];
+
     localStorage.setItem("reservas", JSON.stringify(actualizadas));
 
     try {
-      await fetch("https://formsubmit.co/ajax/contacto@tctservices-pty.com", {
+      const res = await fetch("/api/reservar", {
         method: "POST",
-        headers: { "Content-Type": "application/json", Accept: "application/json" },
-        body: JSON.stringify({
-          to: form.email,
-          subject: "Confirmación de cita - TCT Services",
-          message: `
-          Hola ${form.nombre},
-
-          Tu cita ha sido ${reservaActiva ? "modificada" : "confirmada"} exitosamente.
-
-          📅 Fecha: ${form.fecha}
-          🕓 Hora: ${form.hora}
-          📞 Teléfono: ${form.telefono}
-          🔢 Código de reserva: ${nuevoCodigo}
-
-          Guarda este código para modificar o cancelar tu cita más adelante.
-
-          — Equipo TCT Services
-          `,
-        }),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...form, codigo: nuevoCodigo }),
       });
 
-      setCodigo(nuevoCodigo);
+      if (!res.ok) throw new Error("Error al guardar en servidor");
+      const data = await res.json();
+
+      setCodigo(data.codigo || nuevoCodigo);
       setModo("confirmada");
       setReservaActiva(null);
       setForm({ nombre: "", email: "", telefono: "", fecha: "", hora: "" });
-    } catch {
-      alert("Error al enviar correo.");
+    } catch (err) {
+      console.error(err);
+      alert("Error al enviar la reserva. Inténtalo nuevamente.");
     } finally {
       setEnviando(false);
     }
@@ -270,7 +264,9 @@ export default function Reservar() {
               <h2 className="text-xl font-semibold">¡Cita confirmada!</h2>
               <p className="text-gray-100">
                 Tu código de reserva:{" "}
-                <span className="font-mono text-[#FFD700] text-xl">{codigo}</span>
+                <span className="font-mono text-[#FFD700] text-xl">
+                  {codigo}
+                </span>
               </p>
               <p className="text-sm text-gray-300">
                 Guarda este código para modificar o cancelar más adelante.
