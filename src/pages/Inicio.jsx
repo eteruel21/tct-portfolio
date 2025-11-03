@@ -51,7 +51,7 @@ export default function Inicio() {
           </Link>
           <Link
             to="/reservar"
-            className="px-4 py-2 bg-[#FFD700] text-[#0D3B66] rounded-xl font-semibold hover:bg-[#e5c100] animate-pulseLight"
+            className="absolute top-8 left-1/2 -translate-x-1/2 px-6 py-3 bg-[#FFD700] text-[#0D3B66] rounded-2xl font-semibold hover:bg-[#e5c100] shadow-lg animate-pulseLight z-20"
           >
             Reservar Cita
           </Link>
