@@ -1,14 +1,27 @@
-// functions/api/disponibilidad.js
 export async function onRequestGet({ request, env }) {
-  const url = new URL(request.url);
-  const fecha = url.searchParams.get("fecha");
-  if (!fecha) return new Response("Fecha requerida", { status: 400 });
+  try {
+    const url = new URL(request.url);
+    const fecha = url.searchParams.get("fecha");
+    if (!fecha)
+      return new Response(JSON.stringify({ error: "Falta parámetro 'fecha'" }), {
+        status: 400,
+        headers: { "Content-Type": "application/json" },
+      });
 
-  // Consulta las horas ocupadas para esa fecha
-  const { results } = await env.DB.prepare(
-    "SELECT hora FROM reservas WHERE fecha = ?"
-  ).bind(fecha).all();
+    const rows = await env.DB.prepare(
+      "SELECT hora FROM reservas WHERE fecha = ?"
+    )
+      .bind(fecha)
+      .all();
 
-  const ocupadas = results.map((r) => r.hora);
-  return Response.json({ ocupadas });
+    const ocupadas = rows.results.map((r) => r.hora);
+    return new Response(JSON.stringify({ ocupadas }), {
+      headers: { "Content-Type": "application/json" },
+    });
+  } catch (err) {
+    return new Response(JSON.stringify({ error: err.message }), {
+      status: 500,
+      headers: { "Content-Type": "application/json" },
+    });
+  }
 }
