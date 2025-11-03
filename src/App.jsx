@@ -186,6 +186,7 @@ export default function App() {
             <Route path="/construccion" element={<Construccion />} />
             <Route path="/legal" element={<Page title="Legal" />} />
             <Route path="*" element={<Navigate to="/" replace />} />
+            <Route path="/reservar" element={<Reservar />} />
           </Routes>
         </motion.div>
       </main>
