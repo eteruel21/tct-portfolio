@@ -1,4 +1,13 @@
+<script>
+  // Si venimos de un 404, restaurar la ruta original
+  if (sessionStorage.redirect) {
+    history.replaceState(null, null, sessionStorage.redirect);
+    sessionStorage.removeItem("redirect");
+  }
+</script>
+
 <!doctype html>
+
 <html lang="es">
   <head>
     <meta charset="UTF-8" />
@@ -8,6 +17,7 @@
     <script type="module" crossorigin src="/assets/index-DoNslUBZ.js"></script>
     <link rel="stylesheet" crossorigin href="/assets/index-kCJFrP9N.css">
   </head>
+  
   <body>
     <div id="root"></div>
   </body>

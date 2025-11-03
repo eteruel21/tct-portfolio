@@ -3,37 +3,13 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta http-equiv="refresh" content="0; url=https://tctservices-pty.com/" />
-    <title>Redirigiendo...</title>
-    <style>
-      body {
-        background-color: #0d3b66;
-        color: #fff;
-        font-family: Arial, sans-serif;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        height: 100vh;
-        margin: 0;
-        text-align: center;
-      }
-      h1 {
-        font-size: 2rem;
-        margin-bottom: 0.5rem;
-        color: #ffd700;
-      }
-      p {
-        opacity: 0.9;
-      }
-      a {
-        color: #ffd700;
-        text-decoration: underline;
-      }
-    </style>
+    <title>TCT Services</title>
+    <script>
+      // Si hay una URL con subruta (ej. /portafolio), conserva la ruta.
+      sessionStorage.redirect = location.href;
+      // Redirige internamente a index.html
+      location.replace("/");
+    </script>
   </head>
-  <body>
-    <h1>Redirigiendo...</h1>
-    <p>Si no eres redirigido automáticamente, <a href="https://tctservices-pty.com/">haz clic aquí</a>.</p>
-  </body>
+  <body></body>
 </html>
