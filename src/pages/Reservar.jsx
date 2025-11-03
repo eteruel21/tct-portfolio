@@ -17,14 +17,23 @@ export default function Reservar() {
   const [codigoBusqueda, setCodigoBusqueda] = useState("");
   const [enviando, setEnviando] = useState(false);
 
-  const horasDisponibles = Array.from({ length: 9 }, (_, i) =>
+  const horasDisponibles = Array.from({ length: 10 }, (_, i) =>
     `${(8 + i).toString().padStart(2, "0")}:00`
   );
+
+  const esDiaPermitido = (fecha) => {
+    const dia = new Date(fecha).getDay(); // 0 = domingo, 6 = sábado
+    return dia >= 1 && dia <= 6; // lunes - sábado
+  };
   const generarCodigo = () => Math.random().toString(36).substring(2, 8).toUpperCase();
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setForm((f) => ({ ...f, [name]: value }));
+  const handleFechaChange = (e) => {
+    const valor = e.target.value;
+    if (esDiaPermitido(valor)) {
+      setForm((f) => ({ ...f, fecha: valor }));
+    } else {
+      alert("Solo se permiten reservas de lunes a sábado.");
+    } 
   };
 
   // ✅ Buscar reserva existente en la base Cloudflare D1
