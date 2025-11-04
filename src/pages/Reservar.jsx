@@ -350,10 +350,13 @@ export default function Reservar() {
                 <input
                   type="text"
                   name="direccion"
-                  value={form.direccion}
-                  onChange={(e) => setForm({ ...form, direccion: e.target.value })}
+                  required
+                  value={form.direccion || ""}
+                  onChange={(e) =>
+                    setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }))
+                  }
                   placeholder="Ej: Calle 50, Edificio Omega, piso 3"
-                  className="w-full p-2 border rounded mb-3"
+                  className="w-full border p-2 rounded"
                 />
               </div>
 
@@ -361,11 +364,14 @@ export default function Reservar() {
                 <label className="block text-sm font-medium mb-1">Motivo de la visita técnica</label>
                 <textarea
                   name="motivo"
-                  value={form.motivo}
-                  onChange={(e) => setForm({ ...form, motivo: e.target.value })}
-                  placeholder="Describe brevemente el problema o necesidad"
-                  className="w-full p-2 border rounded mb-3"
+                  required
                   rows="3"
+                  value={form.motivo || ""}
+                  onChange={(e) =>
+                    setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }))
+                  }
+                  placeholder="Describe brevemente el problema o necesidad"
+                  className="w-full border p-2 rounded"
                 />
               </div>
 
