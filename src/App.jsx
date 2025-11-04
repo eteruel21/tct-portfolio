@@ -15,6 +15,7 @@ import Contacto from "./pages/Contacto.jsx";
 import FAQs from "./pages/FAQs.jsx";
 import Construccion from "./pages/Construccion.jsx";
 import Reservar from "./pages/Reservar.jsx";
+import AdminReservas from "./pages/AdminReservas.jsx";
 
 const links = [
   { to: "/", label: "Inicio", icon: <FaHome /> },
@@ -188,6 +189,7 @@ export default function App() {
             <Route path="/construccion" element={<Construccion />} />
             <Route path="/legal" element={<Page title="Legal" />} />
             <Route path="/reservar" element={<Reservar />} />
+            <Route path="/admin-reservas" element={<AdminReservas />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </motion.div>
