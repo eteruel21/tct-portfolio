@@ -41,10 +41,20 @@ export async function onRequestGet({ request, env }) {
 export async function onRequestPost({ request, env }) {
   try {
     const data = await request.json();
-    await env.DB.prepare(
-      "INSERT INTO reservas (codigo, nombre, email, telefono, fecha, hora) VALUES (?, ?, ?, ?, ?, ?)"
-    )
-      .bind(data.codigo, data.nombre, data.email, data.telefono, data.fecha, data.hora)
+    await env.DB.prepare(`
+      INSERT INTO reservas (codigo, nombre, email, telefono, fecha, hora, direccion, motivo)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    `)
+      .bind(
+        data.codigo,
+        data.nombre,
+        data.email,
+        data.telefono,
+        data.fecha,
+        data.hora,
+        data.direccion,
+        data.motivo
+      )
       .run();
 
     return new Response(JSON.stringify({ ok: true, codigo: data.codigo }), {
@@ -61,10 +71,21 @@ export async function onRequestPost({ request, env }) {
 export async function onRequestPut({ request, env }) {
   try {
     const data = await request.json();
-    await env.DB.prepare(
-      "UPDATE reservas SET nombre=?, email=?, telefono=?, fecha=?, hora=? WHERE codigo=?"
-    )
-      .bind(data.nombre, data.email, data.telefono, data.fecha, data.hora, data.codigo)
+    await env.DB.prepare(`
+      UPDATE reservas
+      SET nombre=?, email=?, telefono=?, fecha=?, hora=?, direccion=?, motivo=?
+      WHERE codigo=?
+    `)
+      .bind(
+        data.nombre,
+        data.email,
+        data.telefono,
+        data.fecha,
+        data.hora,
+        data.direccion,
+        data.motivo,
+        data.codigo
+      )
       .run();
 
     return new Response(JSON.stringify({ updated: true }), {

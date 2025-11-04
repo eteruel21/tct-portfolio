@@ -139,6 +139,8 @@ export default function Reservar() {
       telefono: form.telefono,
       fecha: form.fecha,
       hora: form.hora,
+      direccion: form.direccion,
+      motivo: form.motivo,
       codigo: nuevoCodigo,
     };
 
@@ -167,6 +169,8 @@ export default function Reservar() {
               <tr><td style="padding: 8px; border-bottom: 1px solid #ddd;"><strong>Fecha:</strong></td><td>${form.fecha}</td></tr>
               <tr><td style="padding: 8px; border-bottom: 1px solid #ddd;"><strong>Hora:</strong></td><td>${form.hora}</td></tr>
               <tr><td style="padding: 8px; border-bottom: 1px solid #ddd;"><strong>Teléfono:</strong></td><td>${form.telefono}</td></tr>
+              <tr><td style="padding: 8px; border-bottom: 1px solid #ddd;"><strong>Dirección:</strong></td><td>${form.direccion}</td></tr>
+              <tr><td style="padding: 8px; border-bottom: 1px solid #ddd;"><strong>Motivo:</strong></td><td>${form.motivo}</td></tr>
               <tr><td style="padding: 8px; border-bottom: 1px solid #ddd;"><strong>Código de reserva:</strong></td>
                 <td style="font-family: monospace; color: #C1121F; font-size: 16px;">${nuevoCodigo}</td></tr>
             </table>
