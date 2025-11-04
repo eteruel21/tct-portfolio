@@ -1,6 +1,7 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import { visualizer } from "rollup-plugin-visualizer";
+import { resolve } from "path";
 
 export default defineConfig({
   base: "./", // 👈 importante para Cloudflare Pages (sirve desde raíz)
@@ -14,6 +15,18 @@ export default defineConfig({
       open: false,
     }),
   ],
+  resolve: {
+    alias: {
+      react: resolve(__dirname, "node_modules/react"),
+      "react-dom": resolve(__dirname, "node_modules/react-dom"),
+    },
+  },
+  optimizeDeps: {
+    include: ["framer-motion"],
+  },
+  ssr: {
+    noExternal: ["framer-motion"],
+  },
   build: {
     sourcemap: false, // puedes desactivar en producción
     chunkSizeWarningLimit: 700,
