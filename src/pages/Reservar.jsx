@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { FaCalendarAlt, FaCheckCircle, FaTrashAlt, FaTimesCircle } from "react-icons/fa";
+import { FaCalendarAlt, FaCheckCircle, FaTrashAlt, FaTimesCircle, FaTools } from "react-icons/fa";
 import confetti from "canvas-confetti";
 
 export default function Reservar() {
@@ -179,7 +179,7 @@ export default function Reservar() {
     >
       <FaTools className="text-[10px]" /> Panel técnico
     </button>
-    
+
       <motion.div
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
