@@ -149,25 +149,40 @@ export default function Reservar() {
       });
 
       if (!res.ok) throw new Error("Error en el envío al servidor");
+
+      // 2️⃣ Correo con formato profesional
+      const htmlCorreo = `
+        <div style="font-family: Arial, sans-serif; color: #0D3B66; max-width: 600px; margin: auto; border-radius: 12px; overflow: hidden; border: 1px solid #ddd;">
+          <div style="background-color: #0D3B66; color: white; text-align: center; padding: 20px;">
+            <img src="https://tctservices-pty.com/images/logo_tct.png" alt="TCT Services" style="max-width: 140px; margin-bottom: 10px;" />
+            <h2 style="margin: 0;">Confirmación de Cita</h2>
+          </div>
+          <div style="padding: 20px; background-color: #f9f9f9;">
+            <p>Estimado/a <strong>${form.nombre}</strong>,</p>
+            <p>Tu cita ha sido registrada exitosamente con los siguientes datos:</p>
+            <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
+              <tr><td style="padding: 8px; border-bottom: 1px solid #ddd;"><strong>Fecha:</strong></td><td>${form.fecha}</td></tr>
+              <tr><td style="padding: 8px; border-bottom: 1px solid #ddd;"><strong>Hora:</strong></td><td>${form.hora}</td></tr>
+              <tr><td style="padding: 8px; border-bottom: 1px solid #ddd;"><strong>Teléfono:</strong></td><td>${form.telefono}</td></tr>
+              <tr><td style="padding: 8px; border-bottom: 1px solid #ddd;"><strong>Código de reserva:</strong></td><td style="font-family: monospace; color: #C1121F; font-size: 16px;">${nuevoCodigo}</td></tr>
+            </table>
+            <p style="margin-top: 20px;">Guarda este código para modificar o cancelar tu cita más adelante.</p>
+            <p>Gracias por confiar en <strong>TCT Services</strong>.</p>
+          </div>
+          <div style="background-color: #FFD700; color: #0D3B66; text-align: center; padding: 10px; font-size: 13px;">
+            © ${new Date().getFullYear()} TCT Services — Sistemas Especiales que Protegen y Automatizan
+          </div>
+        </div>
+      `;
+
       await fetch("https://formsubmit.co/ajax/contacto@tctservices-pty.com", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          nombre: form.nombre,
-          email: form.email,
-          telefono: form.telefono,
-          fecha: form.fecha,
-          hora: form.hora,
-          codigo: nuevoCodigo,
           _subject: "Confirmación de cita - TCT Services",
-          _template: "table",
-          _cc: form.email, // copia al cliente
-          message: `Nueva cita registrada:
-            Nombre: ${form.nombre}
-            Teléfono: ${form.telefono}
-            Fecha: ${form.fecha}
-            Hora: ${form.hora}
-            Código: ${nuevoCodigo}`,
+          _cc: form.email,
+          message: htmlCorreo,
+          _template: "box", // o "table", da formato limpio
         }),
       });
 
