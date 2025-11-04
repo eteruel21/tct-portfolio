@@ -1,4 +1,5 @@
 name = "tct-portfolio"
+main = "dist"
 compatibility_date = "2025-11-03"
 pages_build_output_dir = "dist"
 
