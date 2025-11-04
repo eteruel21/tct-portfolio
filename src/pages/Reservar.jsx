@@ -1,9 +1,11 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FaCalendarAlt, FaCheckCircle, FaTrashAlt, FaTimesCircle, FaTools } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 import confetti from "canvas-confetti";
 
 export default function Reservar() {
+  const navigate = useNavigate();
   const [form, setForm] = useState({
     nombre: "",
     email: "",
