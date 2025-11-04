@@ -192,8 +192,9 @@ export default function Reservar() {
         body: JSON.stringify({
           _subject: "Confirmación de cita - TCT Services",
           _cc: form.email,
-          message: htmlCorreo,
           _template: "box",
+          _replyto: form.email,
+          _html: htmlCorreo, // <== este es el campo que renderiza HTML
         }),
       });
 
