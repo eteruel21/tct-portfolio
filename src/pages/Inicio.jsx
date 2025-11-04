@@ -49,12 +49,6 @@ export default function Inicio() {
           >
             🚧 CONSTRUCCIÓN
           </Link>
-          <Link
-            to="/reservar"
-            className="px-8 py-3 bg-[#FFD700] text-[#0D3B66] rounded-xl font-semibold hover:bg-[#e5c100] animate-pulseLight"
-          >
-            Reservar Cita
-          </Link>
         </div>
       </div>
 

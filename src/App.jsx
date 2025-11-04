@@ -18,6 +18,7 @@ import Reservar from "./pages/Reservar.jsx";
 
 const links = [
   { to: "/", label: "Inicio", icon: <FaHome /> },
+  { to: "/reservar", label: "Reservar Cita", icon: <FaFileContract /> },
   { to: "/portafolio", label: "Portafolio", icon: <FaTools /> },
   { to: "/cotizador", label: "Cotizador", icon: <FaFileContract /> },
   { to: "/nosotros", label: "Nosotros", icon: <FaInfoCircle /> },
