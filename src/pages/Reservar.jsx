@@ -150,11 +150,12 @@ export default function Reservar() {
 
       if (!res.ok) throw new Error("Error en el envío al servidor");
 
-      // 2️⃣ Correo con formato profesional
+      // 2️⃣ Crear HTML profesional con botón de gestión
+      const dominio = "https://tctservices-pty.com";
       const htmlCorreo = `
         <div style="font-family: Arial, sans-serif; color: #0D3B66; max-width: 600px; margin: auto; border-radius: 12px; overflow: hidden; border: 1px solid #ddd;">
           <div style="background-color: #0D3B66; color: white; text-align: center; padding: 20px;">
-            <img src="https://tctservices-pty.com/images/logo_tct.png" alt="TCT Services" style="max-width: 140px; margin-bottom: 10px;" />
+            <img src="${dominio}/images/logo_tct.png" alt="TCT Services" style="max-width: 140px; margin-bottom: 10px;" />
             <h2 style="margin: 0;">Confirmación de Cita</h2>
           </div>
           <div style="padding: 20px; background-color: #f9f9f9;">
@@ -164,9 +165,19 @@ export default function Reservar() {
               <tr><td style="padding: 8px; border-bottom: 1px solid #ddd;"><strong>Fecha:</strong></td><td>${form.fecha}</td></tr>
               <tr><td style="padding: 8px; border-bottom: 1px solid #ddd;"><strong>Hora:</strong></td><td>${form.hora}</td></tr>
               <tr><td style="padding: 8px; border-bottom: 1px solid #ddd;"><strong>Teléfono:</strong></td><td>${form.telefono}</td></tr>
-              <tr><td style="padding: 8px; border-bottom: 1px solid #ddd;"><strong>Código de reserva:</strong></td><td style="font-family: monospace; color: #C1121F; font-size: 16px;">${nuevoCodigo}</td></tr>
+              <tr><td style="padding: 8px; border-bottom: 1px solid #ddd;"><strong>Código de reserva:</strong></td>
+                <td style="font-family: monospace; color: #C1121F; font-size: 16px;">${nuevoCodigo}</td></tr>
             </table>
+
             <p style="margin-top: 20px;">Guarda este código para modificar o cancelar tu cita más adelante.</p>
+
+            <div style="text-align: center; margin: 25px 0;">
+              <a href="${dominio}/#/reservar" 
+                style="background-color: #C1121F; color: white; padding: 12px 20px; border-radius: 8px; text-decoration: none; font-weight: bold;">
+                Modificar o cancelar cita
+              </a>
+            </div>
+
             <p>Gracias por confiar en <strong>TCT Services</strong>.</p>
           </div>
           <div style="background-color: #FFD700; color: #0D3B66; text-align: center; padding: 10px; font-size: 13px;">
@@ -182,7 +193,7 @@ export default function Reservar() {
           _subject: "Confirmación de cita - TCT Services",
           _cc: form.email,
           message: htmlCorreo,
-          _template: "box", // o "table", da formato limpio
+          _template: "box",
         }),
       });
 
