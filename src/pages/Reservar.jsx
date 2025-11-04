@@ -351,12 +351,10 @@ export default function Reservar() {
                   type="text"
                   name="direccion"
                   required
-                  value={form.direccion || ""}
-                  onChange={(e) =>
-                    setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }))
-                  }
+                  value={form.direccion}
+                  onChange={handleChange}
                   placeholder="Ej: Calle 50, Edificio Omega, piso 3"
-                  className="w-full border p-2 rounded"
+                  className="w-full px-3 py-2 rounded-xl text-black"
                 />
               </div>
 
@@ -366,12 +364,10 @@ export default function Reservar() {
                   name="motivo"
                   required
                   rows="3"
-                  value={form.motivo || ""}
-                  onChange={(e) =>
-                    setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }))
-                  }
+                  value={form.motivo}
+                  onChange={handleChange}
                   placeholder="Describe brevemente el problema o necesidad"
-                  className="w-full border p-2 rounded"
+                  className="w-full px-3 py-2 rounded-xl text-black"
                 />
               </div>
 
