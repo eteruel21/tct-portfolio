@@ -170,7 +170,16 @@ export default function Reservar() {
 
   // === INTERFAZ ===
   return (
-    <section className="min-h-screen bg-gradient-to-b from-[#0D3B66] to-[#1B4F72] flex flex-col items-center justify-center text-white px-6 py-12">
+    <section className="relative min-h-screen bg-gradient-to-b from-[#0D3B66] to-[#1B4F72] flex flex-col items-center justify-center text-white px-6 py-12">
+      {/* Botón discreto para panel técnico */}
+      <button
+      onClick={() => navigate("/admin-reservas")}
+      title="Acceso técnico"
+      className="absolute bottom-2 right-3 text-xs text-gray-400 hover:text-[#FFD700] flex items-center gap-1 opacity-60 hover:opacity-100 transition-all"
+    >
+      <FaTools className="text-[10px]" /> Panel técnico
+    </button>
+    
       <motion.div
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
