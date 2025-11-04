@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
+import { useSpring, useTransition, animated } from "@react-spring/web";
 import { FaSearch, FaTrashAlt, FaCalendarCheck, FaFileExcel } from "react-icons/fa";
 import * as XLSX from "xlsx";
 

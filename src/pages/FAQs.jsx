@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useSpring, useTransition, animated } from "@react-spring/web";
 
 const preguntas = [
   {

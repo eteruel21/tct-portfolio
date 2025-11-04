@@ -1,6 +1,6 @@
 import { Routes, Route, NavLink, Navigate, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useSpring, useTransition, animated } from "@react-spring/web";
 import {
   FaBars, FaTimes,
   FaHome, FaTools, FaFileContract, FaInfoCircle,

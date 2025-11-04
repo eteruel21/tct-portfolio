@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useSpring, useTransition, animated } from "@react-spring/web";
 import { Link } from "react-router-dom";
 
 const BASE = import.meta.env.BASE_URL;

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useSpring, useTransition, animated } from "@react-spring/web";
 import { FaCalendarAlt, FaCheckCircle, FaTrashAlt, FaTimesCircle, FaTools } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import confetti from "canvas-confetti";
