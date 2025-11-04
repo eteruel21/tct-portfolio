@@ -5,4 +5,4 @@ pages_build_output_dir = "dist"
 [[d1_databases]]
 binding = "DB"
 database_name = "citas_tct"
-database_id = "7fc23920-1511-4a3b-90a3-6975e7634eed
+database_id = "7fc23920-1511-4a3b-90a3-6975e7634eed"
