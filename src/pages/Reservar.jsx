@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { FaCalendarAlt, FaCheckCircle, FaTrashAlt } from "react-icons/fa";
+import { FaCalendarAlt, FaCheckCircle, FaTrashAlt, FaTimesCircle } from "react-icons/fa";
+import confetti from "canvas-confetti";
 
 export default function Reservar() {
   const [form, setForm] = useState({
@@ -12,20 +13,22 @@ export default function Reservar() {
   });
 
   const [codigo, setCodigo] = useState("");
-  const [modo, setModo] = useState("nuevo"); // nuevo | buscar | revisar | confirmada | editar
+  const [modo, setModo] = useState("nuevo"); // nuevo | buscar | revisar | confirmada | editar | cancelada
   const [reservaActiva, setReservaActiva] = useState(null);
   const [codigoBusqueda, setCodigoBusqueda] = useState("");
   const [enviando, setEnviando] = useState(false);
   const [horasDisponibles, setHorasDisponibles] = useState([]);
   const [ocupadas, setOcupadas] = useState([]);
   const [cargando, setCargando] = useState(false);
+  const [esActualizacion, setEsActualizacion] = useState(false);
 
   // === Generar rango 8:00–17:00 ===
   const todasLasHoras = Array.from({ length: 10 }, (_, i) =>
     `${(8 + i).toString().padStart(2, "0")}:00`
   );
 
-  const generarCodigo = () => Math.random().toString(36).substring(2, 8).toUpperCase();
+  const generarCodigo = () =>
+    Math.random().toString(36).substring(2, 8).toUpperCase();
 
   // === Solo lunes–sábado ===
   const esDiaPermitido = (fecha) => {
@@ -43,6 +46,7 @@ export default function Reservar() {
         setReservaActiva(data);
         setForm(data);
         setModo("editar");
+        setEsActualizacion(true);
         cargarDisponibilidad(data.fecha);
       } else {
         alert("Código no encontrado.");
@@ -56,16 +60,17 @@ export default function Reservar() {
   // === Cancelar reserva ===
   const cancelarReserva = async () => {
     if (!reservaActiva) return;
+    if (!window.confirm("¿Deseas cancelar tu reserva?")) return;
+
     try {
       await fetch("/api/reservas", {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ codigo: reservaActiva.codigo }),
       });
-      alert("Reserva cancelada correctamente.");
+      setCodigo(reservaActiva.codigo);
       setReservaActiva(null);
-      setCodigoBusqueda("");
-      setModo("nuevo");
+      setModo("cancelada");
     } catch (err) {
       console.error("Error al cancelar reserva:", err);
       alert("No se pudo cancelar la reserva.");
@@ -96,8 +101,17 @@ export default function Reservar() {
     setForm((f) => ({ ...f, [name]: value }));
 
     if (name === "fecha") {
+      const dia = new Date(value).getDay();
+      if (dia === 0) {
+        alert("No se permiten reservas los domingos.");
+        setForm((f) => ({ ...f, fecha: "" }));
+        setHorasDisponibles([]);
+        return;
+      }
       if (!esDiaPermitido(value)) {
         alert("Solo se permiten reservas de lunes a sábado.");
+        setForm((f) => ({ ...f, fecha: "" }));
+        setHorasDisponibles([]);
         return;
       }
       cargarDisponibilidad(value);
@@ -110,12 +124,12 @@ export default function Reservar() {
     setModo("revisar");
   };
 
-  // === Enviar reserva a Cloudflare D1 ===
+  // === Enviar o actualizar reserva en Cloudflare D1 ===
   const enviarReserva = async () => {
     setEnviando(true);
     const nuevoCodigo = reservaActiva?.codigo || generarCodigo();
 
-    const nuevaReserva = {
+    const datosReserva = {
       nombre: form.nombre,
       email: form.email,
       telefono: form.telefono,
@@ -125,10 +139,11 @@ export default function Reservar() {
     };
 
     try {
+      const method = reservaActiva ? "PUT" : "POST";
       const res = await fetch("/api/reservas", {
-        method: "POST",
+        method,
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(nuevaReserva),
+        body: JSON.stringify(datosReserva),
       });
 
       if (!res.ok) throw new Error("Error en el envío al servidor");
@@ -137,9 +152,17 @@ export default function Reservar() {
       setModo("confirmada");
       setReservaActiva(null);
       setForm({ nombre: "", email: "", telefono: "", fecha: "", hora: "" });
+
+      // 🎉 Lanza confeti al confirmar
+      confetti({
+        particleCount: 120,
+        spread: 80,
+        origin: { y: 0.6 },
+        colors: ["#FFD700", "#C1121F", "#0D3B66"],
+      });
     } catch (err) {
       console.error("Error al enviar reserva:", err);
-      alert("Error al enviar la reserva. Intenta nuevamente.");
+      alert("Error al procesar la reserva. Intenta nuevamente.");
     } finally {
       setEnviando(false);
     }
@@ -210,9 +233,7 @@ export default function Reservar() {
             >
               {["nombre", "email", "telefono"].map((c) => (
                 <div key={c}>
-                  <label className="block text-sm font-semibold mb-1 capitalize">
-                    {c}
-                  </label>
+                  <label className="block text-sm font-semibold mb-1 capitalize">{c}</label>
                   <input
                     type={c === "email" ? "email" : "text"}
                     name={c}
@@ -247,9 +268,7 @@ export default function Reservar() {
                   disabled={cargando || !form.fecha}
                   className="w-full px-3 py-2 rounded-xl text-black"
                 >
-                  <option value="">
-                    {cargando ? "Cargando..." : "Seleccionar hora"}
-                  </option>
+                  <option value="">{cargando ? "Cargando..." : "Seleccionar hora"}</option>
                   {horasDisponibles.map((h) => (
                     <option key={h}>{h}</option>
                   ))}
@@ -282,12 +301,7 @@ export default function Reservar() {
           )}
 
           {modo === "revisar" && (
-            <motion.div
-              key="revisar"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="space-y-5 text-left"
-            >
+            <motion.div key="revisar" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-5 text-left">
               <h3 className="text-xl font-semibold text-center mb-2">
                 Confirmar datos de cita
               </h3>
@@ -312,21 +326,22 @@ export default function Reservar() {
                       : "bg-[#C1121F] hover:bg-[#A10E1A]"
                   }`}
                 >
-                  {enviando ? "Enviando..." : "Confirmar"}
+                  {enviando
+                    ? "Enviando..."
+                    : reservaActiva
+                    ? "Guardar cambios"
+                    : "Confirmar"}
                 </button>
               </div>
             </motion.div>
           )}
 
           {modo === "confirmada" && (
-            <motion.div
-              key="ok"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="space-y-6 text-center"
-            >
+            <motion.div key="ok" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6 text-center">
               <FaCheckCircle className="text-green-400 text-6xl mx-auto" />
-              <h2 className="text-xl font-semibold">¡Cita confirmada!</h2>
+              <h2 className="text-xl font-semibold">
+                {esActualizacion ? "¡Reserva actualizada!" : "¡Cita confirmada!"}
+              </h2>
               <p className="text-gray-100">
                 Tu código de reserva:{" "}
                 <span className="font-mono text-[#FFD700] text-xl">{codigo}</span>
@@ -335,10 +350,30 @@ export default function Reservar() {
                 Guarda este código para modificar o cancelar más adelante.
               </p>
               <button
-                onClick={() => setModo("nuevo")}
+                onClick={() => {
+                  setModo("nuevo");
+                  setEsActualizacion(false);
+                }}
                 className="w-full py-3 bg-[#C1121F] rounded-xl hover:bg-[#A10E1A] font-semibold"
               >
                 Nueva reserva
+              </button>
+            </motion.div>
+          )}
+
+          {modo === "cancelada" && (
+            <motion.div key="cancelada" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6 text-center">
+              <FaTimesCircle className="text-red-400 text-6xl mx-auto" />
+              <h2 className="text-xl font-semibold">¡Reserva cancelada correctamente!</h2>
+              <p className="text-gray-100">
+                Código cancelado:{" "}
+                <span className="font-mono text-[#FFD700] text-xl">{codigo}</span>
+              </p>
+              <button
+                onClick={() => setModo("nuevo")}
+                className="w-full py-3 bg-[#C1121F] rounded-xl hover:bg-[#A10E1A] font-semibold"
+              >
+                Volver al inicio
               </button>
             </motion.div>
           )}
