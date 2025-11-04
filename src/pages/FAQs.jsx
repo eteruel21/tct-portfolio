@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useSpring, useTransition, animated } from "@react-spring/web";
+import { useTransition, animated } from "@react-spring/web";
 
 const preguntas = [
   {
@@ -31,10 +31,7 @@ const preguntas = [
 
 export default function FAQs() {
   const [active, setActive] = useState(null);
-
-  const toggle = (index) => {
-    setActive(active === index ? null : index);
-  };
+  const toggle = (index) => setActive(active === index ? null : index);
 
   return (
     <section className="max-w-4xl mx-auto px-4 py-16">
@@ -46,36 +43,44 @@ export default function FAQs() {
       </p>
 
       <div className="space-y-4">
-        {preguntas.map((item, idx) => (
-          <div
-            key={idx}
-            className="border border-gray-200 rounded-2xl overflow-hidden shadow-sm"
-          >
-            <button
-              onClick={() => toggle(idx)}
-              className="w-full flex justify-between items-center px-5 py-4 text-left font-semibold text-[#1A1A1A] hover:bg-gray-50 transition"
-            >
-              {item.pregunta}
-              <span className="text-[#0D3B66] text-lg">
-                {active === idx ? "−" : "+"}
-              </span>
-            </button>
+        {preguntas.map((item, idx) => {
+          const show = active === idx;
+          const transitions = useTransition(show, {
+            from: { opacity: 0, maxHeight: 0 },
+            enter: { opacity: 1, maxHeight: 300 },
+            leave: { opacity: 0, maxHeight: 0 },
+            config: { tension: 200, friction: 20 },
+          });
 
-            <AnimatePresence>
-              {active === idx && (
-                <motion.div
-                  initial={{ height: 0, opacity: 0 }}
-                  animate={{ height: "auto", opacity: 1 }}
-                  exit={{ height: 0, opacity: 0 }}
-                  transition={{ duration: 0.3 }}
-                  className="px-5 pb-4 text-[#2C3E50] text-sm leading-relaxed bg-gray-50"
-                >
-                  {item.respuesta}
-                </motion.div>
+          return (
+            <div
+              key={idx}
+              className="border border-gray-200 rounded-2xl overflow-hidden shadow-sm"
+            >
+              <button
+                onClick={() => toggle(idx)}
+                className="w-full flex justify-between items-center px-5 py-4 text-left font-semibold text-[#1A1A1A] hover:bg-gray-50 transition"
+              >
+                {item.pregunta}
+                <span className="text-[#0D3B66] text-lg">
+                  {show ? "−" : "+"}
+                </span>
+              </button>
+
+              {transitions(
+                (style, open) =>
+                  open && (
+                    <animated.div
+                      style={style}
+                      className="px-5 pb-4 text-[#2C3E50] text-sm leading-relaxed bg-gray-50 overflow-hidden"
+                    >
+                      {item.respuesta}
+                    </animated.div>
+                  )
               )}
-            </AnimatePresence>
-          </div>
-        ))}
+            </div>
+          );
+        })}
       </div>
     </section>
   );

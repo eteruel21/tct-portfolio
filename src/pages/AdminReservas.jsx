@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useSpring, useTransition, animated } from "@react-spring/web";
+import { useSpring, animated } from "@react-spring/web";
 import { FaSearch, FaTrashAlt, FaCalendarCheck, FaFileExcel } from "react-icons/fa";
 import * as XLSX from "xlsx";
 
@@ -71,13 +71,17 @@ export default function AdminReservas() {
     if (acceso) obtenerReservas();
   }, [acceso]);
 
+  const fade = useSpring({
+    from: { opacity: 0, y: 30 },
+    to: { opacity: 1, y: 0 },
+  });
+
   // --- Pantalla de autenticación ---
   if (!acceso) {
     return (
       <section className="min-h-screen bg-[#0D3B66] flex flex-col items-center justify-center text-white">
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
+        <animated.div
+          style={fade}
           className="bg-white/10 backdrop-blur-lg rounded-3xl shadow-xl p-8 w-full max-w-sm text-center"
         >
           <FaCalendarCheck className="text-[#FFD700] text-5xl mx-auto mb-4" />
@@ -98,7 +102,7 @@ export default function AdminReservas() {
           >
             Entrar
           </button>
-        </motion.div>
+        </animated.div>
       </section>
     );
   }
@@ -106,9 +110,8 @@ export default function AdminReservas() {
   // --- Panel de reservas ---
   return (
     <section className="min-h-screen bg-gradient-to-b from-[#0D3B66] to-[#1B4F72] text-white p-6">
-      <motion.div
-        initial={{ opacity: 0, y: 30 }}
-        animate={{ opacity: 1, y: 0 }}
+      <animated.div
+        style={fade}
         className="max-w-6xl mx-auto bg-white/10 backdrop-blur-lg rounded-3xl shadow-xl p-8"
       >
         {/* Encabezado */}
@@ -190,7 +193,7 @@ export default function AdminReservas() {
             </table>
           </div>
         )}
-      </motion.div>
+      </animated.div>
     </section>
   );
 }

@@ -39,6 +39,23 @@ export default function App() {
 
   useEffect(() => setMenuOpen(false), [location.pathname]);
 
+  // Transiciones React Spring
+  const overlayTransition = useTransition(menuOpen, {
+    from: { opacity: 0 },
+    enter: { opacity: 1 },
+    leave: { opacity: 0 },
+    config: { duration: 200 },
+  });
+
+  const sidebarTransition = useTransition(menuOpen, {
+    from: { x: "-100%" },
+    enter: { x: "0%" },
+    leave: { x: "-100%" },
+    config: { tension: 210, friction: 22 },
+  });
+
+  const fadeMain = useSpring({ from: { opacity: 0, y: 20 }, to: { opacity: 1, y: 0 } });
+
   return (
     <div className="min-h-screen flex flex-col bg-white">
       {/* === NAV DESKTOP === */}
@@ -57,7 +74,7 @@ export default function App() {
               to="/construccion"
               className="hidden md:inline-flex items-center px-4 py-1.5 rounded-full 
                         bg-[#C1121F] text-white text-sm font-semibold shadow-md 
-                        hover:bg-[#A10E1A] transition animate-pulseLight"
+                        hover:bg-[#A10E1A] transition"
             >
               🚧 CONSTRUCCIÓN
             </NavLink>
@@ -94,25 +111,22 @@ export default function App() {
       </header>
 
       {/* === SIDEBAR MÓVIL === */}
-      <AnimatePresence>
-        {menuOpen && (
-          <>
-            {/* FONDO CON BLUR ELEGANTE */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.25 }}
-              onClick={() => setMenuOpen(false)}
+      {overlayTransition(
+        (style, item) =>
+          item && (
+            <animated.div
+              style={style}
               className="fixed inset-0 z-40 bg-black/30 backdrop-blur-md"
+              onClick={() => setMenuOpen(false)}
             />
+          )
+      )}
 
-            {/* PANEL LATERAL */}
-            <motion.aside
-              initial={{ x: "-100%" }}
-              animate={{ x: 0 }}
-              exit={{ x: "-100%" }}
-              transition={{ duration: 0.3 }}
+      {sidebarTransition(
+        (style, item) =>
+          item && (
+            <animated.aside
+              style={style}
               className="fixed left-0 top-0 h-full w-64 bg-[#0D3B66]/95 text-white z-50 
                          flex flex-col justify-between shadow-2xl backdrop-blur-lg border-r border-white/10"
             >
@@ -136,7 +150,7 @@ export default function App() {
                   onClick={() => setMenuOpen(false)}
                   className="flex items-center justify-center gap-2 mx-4 mt-5 mb-3 py-2.5 
                              rounded-xl bg-[#C1121F] text-sm font-semibold shadow-md 
-                             hover:bg-[#A10E1A] transition animate-pulseLight"
+                             hover:bg-[#A10E1A] transition"
                 >
                   🚧 Construcción
                 </NavLink>
@@ -163,22 +177,16 @@ export default function App() {
                 </nav>
               </div>
 
-              {/* PIE */}
               <div className="text-center py-3 text-xs text-gray-300 border-t border-white/10">
                 © {new Date().getFullYear()} TCT Services
               </div>
-            </motion.aside>
-          </>
-        )}
-      </AnimatePresence>
+            </animated.aside>
+          )
+      )}
 
       {/* === CONTENIDO PRINCIPAL === */}
       <main className="flex-1">
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-        >
+        <animated.div style={fadeMain}>
           <Routes>
             <Route path="/" element={<Inicio />} />
             <Route path="/portafolio" element={<PortfolioGaleria />} />
@@ -192,7 +200,7 @@ export default function App() {
             <Route path="/admin-reservas" element={<AdminReservas />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
-        </motion.div>
+        </animated.div>
       </main>
 
       {/* === PIE DE PÁGINA === */}

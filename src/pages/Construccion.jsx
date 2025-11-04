@@ -12,8 +12,8 @@ const proyectos = [
   { id: 5, titulo: "Portón y verjas en residencia", tipo: "imagen", src: `${BASE}images/obra5.jpg`, ubicacion: "Villa Lucre, Panamá" },
   { id: 6, titulo: "Construcción de piscina", tipo: "imagen", src: `${BASE}images/obra6.jpg`, ubicacion: "Capira, Panamá Oeste" },
   { id: 7, titulo: "Verjas con diseño", tipo: "imagen", src: `${BASE}images/obra7.jpg`, ubicacion: "Burunga, Panamá Oeste" },
-  { id: 8, titulo: "La mejor expericia en estructura", tipo: "video", src: `${BASE}videos/obra8.mp4`, ubicacion: "Villa Las Fuentes, Panamá" },
-  { id: 9, titulo: "Siempre con la mejor efisiciencia", tipo: "imagen", src: `${BASE}images/obra9.jpg`, ubicacion: "San Miguelito, Panamá" },
+  { id: 8, titulo: "La mejor experiencia en estructura", tipo: "video", src: `${BASE}videos/obra8.mp4`, ubicacion: "Villa Las Fuentes, Panamá" },
+  { id: 9, titulo: "Siempre con la mejor eficiencia", tipo: "imagen", src: `${BASE}images/obra9.jpg`, ubicacion: "San Miguelito, Panamá" },
   { id: 10, titulo: "Diseño en interior de sala", tipo: "video", src: `${BASE}videos/obra10.mp4`, ubicacion: "Urbanización El Bosque, Panamá" },
 ];
 
@@ -35,6 +35,16 @@ export default function Construccion() {
     return () => window.removeEventListener("keydown", onKey);
   }, [close, next, prev]);
 
+  // Animaciones
+  const fadeUp = useSpring({ from: { opacity: 0, y: 30 }, to: { opacity: 1, y: 0 } });
+
+  const transitions = useTransition(openIndex >= 0 ? proyectos[openIndex] : null, {
+    from: { opacity: 0, transform: "scale(0.9)" },
+    enter: { opacity: 1, transform: "scale(1)" },
+    leave: { opacity: 0, transform: "scale(0.9)" },
+    config: { tension: 200, friction: 18 },
+  });
+
   return (
     <section className="min-h-screen text-white relative">
       {/* === Encabezado === */}
@@ -47,9 +57,8 @@ export default function Construccion() {
         }}
       >
         <div className="absolute inset-0 bg-black/70"></div>
-
         <div className="relative z-10 max-w-4xl px-6">
-          <h1 className="text-5xl font-extrabold text-[#FFD700] mb-6 animate-fadeInUp">
+          <h1 className="text-5xl font-extrabold text-[#FFD700] mb-6">
             División de Construcción
           </h1>
           <p className="text-lg md:text-xl mb-8 text-gray-200 leading-relaxed">
@@ -70,12 +79,7 @@ export default function Construccion() {
       </div>
 
       {/* === Galería === */}
-      <motion.div
-        initial={{ opacity: 0, y: 30 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8 }}
-        className="bg-white text-[#1A1A1A] py-16 px-6"
-      >
+      <animated.div style={fadeUp} className="bg-white text-[#1A1A1A] py-16 px-6">
         <h2 className="text-3xl font-bold text-center mb-10 text-[#0D3B66]">
           Proyectos Realizados
         </h2>
@@ -88,23 +92,14 @@ export default function Construccion() {
               onClick={() => setOpenIndex(idx)}
             >
               {obra.tipo === "video" ? (
-                obra.src.includes("youtube") ? (
-                  <iframe
-                    src={obra.src}
-                    title={obra.titulo}
-                    className="w-full h-64 object-cover"
-                    allow="autoplay; encrypted-media"
-                  ></iframe>
-                ) : (
-                  <video
-                    src={obra.src}
-                    muted
-                    loop
-                    autoPlay
-                    playsInline
-                    className="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-500"
-                  />
-                )
+                <video
+                  src={obra.src}
+                  muted
+                  loop
+                  autoPlay
+                  playsInline
+                  className="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-500"
+                />
               ) : (
                 <img
                   src={obra.src}
@@ -120,64 +115,51 @@ export default function Construccion() {
             </div>
           ))}
         </div>
-      </motion.div>
+      </animated.div>
 
       {/* === Lightbox === */}
-      <AnimatePresence>
-        {openIndex >= 0 && (
-          <motion.div
-            key="lightbox"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4"
-            onClick={close}
-          >
-            <motion.div
-              initial={{ scale: 0.95 }}
-              animate={{ scale: 1 }}
-              exit={{ scale: 0.9 }}
-              transition={{ duration: 0.3 }}
-              className="relative max-w-5xl w-full"
-              onClick={(e) => e.stopPropagation()}
+      {transitions(
+        (style, obra) =>
+          obra && (
+            <animated.div
+              style={{ ...style }}
+              className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4"
+              onClick={close}
             >
-              {proyectos[openIndex].tipo === "video" ? (
-                proyectos[openIndex].src.includes("youtube") ? (
-                  <iframe
-                    src={proyectos[openIndex].src}
-                    className="w-full h-[70vh] rounded-xl"
-                    allowFullScreen
-                  ></iframe>
-                ) : (
+              <div
+                className="relative max-w-5xl w-full"
+                onClick={(e) => e.stopPropagation()}
+              >
+                {obra.tipo === "video" ? (
                   <video
-                    src={proyectos[openIndex].src}
+                    src={obra.src}
                     controls
                     autoPlay
                     className="w-full h-auto rounded-xl"
                   />
-                )
-              ) : (
-                <img
-                  src={proyectos[openIndex].src}
-                  alt={proyectos[openIndex].titulo}
-                  className="w-full h-auto rounded-xl"
-                />
-              )}
-              <div className="text-white mt-3 flex justify-between items-center">
-                <div>
-                  <h3 className="text-xl font-semibold">{proyectos[openIndex].titulo}</h3>
-                  <p className="text-sm text-gray-300">{proyectos[openIndex].ubicacion}</p>
-                </div>
-                <div className="flex gap-2">
-                  <button onClick={prev} className="px-3 py-2 bg-white/10 hover:bg-white/20 rounded">←</button>
-                  <button onClick={next} className="px-3 py-2 bg-white/10 hover:bg-white/20 rounded">→</button>
-                  <button onClick={close} className="px-3 py-2 bg-white/10 hover:bg-white/20 rounded">✕</button>
+                ) : (
+                  <img
+                    src={obra.src}
+                    alt={obra.titulo}
+                    className="w-full h-auto rounded-xl"
+                  />
+                )}
+
+                <div className="text-white mt-3 flex justify-between items-center">
+                  <div>
+                    <h3 className="text-xl font-semibold">{obra.titulo}</h3>
+                    <p className="text-sm text-gray-300">{obra.ubicacion}</p>
+                  </div>
+                  <div className="flex gap-2">
+                    <button onClick={prev} className="px-3 py-2 bg-white/10 hover:bg-white/20 rounded">←</button>
+                    <button onClick={next} className="px-3 py-2 bg-white/10 hover:bg-white/20 rounded">→</button>
+                    <button onClick={close} className="px-3 py-2 bg-white/10 hover:bg-white/20 rounded">✕</button>
+                  </div>
                 </div>
               </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+            </animated.div>
+          )
+      )}
     </section>
   );
 }

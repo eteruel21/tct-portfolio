@@ -4,15 +4,14 @@ import { useSearchParams } from "react-router-dom";
 export default function Cotizador() {
   const [searchParams] = useSearchParams();
   const mensajeInicial = searchParams.get("mensaje") || "";
-  const BASE = import.meta.env.BASE_URL || "/"; // agrega esto
-  
+  const BASE = import.meta.env.BASE_URL || "/";
+
   // Detectar si es móvil
-  const [isMobile, setIsMobile] = useState(false);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   useEffect(() => {
-    const checkMobile = () => setIsMobile(window.innerWidth < 768);
-    checkMobile();
-    window.addEventListener("resize", checkMobile);
-    return () => window.removeEventListener("resize", checkMobile);
+    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   const [formData, setFormData] = useState({
@@ -38,18 +37,15 @@ export default function Cotizador() {
 
   const numero = "50761163672";
 
-  const generarMensaje = () => {
-    const base = formData.servicio || "uno de los servicios de TCT Services";
-    return `
-      Hola, soy ${formData.nombre || "un cliente interesado"}.
-      Quisiera cotizar el servicio de ${base}.
-      Ubicación: ${formData.ubicacion || "No especificada"}.
-      Tipo de instalación: ${formData.tipo || "No especificado"}.
-      Mensaje adicional: ${formData.mensaje || "N/A"}.
-      Correo: ${formData.email || "No indicado"}.
-      Teléfono: ${formData.telefono || "No indicado"}.
-    `;
-  };
+  const generarMensaje = () => `
+Hola, soy ${formData.nombre || "un cliente interesado"}.
+Quisiera cotizar el servicio de ${formData.servicio || "TCT Services"}.
+Ubicación: ${formData.ubicacion || "No especificada"}.
+Tipo de instalación: ${formData.tipo || "No especificado"}.
+Mensaje: ${formData.mensaje || "N/A"}.
+Correo: ${formData.email || "No indicado"}.
+Teléfono: ${formData.telefono || "No indicado"}.
+`;
 
   const handleWhatsApp = () => {
     const texto = generarMensaje();
@@ -64,35 +60,27 @@ export default function Cotizador() {
         backgroundImage: `url(${BASE}images/fondo_inicio.jpg)`,
         backgroundSize: "cover",
         backgroundPosition: "center",
-        backgroundRepeat: "no-repeat",
       }}
     >
-      {/* Capa oscura para contraste */}
-      <div className="absolute inset-0 bg-black/40"></div>
+      {/* Capa oscura */}
+      <div className="absolute inset-0 bg-black/45"></div>
 
-      {/* Contenedor principal */}
+      {/* Contenedor */}
       <div
-        className={`
-          relative z-10 max-w-3xl w-full 
-          bg-white/75 backdrop-blur-lg 
-          p-10 rounded-2xl 
-          border border-white/40 
-          shadow-[0_10px_30px_rgba(255,255,255,0.2)] 
-          transform translate-y-10 opacity-0
+        className={`relative z-10 max-w-3xl w-full 
+          bg-white/80 backdrop-blur-lg p-10 rounded-2xl border border-white/30
+          shadow-[0_10px_30px_rgba(0,0,0,0.3)]
           ${isMobile ? "animate-fadeInUpSlow" : "animate-fadeInUp"}
-          md:hover:translate-y-2 
-          md:hover:shadow-[0_20px_60px_rgba(13,59,102,0.45)] 
-          transition-all duration-500 ease-out 
-          hover:border-[#0D3B66]/60
-        `}
+          transition-all duration-700 ease-out`}
       >
-      {/* Encabezado */}
         <h1 className="text-3xl font-bold mb-3 text-[#0D3B66] text-center">
           Solicitud de Cotización
         </h1>
         <p className="text-gray-700 text-center mb-6">
           Completa el formulario o contáctanos directamente por WhatsApp.
         </p>
+
+        {/* Botón WhatsApp rápido */}
         <div className="flex justify-center mb-6">
           <a
             href={`https://wa.me/${numero}?text=${encodeURIComponent(
@@ -106,71 +94,65 @@ export default function Cotizador() {
           </a>
         </div>
 
-        {/* Formulario */}
+        {/* Formulario principal */}
         <form
           action="https://formsubmit.co/tctservice19@gmail.com"
           method="POST"
           className="space-y-4 bg-white shadow-md rounded-xl p-6 border border-gray-200"
         >
-          <input type="hidden" name="_next" value="https://eteruel21.github.io/tct-portfolio/gracias.html" />
+          <input
+            type="hidden"
+            name="_next"
+            value="https://eteruel21.github.io/tct-portfolio/gracias.html"
+          />
           <input type="hidden" name="_captcha" value="false" />
 
-          {/* Nombre */}
+          {/* Campos */}
           <div>
-            <label className="block text-sm font-semibold mb-1">
-              Nombre completo
-            </label>
+            <label className="block text-sm font-semibold mb-1">Nombre completo</label>
             <input
               type="text"
               name="nombre"
               value={formData.nombre}
               onChange={handleChange}
-              className="w-full border rounded-lg px-3 py-2"
               required
+              className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-[#0D3B66]"
             />
           </div>
 
-          {/* Email y Teléfono */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-semibold mb-1">
-                Correo electrónico
-              </label>
+              <label className="block text-sm font-semibold mb-1">Correo electrónico</label>
               <input
                 type="email"
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
-                className="w-full border rounded-lg px-3 py-2"
                 required
+                className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-[#0D3B66]"
               />
             </div>
             <div>
-              <label className="block text-sm font-semibold mb-1">
-                Teléfono
-              </label>
+              <label className="block text-sm font-semibold mb-1">Teléfono</label>
               <input
                 type="text"
                 name="telefono"
                 value={formData.telefono}
                 onChange={handleChange}
-                className="w-full border rounded-lg px-3 py-2"
                 required
+                className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-[#0D3B66]"
               />
             </div>
           </div>
 
-          {/* Servicio */}
           <div>
-            <label className="block text-sm font-semibold mb-1">
-              Tipo de servicio
-            </label>
+            <label className="block text-sm font-semibold mb-1">Tipo de servicio</label>
             <select
               name="servicio"
               value={formData.servicio}
               onChange={handleChange}
-              className="w-full border rounded-lg px-3 py-2"
               required
+              className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-[#0D3B66]"
             >
               <option value="">Seleccione una opción</option>
               <option value="Sistema de Parking">Sistema de Parking</option>
@@ -184,30 +166,25 @@ export default function Cotizador() {
             </select>
           </div>
 
-          {/* Ubicación y Tipo */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-semibold mb-1">
-                Ubicación / Ciudad
-              </label>
+              <label className="block text-sm font-semibold mb-1">Ubicación / Ciudad</label>
               <input
                 type="text"
                 name="ubicacion"
                 value={formData.ubicacion}
                 onChange={handleChange}
-                className="w-full border rounded-lg px-3 py-2"
                 required
+                className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-[#0D3B66]"
               />
             </div>
             <div>
-              <label className="block text-sm font-semibold mb-1">
-                Tipo de instalación
-              </label>
+              <label className="block text-sm font-semibold mb-1">Tipo de instalación</label>
               <select
                 name="tipo"
                 value={formData.tipo}
                 onChange={handleChange}
-                className="w-full border rounded-lg px-3 py-2"
+                className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-[#0D3B66]"
               >
                 <option value="">Seleccione</option>
                 <option value="Residencial">Residencial</option>
@@ -217,16 +194,13 @@ export default function Cotizador() {
             </div>
           </div>
 
-          {/* Mensaje */}
           <div>
-            <label className="block text-sm font-semibold mb-1">
-              Mensaje adicional
-            </label>
+            <label className="block text-sm font-semibold mb-1">Mensaje adicional</label>
             <textarea
               name="mensaje"
               value={formData.mensaje}
               onChange={handleChange}
-              className="w-full border rounded-lg px-3 py-2 h-32"
+              className="w-full border rounded-lg px-3 py-2 h-32 focus:ring-2 focus:ring-[#0D3B66]"
             />
           </div>
 
@@ -234,18 +208,17 @@ export default function Cotizador() {
           <div className="flex flex-col md:flex-row gap-4 mt-6">
             <button
               type="submit"
-              className="flex-1 bg-[#0D3B66] text-white py-3 rounded-xl font-semibold hover:bg-[#1B4F72]"
+              className="flex-1 bg-[#0D3B66] text-white py-3 rounded-xl font-semibold hover:bg-[#1B4F72] transition"
             >
               Enviar por correo
             </button>
-
             <button
               type="button"
               onClick={handleWhatsApp}
-              className="flex-1 bg-[#25D366] text-white py-3 rounded-xl font-semibold hover:bg-[#1DA851]"
+              className="flex-1 bg-[#25D366] text-white py-3 rounded-xl font-semibold hover:bg-[#1DA851] transition"
             >
               {formData.servicio
-                ? `Enviar cotización de ${formData.servicio} por WhatsApp`
+                ? `Enviar cotización de ${formData.servicio}`
                 : "Enviar por WhatsApp"}
             </button>
           </div>

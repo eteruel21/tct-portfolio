@@ -19,39 +19,36 @@ export default function Contacto() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-        const data = new FormData();
-        console.log(formData);
-        Object.entries(formData).forEach(([key, value]) => data.append(key, value));
-        data.append("_captcha", "false"); // sin verificación
-        data.append("_template", "box"); // diseño más bonito del correo
-
-        await fetch("https://formsubmit.co/ajax/contacto@tctservices-pty.com", {
+      await fetch("https://formsubmit.co/ajax/contacto@tctservices-pty.com", {
         method: "POST",
         headers: { "Content-Type": "application/json", Accept: "application/json" },
         body: JSON.stringify(formData),
-        });
-
-        setEnviado(true);
-        setFormData({ nombre: "", email: "", telefono: "", mensaje: "" });
+      });
+      setEnviado(true);
+      setFormData({ nombre: "", email: "", telefono: "", mensaje: "" });
     } catch (err) {
-        alert("Error al enviar. Verifica tu conexión o intenta más tarde.");
+      alert("Error al enviar. Verifica tu conexión o intenta más tarde.");
     }
-};
+  };
+
+  const fadeIn = useSpring({ from: { opacity: 0, y: 40 }, to: { opacity: 1, y: 0 } });
+
+  const transition = useTransition(enviado, {
+    from: { opacity: 0, scale: 0.9 },
+    enter: { opacity: 1, scale: 1 },
+    leave: { opacity: 0, scale: 0.9 },
+    config: { tension: 200, friction: 18 },
+  });
 
   return (
     <section className="max-w-5xl mx-auto px-6 py-16">
       {/* ENCABEZADO */}
-      <motion.div
-        initial={{ opacity: 0, y: 40 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
-        className="text-center mb-12"
-      >
+      <animated.div style={fadeIn} className="text-center mb-12">
         <h1 className="text-4xl font-bold text-[#0D3B66] mb-4">Contáctanos</h1>
         <p className="text-[#2C3E50] text-lg">
           Escríbenos o utiliza cualquiera de los siguientes medios.
         </p>
-      </motion.div>
+      </animated.div>
 
       {/* CONTACTOS */}
       <div className="grid md:grid-cols-3 gap-8 text-center mb-16">
@@ -88,23 +85,18 @@ export default function Contacto() {
       </div>
 
       {/* FORMULARIO */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.2 }}
+      <animated.div
+        style={fadeIn}
         className="bg-white shadow-md rounded-2xl p-8 border border-gray-200 max-w-3xl mx-auto"
       >
         <h2 className="text-2xl font-semibold text-center text-[#0D3B66] mb-6">
           Envíanos un mensaje
         </h2>
 
-        <AnimatePresence>
-          {enviado ? (
-            <motion.div
-              key="confirmacion"
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0 }}
+        {transition((style, visible) =>
+          visible ? (
+            <animated.div
+              style={style}
               className="text-center py-12"
             >
               <FaCheckCircle className="text-green-500 text-5xl mx-auto mb-4" />
@@ -120,14 +112,11 @@ export default function Contacto() {
               >
                 Enviar otro mensaje
               </button>
-            </motion.div>
+            </animated.div>
           ) : (
-            <motion.form
-              key="formulario"
+            <animated.form
+              style={style}
               onSubmit={handleSubmit}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
               className="space-y-4"
             >
               <div className="grid md:grid-cols-2 gap-4">
@@ -184,10 +173,10 @@ export default function Contacto() {
               >
                 Enviar mensaje
               </button>
-            </motion.form>
-          )}
-        </AnimatePresence>
-      </motion.div>
+            </animated.form>
+          )
+        )}
+      </animated.div>
     </section>
   );
 }

@@ -1,9 +1,28 @@
 import { Link } from "react-router-dom";
-import { useSpring, useTransition, animated } from "@react-spring/web";
+import { useSpring, animated, useInView } from "@react-spring/web";
+import { useRef } from "react";
 
 const BASE = import.meta.env.BASE_URL;
 
 export default function Inicio() {
+  const ref1 = useRef(null);
+  const ref2 = useRef(null);
+
+  const [inView1, inViewBind1] = useInView({ rootMargin: "-20% 0px" });
+  const [inView2, inViewBind2] = useInView({ rootMargin: "-20% 0px" });
+
+  const fadeText = useSpring({
+    from: { opacity: 0, y: 60 },
+    to: { opacity: inView1 ? 1 : 0, y: inView1 ? 0 : 60 },
+    config: { tension: 200, friction: 20 },
+  });
+
+  const fadeImage = useSpring({
+    from: { opacity: 0, x: 50 },
+    to: { opacity: inView2 ? 1 : 0, x: inView2 ? 0 : 50 },
+    config: { tension: 200, friction: 22 },
+  });
+
   return (
     <section
       className="relative min-h-[90vh] flex flex-col items-center justify-center text-center text-white"
@@ -52,22 +71,23 @@ export default function Inicio() {
         </div>
       </div>
 
-      {/* Sección Construcción con animación y efecto hover */}
-      <motion.div
+      {/* Sección Construcción animada */}
+      <div
+        ref={ref1}
+        {...inViewBind1}
         className="relative z-10 mt-16 mb-10 max-w-6xl w-full px-4"
-        initial={{ opacity: 0, y: 60 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, amount: 0.3 }}
-        transition={{ duration: 0.8, ease: "easeOut" }}
       >
-        <div className="bg-white/10 backdrop-blur-md rounded-2xl overflow-hidden shadow-lg border border-white/20 flex flex-col md:flex-row items-stretch">
+        <animated.div
+          style={fadeText}
+          className="bg-white/10 backdrop-blur-md rounded-2xl overflow-hidden shadow-lg border border-white/20 flex flex-col md:flex-row items-stretch"
+        >
           {/* Texto */}
           <div className="flex-1 p-8 flex flex-col justify-center text-left">
             <h2 className="text-3xl md:text-4xl font-bold mb-4 text-[#FFD700] text-center md:text-left">
               ¡Novedad! Servicios de Construcción Profesional
             </h2>
             <p className="text-gray-100 text-base md:text-lg leading-relaxed mb-6">
-              En <span className="text-[#FFD700] font-semibold">TCT Services </span> 
+              En <span className="text-[#FFD700] font-semibold">TCT Services </span>
               realizamos obras civiles, remodelaciones, estructuras metálicas y mantenimiento integral,
               con calidad, cumplimiento y precisión.
             </p>
@@ -81,28 +101,23 @@ export default function Inicio() {
             </div>
           </div>
 
-          {/* Imagen con efecto hover */}
-          <motion.div
-            className="flex-1 relative group overflow-hidden"
-            initial={{ opacity: 0, x: 50 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.6, delay: 0.3 }}
-          >
-            <img
+          {/* Imagen */}
+          <div ref={ref2} {...inViewBind2} className="flex-1 relative group overflow-hidden">
+            <animated.img
+              style={fadeImage}
               src={`${BASE}images/construccion_destacada.png`}
               alt="Construcción TCT Services"
               className="w-full h-72 md:h-full object-cover transform group-hover:scale-110 transition-transform duration-700"
               loading="lazy"
             />
-            {/* Capa superpuesta al pasar el cursor */}
             <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity duration-500">
               <p className="text-white text-lg font-semibold">
                 Soluciones Integrales de Construcción
               </p>
             </div>
-          </motion.div>
-        </div>
-      </motion.div>
+          </div>
+        </animated.div>
+      </div>
     </section>
   );
 }
