@@ -12,6 +12,8 @@ export default function Reservar() {
     telefono: "",
     fecha: "",
     hora: "",
+    direccion: "",
+    motivo: "",
   });
 
   const [codigo, setCodigo] = useState("");
@@ -337,6 +339,30 @@ export default function Reservar() {
                     Horas no disponibles: {ocupadas.join(", ")}
                   </p>
                 )}
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-1">Dirección exacta</label>
+                <input
+                  type="text"
+                  name="direccion"
+                  value={form.direccion}
+                  onChange={(e) => setForm({ ...form, direccion: e.target.value })}
+                  placeholder="Ej: Calle 50, Edificio Omega, piso 3"
+                  className="w-full p-2 border rounded mb-3"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-1">Motivo de la visita técnica</label>
+                <textarea
+                  name="motivo"
+                  value={form.motivo}
+                  onChange={(e) => setForm({ ...form, motivo: e.target.value })}
+                  placeholder="Describe brevemente el problema o necesidad"
+                  className="w-full p-2 border rounded mb-3"
+                  rows="3"
+                />
               </div>
 
               <div className="flex gap-2">
