@@ -1,3 +1,26 @@
+// === /functions/api/reservas.js ===
+
+export async function onRequestGet({ env }) {
+  const headers = {
+    "Content-Type": "application/json",
+    "Access-Control-Allow-Origin": "*",
+  };
+
+  try {
+    const { results } = await env.DB.prepare(
+      "SELECT * FROM reservas ORDER BY fecha DESC, hora ASC"
+    ).all();
+
+    return new Response(JSON.stringify(results), { headers });
+  } catch (err) {
+    console.error("Error leyendo reservas:", err);
+    return new Response(
+      JSON.stringify({ error: "Error al cargar las reservas" }),
+      { status: 500, headers }
+    );
+  }
+}
+
 export async function onRequestPost({ request, env }) {
   const headers = {
     "Content-Type": "application/json",
@@ -12,17 +35,17 @@ export async function onRequestPost({ request, env }) {
     return new Response(JSON.stringify({ error: "JSON inválido" }), { status: 400, headers });
   }
 
-  // Sanitizar y defaults
+  // --- Sanitizar datos ---
   const nombre = String(data.nombre || "").trim();
   const email = String(data.email || "").trim();
   const telefono = String(data.telefono || "").trim();
-  const fecha = String(data.fecha || "").trim(); // espera YYYY-MM-DD
-  const hora = String(data.hora || "").trim(); // espera HH:MM
+  const fecha = String(data.fecha || "").trim(); // YYYY-MM-DD
+  const hora = String(data.hora || "").trim();   // HH:MM
   const direccion = String(data.direccion || "").trim();
   const motivo = String(data.motivo || "").trim();
   const codigo = String(data.codigo || Math.random().toString(36).substring(2, 8).toUpperCase()).trim();
 
-  // Validaciones mínimas
+  // --- Validaciones básicas ---
   if (!nombre || !email || !fecha || !hora) {
     return new Response(JSON.stringify({ error: "Faltan campos obligatorios" }), { status: 400, headers });
   }
@@ -32,17 +55,14 @@ export async function onRequestPost({ request, env }) {
   if (!/^\d{2}:\d{2}$/.test(hora)) {
     return new Response(JSON.stringify({ error: "Formato de hora inválido (HH:MM)" }), { status: 400, headers });
   }
-  if (email.length > 254 || nombre.length > 200) {
-    return new Response(JSON.stringify({ error: "Campos demasiado largos" }), { status: 400, headers });
-  }
 
-  // Persistir en DB (env.DB)
+  // --- Guardar en base de datos ---
   try {
     await env.DB.prepare(
       `
       INSERT INTO reservas (codigo, nombre, email, telefono, fecha, hora, direccion, motivo)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-    `
+      `
     )
       .bind(codigo, nombre, email, telefono, fecha, hora, direccion, motivo)
       .run();
@@ -51,11 +71,11 @@ export async function onRequestPost({ request, env }) {
     return new Response(JSON.stringify({ error: "Error al guardar la reserva" }), { status: 500, headers });
   }
 
-  // Config desde env con fallback
+  // --- Configuración y URLs ---
   const DOMAIN = env.DOMAIN || "https://tctservices-pty.com";
   const ADMIN_EMAIL = env.ADMIN_EMAIL || "contacto@tctservices-pty.com";
 
-  // Construir enlace Google Calendar (end date = fecha + 1 día para eventos all-day)
+  // --- Crear enlace de calendario ---
   const makeYMD = (d) => {
     const y = d.getUTCFullYear();
     const m = String(d.getUTCMonth() + 1).padStart(2, "0");
@@ -69,7 +89,7 @@ export async function onRequestPost({ request, env }) {
     "Cita TCT Services"
   )}&dates=${calendarDates}&details=${encodeURIComponent("Cliente: " + nombre)}&location=${encodeURIComponent("TCT Services")}`;
 
-  // Emails HTML (escapando valores)
+  // --- Email al cliente ---
   const correoCliente = `
     <div style="font-family: Arial, sans-serif; color: #0D3B66; max-width: 600px; margin: auto;">
       <div style="background-color:#0D3B66;color:white;text-align:center;padding:20px;">
@@ -96,6 +116,7 @@ export async function onRequestPost({ request, env }) {
     </div>
   `;
 
+  // --- Email al administrador ---
   const correoAdmin = `
     <div style="font-family:Arial,sans-serif;color:#0D3B66;max-width:600px;margin:auto;">
       <h3>Nueva cita registrada</h3>
@@ -105,13 +126,12 @@ export async function onRequestPost({ request, env }) {
       <p><strong>Email:</strong> ${escapeHtml(email)}</p>
       <p><strong>Código:</strong> ${escapeHtml(codigo)}</p>
       <div style="margin-top:20px;text-align:center;">
-        <a href="${calendarUrl}"
-           style="background:#0D3B66;color:white;padding:10px 18px;text-decoration:none;border-radius:6px;">Agregar al calendario</a>
+        <a href="${calendarUrl}" style="background:#0D3B66;color:white;padding:10px 18px;text-decoration:none;border-radius:6px;">Agregar al calendario</a>
       </div>
     </div>
   `;
 
-  // === Envío de correos con Resend ===
+  // --- Envío de correos con Resend ---
   try {
     const headersResend = {
       "Authorization": `Bearer ${env.RESEND_API_KEY}`,
@@ -140,15 +160,15 @@ export async function onRequestPost({ request, env }) {
       }),
     });
 
-  await Promise.allSettled([sendClient, sendAdmin]);
-} catch (err) {
-  console.error("Error enviando correo Resend:", err);
-}
+    await Promise.allSettled([sendClient, sendAdmin]);
+  } catch (err) {
+    console.error("Error enviando correo Resend:", err);
+  }
 
   return new Response(JSON.stringify({ ok: true, codigo }), { status: 201, headers });
 }
 
-// pequeña función para evitar inyección HTML en los correos
+// --- Protección contra inyección HTML ---
 function escapeHtml(str) {
   return String(str || "")
     .replace(/&/g, "&amp;")
