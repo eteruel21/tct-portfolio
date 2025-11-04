@@ -9,7 +9,8 @@
     "preview": "vite preview --host 0.0.0.0 --port 5173",
     "start": "vite preview --host 0.0.0.0 --port=$PORT",
     "update": "git add . && git commit -m \"Actualización automática\" && git push origin main",
-    "deploy": "vite build && gh-pages -d dist"
+    "deploy": "vite build && gh-pages -d dist",
+    "analyze": "source-map-explorer \"dist/assets/*.js\" --html > dist/report.html"
   },
   "engines": {
     "node": "22.20.0"
@@ -39,7 +40,9 @@
     "gh-pages": "^6.3.0",
     "globals": "^16.4.0",
     "postcss": "^8.5.6",
+    "rollup-plugin-visualizer": "^6.0.5",
     "serve": "^14.2.0",
+    "source-map-explorer": "^2.5.3",
     "tailwindcss": "^3.4.14",
     "vite": "^7.1.7"
   }
