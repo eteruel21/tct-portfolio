@@ -111,28 +111,39 @@ export async function onRequestPost({ request, env }) {
     </div>
   `;
 
-  // Envío de correos (no abortar la respuesta si fallan)
+  // === Envío de correos con Resend ===
   try {
-    const sendClient = fetch("https://formsubmit.co/ajax/" + encodeURIComponent(email), {
+    const headersResend = {
+      "Authorization": `Bearer ${env.RESEND_API_KEY}`,
+      "Content-Type": "application/json",
+    };
+
+    const sendClient = fetch("https://api.resend.com/emails", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ _subject: "Confirmación de cita - TCT Services", _html: correoCliente, _template: "box" }),
+      headers: headersResend,
+      body: JSON.stringify({
+        from: "TCT Services <no-reply@tctservices-pty.com>",
+        to: email,
+        subject: "Confirmación de cita - TCT Services",
+        html: correoCliente,
+      }),
     });
 
-    const sendAdmin = fetch("https://formsubmit.co/ajax/" + encodeURIComponent(ADMIN_EMAIL), {
+    const sendAdmin = fetch("https://api.resend.com/emails", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ _subject: "Nueva cita registrada", _html: correoAdmin, _template: "box" }),
+      headers: headersResend,
+      body: JSON.stringify({
+        from: "TCT Services <no-reply@tctservices-pty.com>",
+        to: ADMIN_EMAIL,
+        subject: "Nueva cita registrada",
+        html: correoAdmin,
+      }),
     });
 
-    const results = await Promise.allSettled([sendClient, sendAdmin]);
-    results.forEach((r, i) => {
-      if (r.status === "rejected") console.error("Email send failed:", i, r.reason);
-      else if (r.value && !r.value.ok) console.warn("Email service responded with non-ok:", i, r.value.status);
-    });
-  } catch (err) {
-    console.error("Email sending unexpected error:", err);
-  }
+  await Promise.allSettled([sendClient, sendAdmin]);
+} catch (err) {
+  console.error("Error enviando correo Resend:", err);
+}
 
   return new Response(JSON.stringify({ ok: true, codigo }), { status: 201, headers });
 }
