@@ -149,6 +149,27 @@ export default function Reservar() {
       });
 
       if (!res.ok) throw new Error("Error en el envío al servidor");
+      await fetch("https://formsubmit.co/ajax/contacto@tctservices-pty.com", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          nombre: form.nombre,
+          email: form.email,
+          telefono: form.telefono,
+          fecha: form.fecha,
+          hora: form.hora,
+          codigo: nuevoCodigo,
+          _subject: "Confirmación de cita - TCT Services",
+          _template: "table",
+          _cc: form.email, // copia al cliente
+          message: `Nueva cita registrada:
+            Nombre: ${form.nombre}
+            Teléfono: ${form.telefono}
+            Fecha: ${form.fecha}
+            Hora: ${form.hora}
+            Código: ${nuevoCodigo}`,
+        }),
+      });
 
       setCodigo(nuevoCodigo);
       setModo("confirmada");
