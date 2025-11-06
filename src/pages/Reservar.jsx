@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { useSpring, useTransition, animated } from "@react-spring/web";
 import { FaCalendarAlt, FaCheckCircle, FaTimesCircle, FaTools, FaSolarPanel, FaShieldAlt, FaHome } from "react-icons/fa";
 import { useNavigate, useSearchParams } from "react-router-dom";
