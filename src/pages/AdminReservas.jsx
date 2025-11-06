@@ -11,25 +11,25 @@ export default function AdminReservas() {
   const [acceso, setAcceso] = useState(false);
   const [cargando, setCargando] = useState(false);
 
-  const CLAVE_ADMIN = "tctadmin2025"; // 🔒 cambia esta clave según tu preferencia
+  const CLAVE_ADMIN = "tctadmin2025";
 
   // --- Obtener reservas desde el backend ---
-  const obtenerReservas = async () => {
+  async function obtenerReservas() {
     try {
       setCargando(true);
       const res = await fetch("/api/reservas");
       const data = await res.json();
-      setReservas(data || []);
+      setReservas(Array.isArray(data) ? data : []);
     } catch (err) {
       console.error("Error cargando reservas:", err);
       alert("Error al cargar reservas.");
     } finally {
       setCargando(false);
     }
-  };
+  }
 
-  // --- Eliminar una reserva ---
-  const eliminarReserva = async (codigo) => {
+  // --- Eliminar una reserva (hoisted) ---
+  async function eliminarReserva(codigo) {
     if (!window.confirm(`¿Eliminar reserva ${codigo}?`)) return;
     try {
       const res = await fetch("/api/reservas", {
@@ -37,18 +37,18 @@ export default function AdminReservas() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ codigo }),
       });
-      if (!res.ok) throw new Error();
+      if (!res.ok) throw new Error("DELETE failed");
       await obtenerReservas();
       alert("Reserva eliminada correctamente.");
     } catch (err) {
       console.error("Error al eliminar:", err);
       alert("No se pudo eliminar la reserva.");
     }
-  };
+  }
 
-  // --- Editar una reserva ---
-  const editarReserva = async (reserva) => {
-    const nuevoNombre = prompt("Editar nombre del cliente:", reserva.nombre);
+  // --- Editar una reserva (hoisted) ---
+  async function editarReserva(reserva) {
+    const nuevoNombre = prompt("Editar nombre del cliente:", reserva.nombre ?? "");
     if (nuevoNombre === null) return; // cancelado
 
     try {
@@ -57,48 +57,45 @@ export default function AdminReservas() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ ...reserva, nombre: nuevoNombre }),
       });
-      if (!res.ok) throw new Error();
+      if (!res.ok) throw new Error("PUT failed");
       await obtenerReservas();
       alert("Reserva actualizada correctamente.");
     } catch (err) {
       console.error("Error al actualizar:", err);
       alert("No se pudo actualizar la reserva.");
     }
-  };
+  }
 
   // --- Filtrar resultados ---
   const reservasFiltradas = reservas.filter((r) => {
+    const q = busqueda.toLowerCase();
     const coincideBusqueda =
-      r.nombre?.toLowerCase().includes(busqueda.toLowerCase()) ||
-      r.email?.toLowerCase().includes(busqueda.toLowerCase()) ||
-      r.codigo?.toLowerCase().includes(busqueda.toLowerCase());
+      (r.nombre ?? "").toLowerCase().includes(q) ||
+      (r.email ?? "").toLowerCase().includes(q) ||
+      (r.codigo ?? "").toLowerCase().includes(q);
     const coincideFecha = filtroFecha ? r.fecha === filtroFecha : true;
     return coincideBusqueda && coincideFecha;
   });
 
   // --- Exportar a Excel ---
-  const exportarExcel = () => {
+  function exportarExcel() {
     if (reservasFiltradas.length === 0) {
       alert("No hay datos para exportar.");
       return;
     }
-
     const hoja = XLSX.utils.json_to_sheet(reservasFiltradas);
     const libro = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(libro, hoja, "Reservas");
     XLSX.writeFile(libro, "Reservas_TCT_Services.xlsx");
-  };
+  }
 
   useEffect(() => {
     if (acceso) obtenerReservas();
   }, [acceso]);
 
-  const fade = useSpring({
-    from: { opacity: 0, y: 30 },
-    to: { opacity: 1, y: 0 },
-  });
+  const fade = useSpring({ from: { opacity: 0, y: 30 }, to: { opacity: 1, y: 0 } });
 
-  // --- Pantalla de autenticación ---
+  // --- Login simple ---
   if (!acceso) {
     return (
       <section className="min-h-screen bg-[#0D3B66] flex flex-col items-center justify-center text-white">
@@ -191,9 +188,7 @@ export default function AdminReservas() {
                 {reservasFiltradas.map((r, idx) => (
                   <tr
                     key={r.codigo}
-                    className={`hover:bg-white/10 transition ${
-                      idx % 2 ? "bg-white/5" : "bg-transparent"
-                    }`}
+                    className={`hover:bg-white/10 transition ${idx % 2 ? "bg-white/5" : "bg-transparent"}`}
                   >
                     <td className="py-2 px-4 font-mono text-[#FFD700]">{r.codigo}</td>
                     <td className="py-2 px-4">{r.nombre}</td>
