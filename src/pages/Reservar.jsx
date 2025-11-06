@@ -204,7 +204,9 @@ export default function Reservar() {
 
         {/* --- UI selector de servicio anexado --- */}
         <div className="mb-4 text-left">
-          <label className="block text-sm font-semibold mb-2 text-white/90">Selecciona un servicio</label>
+          <label className="block text-sm font-semibold mb-2 text-white/90">
+            Selecciona un servicio
+          </label>
           <div className="grid grid-cols-2 gap-3">
             {servicios.map((s) => (
               <motion.button
@@ -232,7 +234,10 @@ export default function Reservar() {
                 exit={{ opacity: 0 }}
                 className="mt-3 p-3 rounded-lg bg-white/5 text-sm text-white/90"
               >
-                Has seleccionado: <span className="font-semibold">{servicios.find(s => s.id === servicio)?.nombre}</span>
+                Has seleccionado:
+                <span className="font-semibold">
+                  {servicios.find(s => s.id === servicio)?.nombre}
+                </span>
               </motion.div>
             )}
           </AnimatePresence>
@@ -299,92 +304,103 @@ export default function Reservar() {
             )}
 
             {(item === "nuevo" || item === "editar") && (
-              <form onSubmit={handleSubmit} className="space-y-4 text-left">
-                {["nombre", "email", "telefono"].map((c) => (
-                  <div key={c}>
-                    <label className="block text-sm font-semibold mb-1 capitalize">{c}</label>
+              <>
+                {form.servicio && (
+                  <div className="mb-4 p-3 rounded-lg bg-white/5 text-sm text-white/90">
+                    Servicio seleccionado:{" "}
+                    <span className="font-semibold">
+                      {servicios.find((s) => s.id === form.servicio)?.nombre}
+                    </span>
+                  </div>
+                )}
+
+                <form onSubmit={handleSubmit} className="space-y-4 text-left">
+                  {["nombre", "email", "telefono"].map((c) => (
+                    <div key={c}>
+                      <label className="block text-sm font-semibold mb-1 capitalize">{c}</label>
+                      <input
+                        type={c === "email" ? "email" : "text"}
+                        name={c}
+                        value={form[c]}
+                        onChange={handleChange}
+                        required
+                        className="w-full px-3 py-2 rounded-xl text-black"
+                      />
+                    </div>
+                  ))}
+
+                  <div>
+                    <label className="block text-sm font-semibold mb-1">Fecha</label>
                     <input
-                      type={c === "email" ? "email" : "text"}
-                      name={c}
-                      value={form[c]}
+                      type="date"
+                      name="fecha"
+                      min={new Date().toISOString().split("T")[0]}
+                      value={form.fecha}
                       onChange={handleChange}
                       required
                       className="w-full px-3 py-2 rounded-xl text-black"
                     />
                   </div>
-                ))}
 
-                <div>
-                  <label className="block text-sm font-semibold mb-1">Fecha</label>
-                  <input
-                    type="date"
-                    name="fecha"
-                    min={new Date().toISOString().split("T")[0]}
-                    value={form.fecha}
-                    onChange={handleChange}
-                    required
-                    className="w-full px-3 py-2 rounded-xl text-black"
-                  />
-                </div>
+                  <div>
+                    <label className="block text-sm font-semibold mb-1">Hora</label>
+                    <select
+                      name="hora"
+                      value={form.hora}
+                      onChange={handleChange}
+                      required
+                      disabled={cargando || !form.fecha}
+                      className="w-full px-3 py-2 rounded-xl text-black"
+                    >
+                      <option value="">{cargando ? "Cargando..." : "Seleccionar hora"}</option>
+                      {horasDisponibles.map((h) => (
+                        <option key={h}>{h}</option>
+                      ))}
+                    </select>
+                  </div>
 
-                <div>
-                  <label className="block text-sm font-semibold mb-1">Hora</label>
-                  <select
-                    name="hora"
-                    value={form.hora}
-                    onChange={handleChange}
-                    required
-                    disabled={cargando || !form.fecha}
-                    className="w-full px-3 py-2 rounded-xl text-black"
-                  >
-                    <option value="">{cargando ? "Cargando..." : "Seleccionar hora"}</option>
-                    {horasDisponibles.map((h) => (
-                      <option key={h}>{h}</option>
-                    ))}
-                  </select>
-                </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Dirección exacta</label>
+                    <input
+                      type="text"
+                      name="direccion"
+                      required
+                      value={form.direccion}
+                      onChange={handleChange}
+                      className="w-full px-3 py-2 rounded-xl text-black"
+                    />
+                  </div>
 
-                <div>
-                  <label className="block text-sm font-medium mb-1">Dirección exacta</label>
-                  <input
-                    type="text"
-                    name="direccion"
-                    required
-                    value={form.direccion}
-                    onChange={handleChange}
-                    className="w-full px-3 py-2 rounded-xl text-black"
-                  />
-                </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Motivo</label>
+                    <textarea
+                      name="motivo"
+                      rows="3"
+                      value={form.motivo}
+                      onChange={handleChange}
+                      required
+                      className="w-full px-3 py-2 rounded-xl text-black"
+                    />
+                  </div>
 
-                <div>
-                  <label className="block text-sm font-medium mb-1">Motivo</label>
-                  <textarea
-                    name="motivo"
-                    rows="3"
-                    value={form.motivo}
-                    onChange={handleChange}
-                    required
-                    className="w-full px-3 py-2 rounded-xl text-black"
-                  />
-                </div>
-
-                <button
-                  type="submit"
-                  className="w-full py-3 bg-[#FFD700] text-[#0D3B66] rounded-xl font-semibold hover:bg-[#e5c100]"
-                >
-                  Continuar
-                </button>
-
-                {esActualizacion && (
                   <button
-                    type="button"
-                    onClick={eliminarReserva}
-                    className="w-full py-3 bg-red-600 text-white rounded-xl font-semibold hover:bg-red-700"
+                    type="submit"
+                    className="w-full py-3 bg-[#FFD700] text-[#0D3B66] rounded-xl font-semibold hover:bg-[#e5c100]"
                   >
-                    Eliminar cita
+                    Continuar
                   </button>
-                )}
-              </form>
+
+                  {esActualizacion && (
+                    <button
+                      type="button"
+                      onClick={eliminarReserva}
+                      className="w-full py-3 bg-red-600 text-white rounded-xl font-semibold hover:bg-red-700"
+                    >
+                      Eliminar cita
+                    </button>
+                  )}
+                </form>
+              </>
             )}
 
             {item === "revisar" && (
