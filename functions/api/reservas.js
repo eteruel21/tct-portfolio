@@ -1,5 +1,4 @@
 // === /functions/api/reservas.js ===
-Panama
 export async function onRequestGet({ request, env }) {
   const headers = {
     "Content-Type": "application/json",
