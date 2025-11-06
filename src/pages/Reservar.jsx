@@ -10,6 +10,10 @@ export default function Reservar() {
 
   // --- Selector de servicio (anexado) ---
   const [servicio, setServicio] = useState("");
+  const seleccionarServicio = (id) => {
+  setServicio(id);
+  setForm((f) => ({ ...f, servicio: id }));
+};
   const servicios = [
     { id: "construccion", nombre: "Construcción", icono: <FaHome /> },
     { id: "sistemas", nombre: "Sistemas Especiales", icono: <FaShieldAlt /> },
@@ -26,6 +30,7 @@ export default function Reservar() {
     hora: "",
     direccion: "",
     motivo: "",
+    servicio: "",
   });
 
   const [codigo, setCodigo] = useState("");
@@ -205,7 +210,7 @@ export default function Reservar() {
               <motion.button
                 key={s.id}
                 whileTap={{ scale: 0.97 }}
-                onClick={() => setServicio(s.id)}
+                onClick={() => seleccionarServicio(s.id)}
                 className={`flex flex-col items-center justify-center p-3 rounded-2xl border transition-all ${
                   servicio === s.id
                     ? "bg-[#C1121F] text-white border-[#C1121F]"
