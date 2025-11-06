@@ -23,6 +23,13 @@ export default function Inicio() {
     config: { tension: 200, friction: 22 },
   });
 
+  const fadeReservar = useSpring({
+    from: { opacity: 0, y: 40 },
+    to: { opacity: 1, y: 0 },
+    config: { tension: 200, friction: 20 },
+    delay: 300,
+  });
+
   return (
     <section
       className="relative min-h-[90vh] flex flex-col items-center justify-center text-center text-white"
@@ -49,7 +56,19 @@ export default function Inicio() {
           Parking · Control de Acceso · CCTV · Alarmas · Automatización · Construcción
         </p>
 
-        <div className="mt-8 flex flex-wrap gap-4 justify-center">
+        {/* Botón principal de Reservar cita */}
+        <animated.div style={fadeReservar} className="mt-10 flex justify-center">
+          <Link
+            to="/reservar"
+            className="px-8 py-4 bg-[#FFD700] text-[#0D3B66] font-extrabold rounded-full shadow-lg 
+               hover:bg-[#e5c100] hover:scale-105 transform transition duration-300 text-lg md:text-xl"
+          >
+            📅 Reservar cita
+          </Link>
+        </animated.div>
+
+        {/* Botones secundarios */}
+        <div className="mt-6 flex flex-wrap gap-4 justify-center">
           <Link
             to="/cotizador"
             className="px-6 py-3 bg-[#C1121F] hover:bg-[#A10E1A] rounded-2xl font-semibold"
