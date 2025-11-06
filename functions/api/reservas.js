@@ -262,6 +262,46 @@ function escapeHtml(str) {
     .replace(/'/g, "&#039;");
 }
 
+// --- Editar reserva ---
+export async function onRequestPut({ request, env }) {
+  const headers = {
+    "Content-Type": "application/json",
+    "Access-Control-Allow-Origin": "*",
+  };
+
+  try {
+    const data = await request.json();
+    if (!data.codigo)
+      return new Response(JSON.stringify({ error: "Falta código" }), {
+        status: 400,
+        headers,
+      });
+
+    await env.DB.prepare(
+      `UPDATE reservas SET nombre=?, email=?, telefono=?, fecha=?, hora=?, direccion=?, motivo=? WHERE codigo=?`
+    )
+      .bind(
+        data.nombre,
+        data.email,
+        data.telefono,
+        data.fecha,
+        data.hora,
+        data.direccion,
+        data.motivo,
+        data.codigo
+      )
+      .run();
+
+    return new Response(JSON.stringify({ ok: true }), { headers });
+  } catch (err) {
+    console.error("Error actualizando reserva:", err);
+    return new Response(
+      JSON.stringify({ error: "Error interno" }),
+      { status: 500, headers }
+    );
+  }
+}
+
 // --- Eliminar reserva ---
 export async function onRequestDelete({ request, env }) {
   const headers = {
