@@ -63,7 +63,7 @@
     }
     .pie {
       background-color: #1E3A5F;
-      color: #D4AF37;
+      color: #ffffff;
       text-align: center;
       padding: 12px;
       font-size: 13px;
@@ -100,9 +100,10 @@
       </div>
 
       <div style="text-align:center; margin:25px 0;">
-        <a href="https://tctservices-pty.com/calendar-redirect.html?fecha=2025-11-07&hora=09:00&nombre=Cliente%20de%20prueba"
-           class="boton boton-secundario">Agregar al calendario</a>
-      </div>
+        <a href="https://tctservices-pty.com/calendar-redirect.html?fecha={{fecha}}&hora={{hora}}&duracion={{duracion}}&nombre={{motivo}}%20–%20{{nombre}}&detalle=Motivo:%20{{motivo}}%0AOrganizador:%20contacto@tctservices-pty.com&ubicacion={{direccion}}"
+          class="boton boton-secundario">
+          Agregar al calendario
+        </a>
 
       <p style="font-size:13px; color:#666; text-align:center;">
         Si necesitas modificar o cancelar tu cita, usa el botón “Gestionar mi cita”.

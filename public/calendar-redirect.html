@@ -2,28 +2,110 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <title>Agregar al calendario</title>
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Agregar al calendario — TCT Services</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
-    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:#0D3B66;color:#fff;display:flex;align-items:center;justify-content:center;height:100vh;margin:0;padding:24px;text-align:center}
-    .card{max-width:620px;background:linear-gradient(180deg,#0b2a4a 0%,#0d3b66 100%);padding:24px;border-radius:12px;box-shadow:0 8px 30px rgba(0,0,0,.35)}
-    h1{font-size:20px;margin:0 0 12px}
-    p{color:#e6f0ff;margin:8px 0}
-    .actions{display:flex;gap:10px;justify-content:center;margin-top:16px}
-    .btn{padding:10px 16px;border-radius:10px;text-decoration:none;font-weight:700}
-    .gcal{background:#0D3B66;color:#fff;border:2px solid #fff}
-    .ics{background:#FFD700;color:#0D3B66}
-    a{color:inherit}
-    small{display:block;margin-top:8px;color:#cfe3ff;font-size:13px}
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(180deg, #0B2A4A 0%, #1E3A5F 100%);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      margin: 0;
+      padding: 24px;
+      text-align: center;
+    }
+    .card {
+      max-width: 620px;
+      width: 100%;
+      background: #ffffff15;
+      padding: 30px;
+      border-radius: 20px;
+      box-shadow: 0 8px 25px rgba(0,0,0,.35);
+      border: 1px solid #D4AF37;
+      animation: fadeIn 0.8s ease;
+    }
+    .logo {
+      height: 65px;
+      margin-bottom: 10px;
+      opacity: 0;
+      animation: fadeIn 1s ease forwards;
+    }
+    h1 {
+      font-size: 22px;
+      color: #D4AF37;
+      margin: 10px 0 14px;
+    }
+    p {
+      color: #e6f0ff;
+      margin: 8px 0;
+      line-height: 1.5;
+    }
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      justify-content: center;
+      margin-top: 22px;
+    }
+    .btn {
+      padding: 12px 20px;
+      border-radius: 10px;
+      text-decoration: none;
+      font-weight: bold;
+      min-width: 140px;
+      text-align: center;
+      transition: 0.25s ease;
+    }
+    .btn-ios {
+      background: #D4AF37;
+      color: #1E3A5F;
+    }
+    .btn-ios:hover { opacity: 0.9; }
+    .btn-android {
+      background: #1E3A5F;
+      color: #D4AF37;
+      border: 2px solid #D4AF37;
+    }
+    .btn-android:hover {
+      background: #D4AF37;
+      color: #1E3A5F;
+    }
+    .loader {
+      width: 38px; height: 38px;
+      border: 4px solid #D4AF37;
+      border-top-color: transparent;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 20px auto;
+    }
+    small {
+      display: block;
+      margin-top: 14px;
+      color: #cfe3ff;
+      font-size: 13px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    @keyframes fadeIn { to { opacity: 1; } }
+    @media (max-width: 480px) {
+      .card { padding: 22px; border-radius: 14px; }
+      h1 { font-size: 18px; }
+      .btn { font-size: 14px; padding: 10px 14px; }
+    }
   </style>
 </head>
 <body>
-  <div class="card" role="main" aria-live="polite">
-    <h1>Agregar evento al calendario</h1>
+  <div class="card">
+    <img class="logo" src="https://tctservices-pty.com/images/logo_tct.png" alt="TCT Services" />
+    <h1>Agregando cita al calendario</h1>
+    <div class="loader"></div>
     <p id="msg">Preparando redirección…</p>
+
     <div class="actions">
-      <a id="btn-ics" class="btn ics" href="#" download="evento.ics">iPhone / Outlook (.ics)</a>
-      <a id="btn-gcal" class="btn gcal" href="#" target="_blank" rel="noopener">Google Calendar</a>
+      <a id="btn-ics" class="btn btn-ios" href="#" download="cita-tct.ics">iPhone / Outlook (.ics)</a>
+      <a id="btn-gcal" class="btn btn-android" href="#" target="_blank" rel="noopener">Google Calendar</a>
     </div>
     <small id="note">Si no ocurre nada, pulsa el botón correspondiente.</small>
   </div>
@@ -34,14 +116,16 @@
       const rawFecha = q.get("fecha");
       const rawHora = q.get("hora");
       const rawNombre = q.get("nombre") || "Cita TCT Services";
-      const detalle = q.get("detalle") || "Cita con TCT Services";
+      const rawDetalle = q.get("detalle") || "Cita con TCT Services";
+      const rawUbicacion = q.get("ubicacion") || "TCT Services";
+      const rawDuracion = parseInt(q.get("duracion") || "60", 10); // duración en minutos
 
       const msg = document.getElementById("msg");
       const btnIcs = document.getElementById("btn-ics");
       const btnGcal = document.getElementById("btn-gcal");
 
       if(!rawFecha || !rawHora){
-        msg.textContent = "Parámetros incompletos (fecha/hora).";
+        msg.textContent = "Faltan datos de fecha u hora.";
         btnIcs.style.pointerEvents = "none";
         btnGcal.style.pointerEvents = "none";
         return;
@@ -50,20 +134,40 @@
       const fecha = decodeURIComponent(rawFecha);
       const hora = decodeURIComponent(rawHora);
       const nombre = decodeURIComponent(rawNombre);
+      const detalle = decodeURIComponent(rawDetalle);
+      const ubicacion = decodeURIComponent(rawUbicacion);
+      const duracion = rawDuracion;
 
-      // Formato básico YYYYMMDD y HHMMSS
+      // Calcular hora de fin
+      const inicio = new Date(`${fecha}T${hora}`);
+      const finDate = new Date(inicio.getTime() + duracion * 60000);
+      const fin = finDate.toISOString().slice(0,16);
+      const finHora = fin.split("T")[1];
+
       const ymd = fecha.replace(/-/g,"");
       const hhmmss = hora.replace(":","") + "00";
+      const hhmmssFin = finHora.replace(":","") + "00";
       const start = `${ymd}T${hhmmss}`;
-      // Por simplicidad usamos mismo inicio/fin (eventos cortos). Si quieres, sumar minutos.
-      const end = start;
+      const end = `${ymd}T${hhmmssFin}`;
 
-      const googleUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(nombre)}&dates=${start}/${end}&details=${encodeURIComponent(detalle)}&location=${encodeURIComponent("TCT Services")}`;
+      // Si ubicación parece una dirección, usar Google Maps
+      const locationFull = ubicacion.startsWith("http")
+        ? ubicacion
+        : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(ubicacion)}`;
 
+      // URL para Google Calendar
+      const googleUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE` +
+        `&text=${encodeURIComponent(nombre)}` +
+        `&dates=${start}/${end}` +
+        `&details=${encodeURIComponent(detalle)}` +
+        `&location=${encodeURIComponent(locationFull)}`;
+
+      // Generar archivo ICS
       const ics = [
         "BEGIN:VCALENDAR",
         "VERSION:2.0",
         "PRODID:-//TCT Services//Reservas//ES",
+        "METHOD:PUBLISH",
         "BEGIN:VEVENT",
         `UID:${ymd}${hhmmss}@tctservices-pty.com`,
         `DTSTAMP:${new Date().toISOString().replace(/[-:]/g,"").split(".")[0]}Z`,
@@ -71,12 +175,17 @@
         `DTEND:${end}`,
         `SUMMARY:${escapeHtml(nombre)}`,
         `DESCRIPTION:${escapeHtml(detalle)}`,
-        "LOCATION:TCT Services",
+        `LOCATION:${escapeHtml(ubicacion)}`,
+        "ORGANIZER;CN=TCT Services:mailto:contacto@tctservices-pty.com",
+        "BEGIN:VALARM",
+        "TRIGGER:-PT30M",
+        "ACTION:DISPLAY",
+        "DESCRIPTION:Recordatorio de cita con TCT Services",
+        "END:VALARM",
         "END:VEVENT",
         "END:VCALENDAR"
       ].join("\r\n");
 
-      // crear blob y url para .ics
       const blob = new Blob([ics], { type: "text/calendar;charset=utf-8" });
       const icsUrl = URL.createObjectURL(blob);
 
@@ -87,39 +196,29 @@
       const isIOS = /iPad|iPhone|iPod/.test(ua) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
       const isAndroid = /Android/i.test(ua);
 
-      function forceDownload(url, filename="evento.ics"){
-        try{
-          const a = document.createElement("a");
-          a.href = url;
-          a.download = filename;
-          document.body.appendChild(a);
-          a.click();
-          a.remove();
-        }catch(e){ console.error("download failed", e); }
-      }
-
-      // Lógica de redirección automática:
       try {
         if (isIOS) {
           msg.textContent = "Abriendo Calendario en iPhone…";
           window.location.replace(icsUrl);
-         } else if (isAndroid) {
-            msg.textContent = "Abriendo Google Calendar…";
-            window.location.replace(googleUrl);
-         } else {
+        } else if (isAndroid) {
           msg.textContent = "Abriendo Google Calendar…";
-          window.location.href = googleUrl;
+          window.location.replace(googleUrl);
+        } else {
+          msg.textContent = "Abriendo Google Calendar en una nueva pestaña…";
+          window.open(googleUrl, "_blank", "noopener");
         }
-      }catch(e){
+      } catch(e) {
         console.error(e);
       }
 
-      // Helper safe
       function escapeHtml(s){
-        return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#039;");
+        return String(s||"").replace(/&/g,"&amp;")
+                            .replace(/</g,"&lt;")
+                            .replace(/>/g,"&gt;")
+                            .replace(/"/g,"&quot;")
+                            .replace(/'/g,"&#039;");
       }
 
-      // Revocar URL después de un tiempo para liberar memoria
       setTimeout(()=>{ try{ URL.revokeObjectURL(icsUrl); }catch(e){} }, 30000);
     })();
   </script>
