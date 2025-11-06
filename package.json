@@ -10,7 +10,8 @@
     "start": "vite preview --host 0.0.0.0 --port=$PORT",
     "update": "git add . && git commit -m \"Actualización automática\" && git push origin main",
     "deploy": "vite build && gh-pages -d dist",
-    "analyze": "source-map-explorer \"dist/assets/*.js\" --html > dist/report.html"
+    "analyze": "source-map-explorer \"dist/assets/*.js\" --html > dist/report.html",
+    "full-deploy": "npm run build && git add . && git commit -m \"Actualización automática\" && git pull --rebase origin main && git push origin main && gh-pages -d dist && echo '✅ Publicación completada en GitHub Pages'"
   },
   "engines": {
     "node": "22.20.0"
