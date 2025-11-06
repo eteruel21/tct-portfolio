@@ -28,41 +28,43 @@ export default function AdminReservas() {
     }
   };
 
-    const eliminarReserva = async (codigo) => {
-      if (!window.confirm(`¿Eliminar reserva ${codigo}?`)) return;
-      try {
-        const res = await fetch("/api/reservas", {
-          method: "DELETE",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ codigo }),
-        });
-        if (!res.ok) throw new Error();
-        await obtenerReservas();
-        alert("Reserva eliminada correctamente.");
-      } catch (err) {
-        console.error("Error al eliminar:", err);
-        alert("No se pudo eliminar la reserva.");
-      }
-    };
+  // --- Eliminar una reserva ---
+  const eliminarReserva = async (codigo) => {
+    if (!window.confirm(`¿Eliminar reserva ${codigo}?`)) return;
+    try {
+      const res = await fetch("/api/reservas", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ codigo }),
+      });
+      if (!res.ok) throw new Error();
+      await obtenerReservas();
+      alert("Reserva eliminada correctamente.");
+    } catch (err) {
+      console.error("Error al eliminar:", err);
+      alert("No se pudo eliminar la reserva.");
+    }
+  };
 
-      const editarReserva = async (reserva) => {
-        const nuevoNombre = prompt("Editar nombre del cliente:", reserva.nombre);
-        if (nuevoNombre === null) return; // cancelado
+  // --- Editar una reserva ---
+  const editarReserva = async (reserva) => {
+    const nuevoNombre = prompt("Editar nombre del cliente:", reserva.nombre);
+    if (nuevoNombre === null) return; // cancelado
 
-        try {
-          const res = await fetch("/api/reservas", {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ ...reserva, nombre: nuevoNombre }),
-          });
-          if (!res.ok) throw new Error();
-          await obtenerReservas();
-          alert("Reserva actualizada correctamente.");
-        } catch (err) {
-          console.error("Error al actualizar:", err);
-          alert("No se pudo actualizar la reserva.");
-        }
-      };
+    try {
+      const res = await fetch("/api/reservas", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...reserva, nombre: nuevoNombre }),
+      });
+      if (!res.ok) throw new Error();
+      await obtenerReservas();
+      alert("Reserva actualizada correctamente.");
+    } catch (err) {
+      console.error("Error al actualizar:", err);
+      alert("No se pudo actualizar la reserva.");
+    }
+  };
 
   // --- Filtrar resultados ---
   const reservasFiltradas = reservas.filter((r) => {
@@ -199,23 +201,21 @@ export default function AdminReservas() {
                     <td className="py-2 px-4">{r.telefono}</td>
                     <td className="py-2 px-4">{r.fecha}</td>
                     <td className="py-2 px-4">{r.hora}</td>
-                    <td className="py-2 px-4 text-right">
-                      <td className="py-2 px-4 text-right space-x-3">
-                        <button
-                          onClick={() => editarReserva(r)}
-                          className="text-yellow-400 hover:text-yellow-600"
-                          title="Editar reserva"
-                        >
-                          <FaCalendarCheck />
-                        </button>
-                        <button
-                          onClick={() => eliminarReserva(r.codigo)}
-                          className="text-red-400 hover:text-red-600"
-                          title="Eliminar reserva"
-                        >
-                          <FaTrashAlt />
-                        </button>
-                      </td>
+                    <td className="py-2 px-4 text-right space-x-3">
+                      <button
+                        onClick={() => editarReserva(r)}
+                        className="text-yellow-400 hover:text-yellow-600"
+                        title="Editar reserva"
+                      >
+                        <FaCalendarCheck />
+                      </button>
+                      <button
+                        onClick={() => eliminarReserva(r.codigo)}
+                        className="text-red-400 hover:text-red-600"
+                        title="Eliminar reserva"
+                      >
+                        <FaTrashAlt />
+                      </button>
                     </td>
                   </tr>
                 ))}
