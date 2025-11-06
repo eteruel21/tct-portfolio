@@ -1,12 +1,13 @@
 import { useState, useEffect } from "react";
 import { useSpring, useTransition, animated } from "@react-spring/web";
-import { FaCalendarAlt, FaCheckCircle, FaTrashAlt, FaTimesCircle, FaTools } from "react-icons/fa";
+import { FaCalendarAlt, FaCheckCircle, FaTimesCircle, FaTools } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import confetti from "canvas-confetti";
 import { useSearchParams } from "react-router-dom";
 
 export default function Reservar() {
   const navigate = useNavigate();
+
   const [form, setForm] = useState({
     nombre: "",
     email: "",
@@ -19,6 +20,7 @@ export default function Reservar() {
 
   const [codigo, setCodigo] = useState("");
   const [modo, setModo] = useState("nuevo");
+
   const [reservaActiva, setReservaActiva] = useState(null);
   const [codigoBusqueda, setCodigoBusqueda] = useState("");
   const [enviando, setEnviando] = useState(false);
@@ -85,51 +87,72 @@ export default function Reservar() {
     setModo("revisar");
   };
 
+  // ✅ FUNCIÓN ELIMINAR RESERVA
+  async function eliminarReserva() {
+    if (!reservaActiva?.codigo)
+      return alert("No hay una reserva activa.");
+
+    if (!window.confirm(`¿Seguro que deseas eliminar la cita ${reservaActiva.codigo}?`))
+      return;
+
+    try {
+      const res = await fetch("/api/reservas", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ codigo: reservaActiva.codigo }),
+      });
+
+      if (!res.ok) throw new Error("Error al eliminar la cita.");
+
+      alert("Cita eliminada correctamente.");
+      setModo("cancelada");
+      setReservaActiva(null);
+      setForm({
+        nombre: "",
+        email: "",
+        telefono: "",
+        fecha: "",
+        hora: "",
+        direccion: "",
+        motivo: "",
+      });
+
+    } catch (err) {
+      console.error(err);
+      alert("No se pudo eliminar la cita.");
+    }
+  }
+
+  // ✅ FUNCIÓN ENVIAR RESERVA (ARREGLADA)
   const enviarReserva = async () => {
     setEnviando(true);
+
     const nuevoCodigo = reservaActiva?.codigo || generarCodigo();
+
     try {
       const res = await fetch("/api/reservas", {
         method: reservaActiva ? "PUT" : "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ ...form, codigo: nuevoCodigo }),
       });
-        const eliminarReserva = async () => {
-          if (!reservaActiva?.codigo) return alert("No hay una reserva activa.");
-          if (!window.confirm(`¿Seguro que deseas eliminar la cita ${reservaActiva.codigo}?`)) return;
-
-          try {
-            const res = await fetch("/api/reservas", {
-              method: "DELETE",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ codigo: reservaActiva.codigo }),
-            });
-            if (!res.ok) throw new Error("Error al eliminar la cita.");
-            alert("Cita eliminada correctamente.");
-            setModo("cancelada");
-            setReservaActiva(null);
-            setForm({
-              nombre: "",
-              email: "",
-              telefono: "",
-              fecha: "",
-              hora: "",
-              direccion: "",
-              motivo: "",
-            });
-          } catch (err) {
-            console.error(err);
-            alert("No se pudo eliminar la cita.");
-          }
-        };
-
 
       if (!res.ok) throw new Error();
 
       confetti({ particleCount: 120, spread: 80, origin: { y: 0.6 } });
+
       setCodigo(nuevoCodigo);
       setModo("confirmada");
-      setForm({ nombre: "", email: "", telefono: "", fecha: "", hora: "", direccion: "", motivo: "" });
+
+      setForm({
+        nombre: "",
+        email: "",
+        telefono: "",
+        fecha: "",
+        hora: "",
+        direccion: "",
+        motivo: "",
+      });
+
     } catch {
       alert("Error al procesar la reserva.");
     } finally {
@@ -139,7 +162,6 @@ export default function Reservar() {
 
   const fadeIn = useSpring({ from: { opacity: 0, y: 30 }, to: { opacity: 1, y: 0 } });
 
-  // transición entre modos
   const transitions = useTransition(modo, {
     from: { opacity: 0, transform: "scale(0.97)" },
     enter: { opacity: 1, transform: "scale(1)" },
@@ -239,6 +261,7 @@ export default function Reservar() {
                     />
                   </div>
                 ))}
+
                 <div>
                   <label className="block text-sm font-semibold mb-1">Fecha</label>
                   <input
@@ -251,6 +274,7 @@ export default function Reservar() {
                     className="w-full px-3 py-2 rounded-xl text-black"
                   />
                 </div>
+
                 <div>
                   <label className="block text-sm font-semibold mb-1">Hora</label>
                   <select
@@ -267,6 +291,7 @@ export default function Reservar() {
                     ))}
                   </select>
                 </div>
+
                 <div>
                   <label className="block text-sm font-medium mb-1">Dirección exacta</label>
                   <input
@@ -278,6 +303,7 @@ export default function Reservar() {
                     className="w-full px-3 py-2 rounded-xl text-black"
                   />
                 </div>
+
                 <div>
                   <label className="block text-sm font-medium mb-1">Motivo</label>
                   <textarea
@@ -289,12 +315,14 @@ export default function Reservar() {
                     className="w-full px-3 py-2 rounded-xl text-black"
                   />
                 </div>
+
                 <button
                   type="submit"
                   className="w-full py-3 bg-[#FFD700] text-[#0D3B66] rounded-xl font-semibold hover:bg-[#e5c100]"
                 >
                   Continuar
                 </button>
+
                 {esActualizacion && (
                   <button
                     type="button"
@@ -304,18 +332,19 @@ export default function Reservar() {
                     Eliminar cita
                   </button>
                 )}
-
               </form>
             )}
 
             {item === "revisar" && (
               <div className="space-y-4 text-left">
                 <h3 className="text-xl font-semibold text-center mb-2">Confirmar datos de cita</h3>
+
                 {Object.entries(form).map(([k, v]) => (
                   <p key={k}>
                     <span className="font-bold capitalize">{k}:</span> {v}
                   </p>
                 ))}
+
                 <div className="flex gap-3 mt-4">
                   <button
                     onClick={() => setModo("nuevo")}
@@ -323,6 +352,7 @@ export default function Reservar() {
                   >
                     Editar
                   </button>
+
                   <button
                     onClick={enviarReserva}
                     disabled={enviando}
@@ -342,10 +372,12 @@ export default function Reservar() {
               <div className="space-y-6 text-center">
                 <FaCheckCircle className="text-green-400 text-6xl mx-auto" />
                 <h2 className="text-xl font-semibold">¡Cita confirmada!</h2>
+
                 <p className="text-gray-100">
                   Tu código:{" "}
                   <span className="font-mono text-[#FFD700] text-xl">{codigo}</span>
                 </p>
+
                 <button
                   onClick={() => setModo("nuevo")}
                   className="w-full py-3 bg-[#C1121F] rounded-xl hover:bg-[#A10E1A] font-semibold"
@@ -358,10 +390,14 @@ export default function Reservar() {
             {item === "cancelada" && (
               <div className="space-y-6 text-center">
                 <FaTimesCircle className="text-red-400 text-6xl mx-auto" />
+
                 <h2 className="text-xl font-semibold">¡Reserva cancelada!</h2>
+
                 <p className="text-gray-100">
-                  Código: <span className="font-mono text-[#FFD700] text-xl">{codigo}</span>
+                  Código:{" "}
+                  <span className="font-mono text-[#FFD700] text-xl">{codigo}</span>
                 </p>
+
                 <button
                   onClick={() => setModo("nuevo")}
                   className="w-full py-3 bg-[#C1121F] rounded-xl hover:bg-[#A10E1A] font-semibold"
@@ -370,6 +406,7 @@ export default function Reservar() {
                 </button>
               </div>
             )}
+
           </animated.div>
         ))}
       </animated.div>
