@@ -3,6 +3,7 @@ import { useSpring, useTransition, animated } from "@react-spring/web";
 import { FaCalendarAlt, FaCheckCircle, FaTrashAlt, FaTimesCircle, FaTools } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import confetti from "canvas-confetti";
+import { useSearchParams } from "react-router-dom";
 
 export default function Reservar() {
   const navigate = useNavigate();
@@ -25,6 +26,16 @@ export default function Reservar() {
   const [ocupadas, setOcupadas] = useState([]);
   const [cargando, setCargando] = useState(false);
   const [esActualizacion, setEsActualizacion] = useState(false);
+  const [searchParams] = useSearchParams();
+
+  useEffect(() => {
+    const codigoUrl = searchParams.get("codigo");
+    const modoUrl = searchParams.get("modo");
+    if (codigoUrl && modoUrl === "buscar") {
+      setModo("buscar");
+      setCodigoBusqueda(codigoUrl.toUpperCase());
+    }
+  }, []);
 
   const todasLasHoras = Array.from({ length: 10 }, (_, i) =>
     `${(8 + i).toString().padStart(2, "0")}:00`

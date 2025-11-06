@@ -133,17 +133,31 @@ END:VCALENDAR
           <table style="width:100%;border-collapse:collapse;margin-top:10px;">
             <tr><td><strong>Fecha:</strong></td><td>${escapeHtml(fecha)}</td></tr>
             <tr><td><strong>Hora:</strong></td><td>${escapeHtml(hora)}</td></tr>
-            <tr><td><strong>Código:</strong></td><td style="font-family:monospace;color:#C1121F;">${escapeHtml(
-              codigo
-            )}</td></tr>
+            <tr><td><strong>Código:</strong></td><td style="font-family:monospace;color:#C1121F;">${escapeHtml(codigo)}</td></tr>
           </table>
+
           <div style="text-align:center;margin:25px 0;">
             <a href="${DOMAIN}/#/reservar?codigo=${encodeURIComponent(
     codigo
-  )}" style="background:#C1121F;color:white;padding:12px 20px;border-radius:8px;text-decoration:none;font-weight:bold;">
+  )}&modo=buscar"
+              style="background:#C1121F;color:white;padding:12px 20px;border-radius:8px;text-decoration:none;font-weight:bold;">
               Gestionar mi cita
             </a>
           </div>
+
+          <div style="text-align:center;margin:25px 0;">
+            <a href="${DOMAIN}/calendar-redirect.html?fecha=${encodeURIComponent(
+    fecha
+  )}&hora=${encodeURIComponent(
+    hora
+  )}&codigo=${encodeURIComponent(
+    codigo
+  )}"
+              style="background:#FFD700;color:#0D3B66;padding:12px 20px;border-radius:8px;text-decoration:none;font-weight:bold;">
+              Agregar al calendario
+            </a>
+          </div>
+
           <p>Gracias por elegir <strong>TCT Services</strong>.</p>
         </div>
         <div style="background-color:#FFD700;color:#0D3B66;text-align:center;padding:10px;font-size:13px;">
