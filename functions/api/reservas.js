@@ -124,21 +124,30 @@ export async function onRequestPost({ request, env }) {
 
   // --- Crear archivo ICS (para iPhone / Outlook) ---
   const eventoICS = `
-BEGIN:VCALENDAR
-VERSION:2.0
-PRODID:-//TCT Services//Reservas//ES
-BEGIN:VEVENT
-UID:${codigo}@tctservices-pty.com
-DTSTAMP:${new Date().toISOString().replace(/[-:]/g, "").split(".")[0]}Z
-DTSTART;TZID=America/Panama:${fecha.replace(/-/g, "")}T${hora.replace(":", "")}00
-DTEND;TZID=America/Panama:${fecha.replace(/-/g, "")}T${hora.replace(":", "")}00
-SUMMARY:Cita TCT Services
-DESCRIPTION:Cliente: ${nombre}\\nTel: ${telefono}\\nEmail: ${email}
-LOCATION:TCT Services
-END:VEVENT
-END:VCALENDAR
+  BEGIN:VCALENDAR
+  VERSION:2.0
+  PRODID:-//TCT Services//Reservas//ES
+  BEGIN:VEVENT
+  UID:${codigo}@tctservices-pty.com
+  DTSTAMP:${new Date().toISOString().replace(/[-:]/g, "").split(".")[0]}Z
+  DTSTART;TZID=America/Panama:${fecha.replace(/-/g, "")}T${hora.replace(":", "")}00
+  DTEND;TZID=America/Panama:${fecha.replace(/-/g, "")}T${hora.replace(":", "")}00
+  SUMMARY:Cita TCT Services
+  DESCRIPTION:Cliente: ${nombre}\\nTel: ${telefono}\\nEmail: ${email}
+  LOCATION:TCT Services
+  END:VEVENT
+  END:VCALENDAR
   `;
-  const eventoBase64 = Buffer.from(eventoICS).toString("base64");
+
+  // Convertir texto a base64 sin usar Buffer
+  function toBase64(str) {
+    // atob/btoa no admiten Unicode, así que se codifica seguro:
+    const utf8 = new TextEncoder().encode(str);
+    let binary = "";
+    for (let i = 0; i < utf8.length; i++) binary += String.fromCharCode(utf8[i]);
+    return btoa(binary);
+  }
+  const eventoBase64 = toBase64(eventoICS);
   const icsUrl = `data:text/calendar;base64,${eventoBase64}`;
 
   // --- Email al cliente ---
