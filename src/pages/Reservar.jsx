@@ -1,9 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useSpring, useTransition, animated } from "@react-spring/web";
-import { FaCalendarAlt, FaCheckCircle, FaTrashAlt, FaTimesCircle, FaTools } from "react-icons/fa";
-import { useNavigate } from "react-router-dom";
+import { FaCalendarAlt, FaCheckCircle, FaTimesCircle, FaTools } from "react-icons/fa";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import confetti from "canvas-confetti";
-import { useSearchParams } from "react-router-dom";
 
 export default function Reservar() {
   const navigate = useNavigate();
@@ -35,7 +34,7 @@ export default function Reservar() {
       setModo("buscar");
       setCodigoBusqueda(codigoUrl.toUpperCase());
     }
-  }, []);
+  }, [searchParams]);
 
   const todasLasHoras = Array.from({ length: 10 }, (_, i) =>
     `${(8 + i).toString().padStart(2, "0")}:00`
@@ -45,6 +44,7 @@ export default function Reservar() {
     Math.random().toString(36).substring(2, 8).toUpperCase();
 
   const esDiaPermitido = (fecha) => {
+    if (!fecha) return false;
     const dia = new Date(fecha).getDay();
     return dia >= 1 && dia <= 6;
   };
@@ -54,6 +54,7 @@ export default function Reservar() {
     setCargando(true);
     try {
       const res = await fetch(`/api/disponibilidad?fecha=${fecha}`);
+      if (!res.ok) throw new Error();
       const data = await res.json();
       setOcupadas(data.ocupadas || []);
       setHorasDisponibles(todasLasHoras.filter((h) => !data.ocupadas?.includes(h)));
@@ -69,8 +70,7 @@ export default function Reservar() {
     setForm((f) => ({ ...f, [name]: value }));
 
     if (name === "fecha") {
-      const dia = new Date(value).getDay();
-      if (dia === 0 || !esDiaPermitido(value)) {
+      if (!esDiaPermitido(value)) {
         alert("Solo se permiten reservas de lunes a sábado.");
         setForm((f) => ({ ...f, fecha: "" }));
         setHorasDisponibles([]);
@@ -100,6 +100,8 @@ export default function Reservar() {
       setCodigo(nuevoCodigo);
       setModo("confirmada");
       setForm({ nombre: "", email: "", telefono: "", fecha: "", hora: "", direccion: "", motivo: "" });
+      setReservaActiva(null);
+      setEsActualizacion(false);
     } catch {
       alert("Error al procesar la reserva.");
     } finally {
@@ -109,7 +111,6 @@ export default function Reservar() {
 
   const fadeIn = useSpring({ from: { opacity: 0, y: 30 }, to: { opacity: 1, y: 0 } });
 
-  // transición entre modos
   const transitions = useTransition(modo, {
     from: { opacity: 0, transform: "scale(0.97)" },
     enter: { opacity: 1, transform: "scale(1)" },
@@ -160,7 +161,7 @@ export default function Reservar() {
                     onClick={async () => {
                       if (!codigoBusqueda) return alert("Ingresa un código");
                       try {
-                        const res = await fetch(`/api/reservas?codigo=${codigoBusqueda}`);
+                        const res = await fetch(`/api/reservas?codigo=${encodeURIComponent(codigoBusqueda)}`);
                         if (!res.ok) throw new Error("No encontrada");
                         const data = await res.json();
                         setReservaActiva(data);
@@ -175,6 +176,7 @@ export default function Reservar() {
                         });
                         setModo("editar");
                         setEsActualizacion(true);
+                        if (data.fecha) cargarDisponibilidad(data.fecha);
                       } catch {
                         alert("No se encontró una reserva con ese código.");
                       }
@@ -209,6 +211,7 @@ export default function Reservar() {
                     />
                   </div>
                 ))}
+
                 <div>
                   <label className="block text-sm font-semibold mb-1">Fecha</label>
                   <input
@@ -221,6 +224,7 @@ export default function Reservar() {
                     className="w-full px-3 py-2 rounded-xl text-black"
                   />
                 </div>
+
                 <div>
                   <label className="block text-sm font-semibold mb-1">Hora</label>
                   <select
@@ -237,6 +241,7 @@ export default function Reservar() {
                     ))}
                   </select>
                 </div>
+
                 <div>
                   <label className="block text-sm font-medium mb-1">Dirección exacta</label>
                   <input
@@ -248,6 +253,7 @@ export default function Reservar() {
                     className="w-full px-3 py-2 rounded-xl text-black"
                   />
                 </div>
+
                 <div>
                   <label className="block text-sm font-medium mb-1">Motivo</label>
                   <textarea
@@ -259,6 +265,7 @@ export default function Reservar() {
                     className="w-full px-3 py-2 rounded-xl text-black"
                   />
                 </div>
+
                 <button
                   type="submit"
                   className="w-full py-3 bg-[#FFD700] text-[#0D3B66] rounded-xl font-semibold hover:bg-[#e5c100]"
@@ -287,9 +294,7 @@ export default function Reservar() {
                     onClick={enviarReserva}
                     disabled={enviando}
                     className={`flex-1 py-3 rounded-xl font-semibold ${
-                      enviando
-                        ? "bg-gray-400 cursor-not-allowed"
-                        : "bg-[#C1121F] hover:bg-[#A10E1A]"
+                      enviando ? "bg-gray-400 cursor-not-allowed" : "bg-[#C1121F] hover:bg-[#A10E1A]"
                     }`}
                   >
                     {enviando ? "Enviando..." : "Confirmar"}
@@ -303,15 +308,22 @@ export default function Reservar() {
                 <FaCheckCircle className="text-green-400 text-6xl mx-auto" />
                 <h2 className="text-xl font-semibold">¡Cita confirmada!</h2>
                 <p className="text-gray-100">
-                  Tu código:{" "}
-                  <span className="font-mono text-[#FFD700] text-xl">{codigo}</span>
+                  Tu código: <span className="font-mono text-[#FFD700] text-xl">{codigo}</span>
                 </p>
-                <button
-                  onClick={() => setModo("nuevo")}
-                  className="w-full py-3 bg-[#C1121F] rounded-xl hover:bg-[#A10E1A] font-semibold"
-                >
-                  Nueva reserva
-                </button>
+                <div className="flex gap-2">
+                  <a
+                    href={`${process.env.PUBLIC_URL || ""}/#/reservar?codigo=${encodeURIComponent(codigo)}&modo=buscar`}
+                    className="flex-1 py-3 bg-[#FFD700] text-[#0D3B66] rounded-xl font-semibold hover:bg-[#e5c100] inline-block"
+                  >
+                    Gestionar cita
+                  </a>
+                  <button
+                    onClick={() => setModo("nuevo")}
+                    className="flex-1 py-3 bg-[#C1121F] rounded-xl hover:bg-[#A10E1A] font-semibold"
+                  >
+                    Nueva reserva
+                  </button>
+                </div>
               </div>
             )}
 

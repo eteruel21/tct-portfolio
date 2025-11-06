@@ -1,57 +1,81 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Agregar al calendario</title>
-  <script>
-    function detectPlatform() {
-      const ua = navigator.userAgent.toLowerCase();
-      if (/iphone|ipad|ipod|mac/.test(ua)) return "ios";
-      if (/android/.test(ua)) return "android";
-      return "other";
-    }
-
-    function main() {
-      const params = new URLSearchParams(window.location.search);
-      const fecha = params.get("fecha");
-      const hora = params.get("hora");
-      const codigo = params.get("codigo");
-
-      const baseDate = fecha.replace(/-/g, "");
-      const time = hora.replace(":", "") + "00";
-
-      const googleUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=Cita+TCT+Services&dates=${baseDate}T${time}Z/${baseDate}T${time}Z&details=Código:+${codigo}&location=TCT+Services`;
-
-      const eventoICS = `
-BEGIN:VCALENDAR
-VERSION:2.0
-PRODID:-//TCT Services//Reservas//ES
-BEGIN:VEVENT
-UID:${codigo}@tctservices-pty.com
-DTSTAMP:${new Date().toISOString().replace(/[-:]/g, '').split('.')[0]}Z
-DTSTART;TZID=America/Panama:${fecha.replace(/-/g, '')}T${hora.replace(':', '')}00
-DTEND;TZID=America/Panama:${fecha.replace(/-/g, '')}T${hora.replace(':', '')}00
-SUMMARY:Cita TCT Services
-DESCRIPTION:Código: ${codigo}
-LOCATION:TCT Services
-END:VEVENT
-END:VCALENDAR`;
-      const icsUrl = "data:text/calendar;charset=utf-8," + encodeURIComponent(eventoICS);
-
-      const platform = detectPlatform();
-      if (platform === "ios") {
-        window.location.href = icsUrl;
-      } else if (platform === "android") {
-        window.location.href = googleUrl;
-      } else {
-        // por defecto abrir Google Calendar
-        window.location.href = googleUrl;
-      }
-    }
-    window.onload = main;
-  </script>
+  <style>
+    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;text-align:center;padding:40px;color:#0D3B66}
+    .btn{display:inline-block;margin:8px;padding:12px 20px;border-radius:10px;text-decoration:none;font-weight:700}
+    .gcal{background:#0D3B66;color:#fff}
+    .ics{background:#FFD700;color:#0D3B66}
+  </style>
 </head>
-<body style="text-align:center;margin-top:50px;font-family:sans-serif;">
-  <h3>Redirigiendo a tu calendario...</h3>
+<body>
+  <h2>Redirigiendo a tu calendario…</h2>
+  <p>Si no ocurre nada, usa los botones:</p>
+  <p>
+    <a id="btn-ics" class="btn ics" href="#" rel="noopener noreferrer">iPhone / Outlook (.ics)</a>
+    <a id="btn-gcal" class="btn gcal" href="#" rel="noopener noreferrer" target="_blank">Google Calendar</a>
+  </p>
+
+  <script>
+    (function(){
+      const q = new URLSearchParams(location.search);
+      const rawG = q.get("g");
+      const rawI = q.get("i");
+      const g = rawG ? decodeURIComponent(rawG) : null;
+      const i = rawI ? decodeURIComponent(rawI) : null;
+
+      const btnIcs = document.getElementById("btn-ics");
+      const btnGcal = document.getElementById("btn-gcal");
+      btnIcs.href = i || "#";
+      btnGcal.href = g || "#";
+
+      const ua = navigator.userAgent || navigator.vendor || "";
+      const isIOS = /iPad|iPhone|iPod/.test(ua) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+      const isAndroid = /Android/i.test(ua);
+
+      function forceDownload(dataUrl, filename = "evento.ics") {
+        try {
+          const a = document.createElement("a");
+          a.href = dataUrl;
+          a.download = filename;
+          a.style.display = "none";
+          document.body.appendChild(a);
+          a.click();
+          setTimeout(() => { document.body.removeChild(a); }, 1000);
+        } catch (e) { console.error("download failed", e); }
+      }
+
+      try {
+        // iOS: intentar abrir data: (esto suele abrir la app de Calendario)
+        if (isIOS && i) { location.replace(i); return; }
+        // Android: abrir Google Calendar si está disponible
+        if (isAndroid && g) { location.replace(g); return; }
+        // Desktop / general: priorizar Google Calendar; si no, forzar descarga .ics
+        if (g) {
+          // abrir en nueva pestaña para no bloquear la página
+          window.open(g, "_blank", "noopener");
+          // además intentar abrir .ics si existe para clientes de escritorio
+          if (i) forceDownload(i, "evento.ics");
+          return;
+        } else if (i) {
+          // si i es data: intenta descarga directa
+          if (i.startsWith("data:")) {
+            forceDownload(i, "evento.ics");
+            // algunos navegadores aceptan location.href a data: para forzar apertura
+            try { location.replace(i); } catch(e) {}
+          } else {
+            // si es URL normal, navegar a ella
+            location.replace(i);
+          }
+          return;
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    })();
+  </script>
 </body>
 </html>
