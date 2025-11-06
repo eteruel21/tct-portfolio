@@ -19,15 +19,16 @@ export default function Contacto() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await fetch("https://formsubmit.co/ajax/contacto@tctservices-pty.com", {
+      const res = await fetch("/api/contacto", {
         method: "POST",
-        headers: { "Content-Type": "application/json", Accept: "application/json" },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
       });
+      if (!res.ok) throw new Error("Error al enviar");
       setEnviado(true);
       setFormData({ nombre: "", email: "", telefono: "", mensaje: "" });
     } catch (err) {
-      alert("Error al enviar. Verifica tu conexión o intenta más tarde.");
+      alert("No se pudo enviar el mensaje. Intenta nuevamente.");
     }
   };
 
@@ -95,10 +96,7 @@ export default function Contacto() {
 
         {transition((style, visible) =>
           visible ? (
-            <animated.div
-              style={style}
-              className="text-center py-12"
-            >
+            <animated.div style={style} className="text-center py-12">
               <FaCheckCircle className="text-green-500 text-5xl mx-auto mb-4" />
               <h3 className="text-xl font-bold text-[#1A1A1A] mb-2">
                 ¡Mensaje enviado con éxito!
@@ -114,11 +112,7 @@ export default function Contacto() {
               </button>
             </animated.div>
           ) : (
-            <animated.form
-              style={style}
-              onSubmit={handleSubmit}
-              className="space-y-4"
-            >
+            <animated.form style={style} onSubmit={handleSubmit} className="space-y-4">
               <div className="grid md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-semibold mb-1">Nombre</label>
