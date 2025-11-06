@@ -1,12 +1,22 @@
 import { useState, useEffect } from "react";
 import { useSpring, useTransition, animated } from "@react-spring/web";
-import { FaCalendarAlt, FaCheckCircle, FaTimesCircle, FaTools } from "react-icons/fa";
-import { useNavigate } from "react-router-dom";
+import { FaCalendarAlt, FaCheckCircle, FaTimesCircle, FaTools, FaSolarPanel, FaShieldAlt, FaHome } from "react-icons/fa";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
 import confetti from "canvas-confetti";
-import { useSearchParams } from "react-router-dom";
 
 export default function Reservar() {
   const navigate = useNavigate();
+
+  // --- Selector de servicio (anexado) ---
+  const [servicio, setServicio] = useState("");
+  const servicios = [
+    { id: "construccion", nombre: "Construcción", icono: <FaHome /> },
+    { id: "sistemas", nombre: "Sistemas Especiales", icono: <FaShieldAlt /> },
+    { id: "solar", nombre: "Energía Solar", icono: <FaSolarPanel /> },
+    { id: "mantenimiento", nombre: "Mantenimiento", icono: <FaTools /> },
+  ];
+  // --- fin selector ---
 
   const [form, setForm] = useState({
     nombre: "",
@@ -186,6 +196,43 @@ export default function Reservar() {
         <h1 className="text-3xl font-bold mb-6 flex justify-center items-center gap-2">
           <FaCalendarAlt className="text-[#FFD700]" /> Reservar cita
         </h1>
+
+        {/* --- UI selector de servicio anexado --- */}
+        <div className="mb-4 text-left">
+          <label className="block text-sm font-semibold mb-2 text-white/90">Selecciona un servicio</label>
+          <div className="grid grid-cols-2 gap-3">
+            {servicios.map((s) => (
+              <motion.button
+                key={s.id}
+                whileTap={{ scale: 0.97 }}
+                onClick={() => setServicio(s.id)}
+                className={`flex flex-col items-center justify-center p-3 rounded-2xl border transition-all ${
+                  servicio === s.id
+                    ? "bg-[#C1121F] text-white border-[#C1121F]"
+                    : "bg-white/10 text-white border-white/20 hover:bg-white/20"
+                }`}
+              >
+                <div className="text-2xl mb-1">{s.icono}</div>
+                <span className="text-sm font-medium">{s.nombre}</span>
+              </motion.button>
+            ))}
+          </div>
+
+          <AnimatePresence>
+            {servicio && (
+              <motion.div
+                key="servicio-info"
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0 }}
+                className="mt-3 p-3 rounded-lg bg-white/5 text-sm text-white/90"
+              >
+                Has seleccionado: <span className="font-semibold">{servicios.find(s => s.id === servicio)?.nombre}</span>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+        {/* --- fin selector --- */}
 
         {modo === "nuevo" && (
           <button
