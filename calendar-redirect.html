@@ -1,85 +1,73 @@
 <!DOCTYPE html>
 <html lang="es">
-  <head>
-    <meta charset="UTF-8" />
-    <title>Agregar al calendario - TCT Services</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <style>
-      body {
-        font-family: Arial, sans-serif;
-        text-align: center;
-        padding-top: 60px;
-        color: #0d3b66;
-      }
-    </style>
-    <script>
-      function detectPlatform() {
-        const ua = navigator.userAgent.toLowerCase();
-        if (/iphone|ipad|ipod|mac/.test(ua)) return "ios";
-        if (/android/.test(ua)) return "android";
-        return "other";
-      }
+<head>
+  <meta charset="UTF-8" />
+  <title>Agregar al calendario</title>
+  <style>
+    body {
+      background: #0D3B66;
+      color: white;
+      font-family: Arial;
+      text-align: center;
+      padding: 40px;
+    }
+    a {
+      color: #FFD700;
+    }
+  </style>
+</head>
+<body>
 
-      function addOneHour(hora) {
-        const [h, m] = hora.split(":").map(Number);
-        const newH = (h + 1) % 24;
-        return `${String(newH).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
-      }
+  <h2>Redirigiendo…</h2>
+  <p>Si no ocurre nada, toca el botón:</p>
+  <div id="btn"></div>
 
-      function main() {
-        const params = new URLSearchParams(window.location.search);
-        const fecha = params.get("fecha");
-        const hora = params.get("hora");
-        const codigo = params.get("codigo");
-        const nombre = params.get("nombre") || "Cita TCT Services";
-        const detalle = params.get("detalle") || "Cita programada con TCT Services";
+<script>
+  const params = new URLSearchParams(location.search);
+  const fecha = params.get("fecha");
+  const hora = params.get("hora");
+  const nombre = params.get("nombre") || "Cita TCT Services";
+  const detalle = params.get("detalle") || "";
 
-        if (!fecha || !hora || !codigo) {
-          document.body.innerHTML = "<h3>Faltan parámetros.</h3>";
-          return;
-        }
+  const start = fecha.replace(/-/g, "") + "T" + hora.replace(":", "") + "00";
+  const end = start;
 
-        // Duración de 1 hora
-        const horaFin = addOneHour(hora);
+  // GOOGLE CALENDAR URL
+  const googleUrl =
+    `https://calendar.google.com/calendar/render?action=TEMPLATE` +
+    `&text=${encodeURIComponent(nombre)}` +
+    `&dates=${start}/${end}` +
+    `&details=${encodeURIComponent(detalle)}` +
+    `&location=${encodeURIComponent("TCT Services")}`;
 
-        // Fechas formato UTC simplificado
-        const baseDate = fecha.replace(/-/g, "");
-        const startTime = hora.replace(":", "") + "00";
-        const endTime = horaFin.replace(":", "") + "00";
-
-        const googleUrl =
-          "https://calendar.google.com/calendar/render?action=TEMPLATE" +
-          `&text=${encodeURIComponent(nombre)}` +
-          `&details=${encodeURIComponent(detalle + " | Código: " + codigo)}` +
-          `&location=${encodeURIComponent("TCT Services")}` +
-          `&dates=${baseDate}T${startTime}Z/${baseDate}T${endTime}Z`;
-
-        const eventoICS = `
+  // ARCHIVO ICS (iPhone)
+  const ics = `
 BEGIN:VCALENDAR
 VERSION:2.0
-PRODID:-//TCT Services//Reservas//ES
 BEGIN:VEVENT
-UID:${codigo}@tctservices-pty.com
-DTSTAMP:${new Date().toISOString().replace(/[-:]/g, "").split(".")[0]}Z
-DTSTART;TZID=America/Panama:${fecha.replace(/-/g, "")}T${hora.replace(":", "")}00
-DTEND;TZID=America/Panama:${fecha.replace(/-/g, "")}T${horaFin.replace(":", "")}00
 SUMMARY:${nombre}
-DESCRIPTION:${detalle} - Código: ${codigo}
+DTSTART:${start}
+DTEND:${end}
+DESCRIPTION:${detalle}
 LOCATION:TCT Services
 END:VEVENT
 END:VCALENDAR`;
-        const icsUrl =
-          "data:text/calendar;charset=utf-8," + encodeURIComponent(eventoICS);
 
-        const platform = detectPlatform();
-        if (platform === "ios") window.location.href = icsUrl;
-        else window.location.href = googleUrl;
-      }
+  const blob = new Blob([ics], { type: "text/calendar" });
+  const icsUrl = URL.createObjectURL(blob);
 
-      window.onload = main;
-    </script>
-  </head>
-  <body>
-    <h3>Redirigiendo a tu calendario...</h3>
-  </body>
+  const isIOS =
+    /iPhone|iPad|iPod/i.test(navigator.userAgent) ||
+    (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+
+  const finalUrl = isIOS ? icsUrl : googleUrl;
+
+  document.getElementById("btn").innerHTML =
+    `<a href="${finalUrl}">Abrir calendario</a>`;
+
+  setTimeout(() => {
+    location.href = finalUrl;
+  }, 800);
+</script>
+</body>
 </html>
