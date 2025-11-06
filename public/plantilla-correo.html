@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Confirmación de cita — TCT Services</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: url('https://tctservices-pty.com/images/fondo_inicio.jpg') center/cover;
+      margin: 0;
+      padding: 0;
+    }
+    .contenedor {
+      background: #ffffffee;
+      border-radius: 16px;
+      max-width: 620px;
+      margin: 40px auto;
+      overflow: hidden;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+    }
+    .encabezado {
+      background-color: #1E3A5F;
+      text-align: center;
+      padding: 25px;
+    }
+    .encabezado img {
+      height: 70px;
+      margin-bottom: 10px;
+    }
+    .encabezado h2 {
+      color: #D4AF37;
+      font-size: 22px;
+      margin: 0;
+    }
+    .contenido {
+      padding: 25px;
+      color: #333;
+    }
+    .contenido table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 15px 0;
+    }
+    .contenido td {
+      padding: 6px 0;
+      vertical-align: top;
+    }
+    .boton {
+      display: inline-block;
+      padding: 12px 25px;
+      border-radius: 10px;
+      text-decoration: none;
+      font-weight: bold;
+    }
+    .boton-principal {
+      background-color: #1E3A5F;
+      color: #fff;
+    }
+    .boton-secundario {
+      background-color: #D4AF37;
+      color: #1E3A5F;
+    }
+    .pie {
+      background-color: #1E3A5F;
+      color: #D4AF37;
+      text-align: center;
+      padding: 12px;
+      font-size: 13px;
+    }
+    @media (max-width: 600px) {
+      .contenedor { margin: 20px; }
+      .contenido { padding: 20px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="contenedor">
+    <!-- Encabezado -->
+    <div class="encabezado">
+      <img src="https://tctservices-pty.com/images/logo_tct.png" alt="TCT Services" />
+      <h2>Confirmación de cita — TCT Services</h2>
+    </div>
+
+    <!-- Contenido -->
+    <div class="contenido">
+      <p>Estimado/a <strong>Cliente de prueba</strong>,</p>
+      <p>Tu cita ha sido registrada con éxito. A continuación los detalles:</p>
+
+      <table>
+        <tr><td><strong>Fecha:</strong></td><td>2025-11-07</td></tr>
+        <tr><td><strong>Hora:</strong></td><td>09:00</td></tr>
+        <tr><td><strong>Código:</strong></td><td><b>ABC123</b></td></tr>
+      </table>
+
+      <div style="text-align:center; margin:25px 0;">
+        <a href="https://tctservices-pty.com/#/reservar?codigo=ABC123&modo=buscar"
+           class="boton boton-principal">Gestionar mi cita</a>
+      </div>
+
+      <div style="text-align:center; margin:25px 0;">
+        <a href="https://tctservices-pty.com/calendar-redirect.html?fecha=2025-11-07&hora=09:00&nombre=Cliente%20de%20prueba"
+           class="boton boton-secundario">Agregar al calendario</a>
+      </div>
+
+      <p style="font-size:13px; color:#666; text-align:center;">
+        Si necesitas modificar o cancelar tu cita, usa el botón “Gestionar mi cita”.
+      </p>
+    </div>
+
+    <!-- Pie -->
+    <div class="pie">
+      © 2025 TCT Services · Panamá
+    </div>
+  </div>
+
+</body>
+</html>

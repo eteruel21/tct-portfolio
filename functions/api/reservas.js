@@ -98,60 +98,11 @@ export async function onRequestPost({ request, env }) {
     );
   }
 
-  // DOMAIN automático
   const DOMAIN =
     env.DOMAIN ||
     (request.url.includes("localhost")
       ? "http://127.0.0.1:8788"
       : "https://tctservices-pty.com");
-
-  // ✅ GOOGLE CALENDAR
-  const toYMD = (d) => {
-    const y = d.getUTCFullYear();
-    const m = String(d.getUTCMonth() + 1).padStart(2, "0");
-    const day = String(d.getUTCDate()).padStart(2, "0");
-    return `${y}${m}${day}`;
-  };
-
-  const start = new Date(fecha + "T" + hora + ":00");
-  const end = new Date(start.getTime() + 3600000);
-
-  const gStart = `${toYMD(start)}T${hora.replace(":", "")}00Z`;
-  const gEnd = `${toYMD(end)}T${hora.replace(":", "")}00Z`;
-
-  const googleCalendarUrl =
-    `https://calendar.google.com/calendar/render?action=TEMPLATE` +
-    `&text=${encodeURIComponent("Cita TCT Services")}` +
-    `&dates=${gStart}/${gEnd}` +
-    `&details=${encodeURIComponent("Cliente: " + nombre)}` +
-    `&location=${encodeURIComponent("TCT Services")}`;
-
-  // ✅ ARCHIVO ICS PARA IPHONE
-  const ics = `
-BEGIN:VCALENDAR
-VERSION:2.0
-PRODID:-//TCT Services//ES
-BEGIN:VEVENT
-UID:${codigo}@tctservices-pty.com
-DTSTAMP:${new Date().toISOString().replace(/[-:]/g, "").split(".")[0]}Z
-DTSTART;TZID=America/Panama:${fecha.replace(/-/g, "")}T${hora.replace(":", "")}00
-DTEND;TZID=America/Panama:${fecha.replace(/-/g, "")}T${hora.replace(":", "")}00
-SUMMARY:Cita TCT Services
-DESCRIPTION:Cliente: ${nombre}\\nTel: ${telefono}\\nEmail: ${email}
-LOCATION:TCT Services
-END:VEVENT
-END:VCALENDAR
-  `;
-
-  function toBase64(str) {
-    const utf8 = new TextEncoder().encode(str);
-    let binary = "";
-    for (let b of utf8) binary += String.fromCharCode(b);
-    return btoa(binary);
-  }
-
-  const icsBase64 = toBase64(ics);
-  const icsUrl = `data:text/calendar;base64,${icsBase64}`;
 
   // ✅ EMAIL HTML (Cliente)
   const correoCliente = `
@@ -170,19 +121,18 @@ END:VCALENDAR
           <p><strong>Código:</strong> ${codigo}</p>
 
           <div style="text-align:center; margin:25px 0;">
-            <a href="${DOMAIN}/#/reservar?codigo=${codigo}&modo=buscar"
+            <a href="${DOMAIN}/#/reservar?codigo=${encodeURIComponent(codigo)}&modo=buscar"
               style="background:#C1121F;color:white;padding:12px 20px;border-radius:10px;text-decoration:none;">
               Gestionar mi cita
             </a>
           </div>
 
           <div style="text-align:center; margin:25px 0;">
-            <a href="${icsUrl}" download="cita-${codigo}.ics"
+            <a href="${DOMAIN}/calendar-redirect.html?fecha=${encodeURIComponent(fecha)}&hora=${encodeURIComponent(hora)}&nombre=${encodeURIComponent(nombre)}"
               style="background:#FFD700;color:#0D3B66;padding:12px 20px;border-radius:10px;text-decoration:none;">
-              Agregar al calendario (iPhone/Outlook)
+              Agregar al calendario (iPhone / Android)
             </a>
           </div>
-
         </div>
 
         <footer style="background:#FFD700; color:#0D3B66; text-align:center; padding:10px;">
@@ -194,17 +144,51 @@ END:VCALENDAR
 
   // ✅ EMAIL ADMIN
   const correoAdmin = `
-    Nueva cita:
-    <br/><br/>
-    <strong>Cliente:</strong> ${nombre}<br/>
-    <strong>Fecha:</strong> ${fecha}<br/>
-    <strong>Hora:</strong> ${hora}<br/>
-    <strong>Teléfono:</strong> ${telefono}<br/>
-    <strong>Código:</strong> ${codigo}<br/>
-    <br/>
-    <a href="${googleCalendarUrl}">Agregar al Google Calendar</a>
-    <br/>
-    <a href="${icsUrl}" download="cita-${codigo}.ics">Descargar ICS</a>
+  <div style="font-family:Arial, sans-serif; padding:0; margin:0;
+      background:#f5f6f8;">
+    <div style="background:#ffffff; border-radius:16px; max-width:620px; margin:auto; overflow:hidden; box-shadow:0 4px 15px rgba(0,0,0,0.1);">
+      
+      <!-- Encabezado con logo -->
+      <div style="background-color:#1E3A5F; text-align:center; padding:25px;">
+        <img src="https://tctservices-pty.com/images/logo_tct.png" alt="TCT Services" style="height:65px; margin-bottom:10px;" />
+        <h2 style="color:#D4AF37; font-size:22px; margin:0;">
+          Nueva cita registrada — TCT Services
+        </h2>
+      </div>
+
+      <!-- Contenido principal -->
+      <div style="padding:25px; color:#333;">
+        <p>Se ha registrado una nueva cita con los siguientes datos:</p>
+
+        <table style="width:100%; border-collapse:collapse; margin:15px 0;">
+          <tr><td style="padding:6px 0;"><strong>Cliente:</strong></td><td>${nombre}</td></tr>
+          <tr><td style="padding:6px 0;"><strong>Correo:</strong></td><td>${email}</td></tr>
+          <tr><td style="padding:6px 0;"><strong>Teléfono:</strong></td><td>${telefono || "—"}</td></tr>
+          <tr><td style="padding:6px 0;"><strong>Dirección:</strong></td><td>${direccion || "—"}</td></tr>
+          <tr><td style="padding:6px 0;"><strong>Motivo:</strong></td><td>${motivo || "—"}</td></tr>
+          <tr><td style="padding:6px 0;"><strong>Fecha:</strong></td><td>${fecha}</td></tr>
+          <tr><td style="padding:6px 0;"><strong>Hora:</strong></td><td>${hora}</td></tr>
+          <tr><td style="padding:6px 0;"><strong>Código:</strong></td><td><b>${codigo}</b></td></tr>
+        </table>
+
+        <div style="text-align:center; margin:25px 0;">
+          <a href="${DOMAIN}/calendar-redirect.html?fecha=${encodeURIComponent(fecha)}&hora=${encodeURIComponent(hora)}&nombre=${encodeURIComponent(nombre)}"
+            style="background-color:#D4AF37;color:#1E3A5F;padding:12px 25px;border-radius:10px;text-decoration:none;display:inline-block;font-weight:bold;">
+            Agregar al calendario
+          </a>
+        </div>
+
+        <p style="font-size:13px; color:#777; text-align:center;">
+          Este correo se envió automáticamente desde el sistema de reservas.
+        </p>
+      </div>
+
+      <!-- Pie de página -->
+      <footer style="background-color:#1E3A5F; color:#D4AF37; text-align:center; padding:12px; font-size:13px;">
+        © ${new Date().getFullYear()} TCT Services · Panamá
+      </footer>
+    </div>
+  </div>
   `;
 
   // ✅ Enviar correos con RESEND
@@ -249,22 +233,15 @@ END:VCALENDAR
 }
 
 // ==================================================
-// PUT: EDITAR RESERVA
+// PUT y DELETE no cambian
 // ==================================================
 
 export async function onRequestPut({ request, env }) {
-  const headers = {
-    "Content-Type": "application/json",
-    "Access-Control-Allow-Origin": "*",
-  };
-
+  const headers = { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" };
   try {
     const data = await request.json();
     if (!data.codigo)
-      return new Response(
-        JSON.stringify({ error: "Falta código" }),
-        { status: 400, headers }
-      );
+      return new Response(JSON.stringify({ error: "Falta código" }), { status: 400, headers });
 
     await env.DB.prepare(
       `UPDATE reservas SET nombre=?, email=?, telefono=?, fecha=?, hora=?, direccion=?, motivo=? 
@@ -286,43 +263,22 @@ export async function onRequestPut({ request, env }) {
 
   } catch (err) {
     console.error("Error actualizando reserva:", err);
-    return new Response(
-      JSON.stringify({ error: "Error interno" }),
-      { status: 500, headers }
-    );
+    return new Response(JSON.stringify({ error: "Error interno" }), { status: 500, headers });
   }
 }
 
-// ==================================================
-// DELETE: ELIMINAR RESERVA
-// ==================================================
-
 export async function onRequestDelete({ request, env }) {
-  const headers = {
-    "Content-Type": "application/json",
-    "Access-Control-Allow-Origin": "*",
-  };
-
+  const headers = { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" };
   try {
     const { codigo } = await request.json();
     if (!codigo)
-      return new Response(
-        JSON.stringify({ error: "Falta código" }),
-        { status: 400, headers }
-      );
+      return new Response(JSON.stringify({ error: "Falta código" }), { status: 400, headers });
 
-    await env.DB
-      .prepare("DELETE FROM reservas WHERE codigo = ?")
-      .bind(codigo)
-      .run();
-
+    await env.DB.prepare("DELETE FROM reservas WHERE codigo = ?").bind(codigo).run();
     return new Response(JSON.stringify({ ok: true }), { headers });
 
   } catch (err) {
     console.error("Error eliminando reserva:", err);
-    return new Response(
-      JSON.stringify({ error: "Error interno" }),
-      { status: 500, headers }
-    );
+    return new Response(JSON.stringify({ error: "Error interno" }), { status: 500, headers });
   }
 }

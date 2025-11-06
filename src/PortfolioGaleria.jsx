@@ -1,5 +1,7 @@
 import React, { useMemo, useState, useEffect, useRef } from "react";
 import { Link, useSearchParams } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
+import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 
 const BASE = import.meta.env.BASE_URL;
 const srcPath = (name) => `${BASE}images/${name}`;
@@ -87,17 +89,9 @@ export default function PortfolioGaleria() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [cat, setCat] = useState(searchParams.get("cat") || "todas");
   const [sub, setSub] = useState(searchParams.get("sub") || "todas");
-  const [q, setQ] = useState("");
-  const [orden, setOrden] = useState("recientes");
-  const [scrollY, setScrollY] = useState(0);
   const [currentIndex, setCurrentIndex] = useState(0);
-  const scrollRef = useRef(null);
-
-  useEffect(() => {
-    const handleScroll = () => setScrollY(window.scrollY);
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  const [dragStart, setDragStart] = useState(null);
+  const containerRef = useRef(null);
 
   useEffect(() => setSub("todas"), [cat]);
 
@@ -112,55 +106,53 @@ export default function PortfolioGaleria() {
     let arr = [...items];
     if (cat !== "todas") arr = arr.filter((i) => i.categorias.includes(cat));
     if (sub !== "todas") arr = arr.filter((i) => (i.subcat || "").toLowerCase() === sub.toLowerCase());
-    if (q.trim()) {
-      const s = q.toLowerCase();
-      arr = arr.filter((i) => i.titulo.toLowerCase().includes(s) || i.ubicacion.toLowerCase().includes(s));
-    }
-    arr.sort((a, b) => (orden === "recientes" ? b.fecha.localeCompare(a.fecha) : a.fecha.localeCompare(b.fecha)));
     return arr;
-  }, [cat, sub, q, orden]);
+  }, [cat, sub]);
 
-  // === Rotación automática y scroll ===
+  // autoplay
   useEffect(() => {
-    if (window.innerWidth >= 768) return;
+    if (!data.length) return;
     const interval = setInterval(() => {
       setCurrentIndex((prev) => (prev + 1) % data.length);
-    }, 30000);
+    }, 15000);
     return () => clearInterval(interval);
   }, [data.length]);
 
-  useEffect(() => {
-    const container = scrollRef.current;
-    if (container && window.innerWidth < 768) {
-      const item = container.children[currentIndex];
-      if (item) item.scrollIntoView({ behavior: "smooth", inline: "center" });
+  // drag handlers (mouse & touch)
+  const handleDragStart = (e) => {
+    setDragStart(e.touches ? e.touches[0].clientX : e.clientX);
+  };
+  const handleDragEnd = (e) => {
+    if (dragStart == null) return;
+    const endX = e.changedTouches ? e.changedTouches[0].clientX : e.clientX;
+    const diff = endX - dragStart;
+    if (Math.abs(diff) > 50) {
+      setCurrentIndex((prev) => (diff > 0 ? (prev - 1 + data.length) % data.length : (prev + 1) % data.length));
     }
-  }, [currentIndex]);
+    setDragStart(null);
+  };
+
+  const next = () => setCurrentIndex((prev) => (prev + 1) % data.length);
+  const prev = () => setCurrentIndex((prev) => (prev - 1 + data.length) % data.length);
 
   const info = CATEGORIA_INFO[cat];
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Cabecera */}
-      <header
-        className={`sticky top-0 z-30 transition-all duration-700 backdrop-blur ${
-          scrollY > 10 ? "opacity-0 pointer-events-none" : "bg-white/70 border-b border-gray-200"
-        }`}
-      >
-        <div className="max-w-7xl mx-auto px-4 py-4 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-          <h1 className="text-2xl md:text-3xl font-bold text-[#1A1A1A]">
+      {/* Cabecera categorías */}
+      <header className="sticky top-0 z-40 bg-white/80 backdrop-blur border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+          <h1 className="text-2xl font-bold text-[#1A1A1A]">
             {cat === "todas" ? "Elige un servicio" : CATEGORIAS.find((c) => c.id === cat)?.label}
           </h1>
-          <div className="flex flex-wrap gap-2">
+          <div className="flex gap-2 overflow-x-auto scrollbar-hide">
             {CATEGORIAS.map((c) => (
               <button
                 key={c.id}
                 onClick={() => setCat(c.id)}
                 className={classNames(
-                  "px-3 py-1.5 rounded-full text-sm border transition-all",
-                  cat === c.id
-                    ? "bg-[#C1121F] text-white border-[#C1121F]"
-                    : "bg-white text-[#2C3E50] hover:bg-gray-100 border-[#BDC3C7]"
+                  "px-3 py-1.5 rounded-full text-sm whitespace-nowrap",
+                  cat === c.id ? "bg-[#C1121F] text-white" : "bg-white text-[#2C3E50] border border-gray-200 hover:bg-gray-50"
                 )}
               >
                 {c.label}
@@ -170,7 +162,7 @@ export default function PortfolioGaleria() {
         </div>
       </header>
 
-      {/* Subcategorías */}
+      {/* Info + subcategorías */}
       {cat !== "todas" && info && (
         <section className="bg-[#0D3B66] text-white">
           <div className="max-w-7xl mx-auto px-4 py-6">
@@ -194,48 +186,103 @@ export default function PortfolioGaleria() {
         </section>
       )}
 
-      {/* Galería adaptable */}
-      <main className="max-w-7xl mx-auto px-4 py-8">
+      {/* Carousel fullscreen (desktop) / fallback grid (mobile) */}
+      <main
+        ref={containerRef}
+        className="relative"
+        onMouseDown={handleDragStart}
+        onMouseUp={handleDragEnd}
+        onTouchStart={handleDragStart}
+        onTouchEnd={handleDragEnd}
+      >
         {data.length === 0 ? (
-          <p className="text-center text-[#2C3E50]">Sin resultados.</p>
+          <p className="text-center py-12 text-[#2C3E50]">Sin resultados.</p>
         ) : (
           <>
-            <ul
-              ref={scrollRef}
-              className="flex md:grid overflow-x-auto md:overflow-visible md:grid-cols-3 snap-x snap-mandatory gap-6 scrollbar-hide scroll-smooth"
-            >
-              {data.map((it) => (
-                <li
-                  key={it.id}
-                  className="flex-shrink-0 w-72 md:w-auto snap-center rounded-2xl overflow-hidden border border-gray-200 shadow-md bg-white hover:shadow-lg transition-all"
-                >
-                  <figure className="flex flex-col h-full">
-                    <img src={it.src} alt={it.titulo} className="w-full h-56 object-cover" loading="lazy" />
-                    <figcaption className="p-4 flex flex-col gap-2 flex-grow">
-                      <h3 className="font-semibold text-[#1A1A1A] text-base md:text-lg">{it.titulo}</h3>
-                      <p className="text-xs text-[#2C3E50] opacity-80">{it.subcat} • {it.ubicacion}</p>
-                      <div className="mt-auto">
-                        <Link
-                          to={`/cotizador?mensaje=${encodeURIComponent(`Hola, estoy interesado en: ${it.titulo}`)}`}
-                          className="px-3 py-1.5 text-xs font-semibold rounded-full bg-[#C1121F] text-white hover:bg-[#A10E1A]"
-                        >
-                          Cotizar
-                        </Link>
-                      </div>
-                    </figcaption>
-                  </figure>
-                </li>
-              ))}
-            </ul>
+            <AnimatePresence mode="wait">
+              <motion.section
+                key={data[currentIndex].id}
+                className="relative w-full h-[calc(100vh-220px)] md:h-[calc(100vh-200px)] flex items-center justify-center"
+                initial={{ opacity: 0, x: 80 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -80 }}
+                transition={{ duration: 0.5, ease: "easeOut" }}
+              >
+                <img
+                  src={data[currentIndex].src}
+                  alt={data[currentIndex].titulo}
+                  className="absolute inset-0 w-full h-full object-cover"
+                  loading="lazy"
+                />
+                <div className="absolute inset-0 bg-black/55"></div>
 
-            {/* Indicadores */}
-            <div className="flex justify-center mt-6 gap-2 md:hidden">
+                <div className="relative z-10 text-center text-white px-6 py-12 max-w-3xl">
+                  <h3 className="text-3xl md:text-4xl font-extrabold mb-4 drop-shadow-lg">
+                    {data[currentIndex].titulo}
+                  </h3>
+                  <p className="text-white/90 mb-6">
+                    {data[currentIndex].subcat} • {data[currentIndex].ubicacion}
+                  </p>
+
+                  <Link
+                    to={`/cotizador?mensaje=${encodeURIComponent(`Hola, estoy interesado en: ${data[currentIndex].titulo}`)}`}
+                    className="px-6 py-3 rounded-full bg-[#C1121F] text-white font-semibold text-lg shadow-lg hover:bg-[#A10E1A] transition"
+                  >
+                    Cotizar ahora
+                  </Link>
+                </div>
+
+                <button
+                  onClick={prev}
+                  className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white p-3 rounded-full transition hidden md:inline-flex"
+                  aria-label="Anterior"
+                >
+                  <FaChevronLeft size={20} />
+                </button>
+                <button
+                  onClick={next}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white p-3 rounded-full transition hidden md:inline-flex"
+                  aria-label="Siguiente"
+                >
+                  <FaChevronRight size={20} />
+                </button>
+              </motion.section>
+            </AnimatePresence>
+
+            {/* Mobile: horizontal scroll list */}
+            <div className="md:hidden px-4 py-6">
+              <ul className="flex gap-4 overflow-x-auto snap-x snap-mandatory scrollbar-hide">
+                {data.map((it, i) => (
+                  <li key={it.id} className="min-w-[260px] snap-center rounded-xl overflow-hidden border border-gray-200">
+                    <img src={it.src} alt={it.titulo} className="w-full h-40 object-cover" />
+                    <div className="p-3 bg-white">
+                      <h4 className="font-semibold text-sm">{it.titulo}</h4>
+                      <p className="text-xs text-gray-500">{it.subcat} • {it.ubicacion}</p>
+                      <Link to={`/cotizador?mensaje=${encodeURIComponent(`Hola, estoy interesado en: ${it.titulo}`)}`}
+                        className="inline-block mt-3 px-3 py-1.5 text-xs font-semibold rounded-full bg-[#C1121F] text-white">
+                        Cotizar
+                      </Link>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+
+              {/* indicadores móviles */}
+              <div className="flex justify-center gap-2 mt-4">
+                {data.map((_, i) => (
+                  <div key={i} className={`w-2.5 h-2.5 rounded-full ${i === currentIndex ? "bg-[#C1121F]" : "bg-gray-300"}`} />
+                ))}
+              </div>
+            </div>
+
+            {/* Indicadores desktop */}
+            <div className="hidden md:flex absolute bottom-6 left-1/2 -translate-x-1/2 gap-2 z-20">
               {data.map((_, i) => (
-                <div
+                <button
                   key={i}
-                  className={`w-2.5 h-2.5 rounded-full transition ${
-                    i === currentIndex ? "bg-[#C1121F]" : "bg-gray-300"
-                  }`}
+                  aria-label={`Ir a ${i + 1}`}
+                  onClick={() => setCurrentIndex(i)}
+                  className={`w-3 h-3 rounded-full transition ${i === currentIndex ? "bg-[#C1121F]" : "bg-white/50"}`}
                 />
               ))}
             </div>
