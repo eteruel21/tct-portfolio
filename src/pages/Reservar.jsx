@@ -94,6 +94,36 @@ export default function Reservar() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ ...form, codigo: nuevoCodigo }),
       });
+        const eliminarReserva = async () => {
+          if (!reservaActiva?.codigo) return alert("No hay una reserva activa.");
+          if (!window.confirm(`¿Seguro que deseas eliminar la cita ${reservaActiva.codigo}?`)) return;
+
+          try {
+            const res = await fetch("/api/reservas", {
+              method: "DELETE",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ codigo: reservaActiva.codigo }),
+            });
+            if (!res.ok) throw new Error("Error al eliminar la cita.");
+            alert("Cita eliminada correctamente.");
+            setModo("cancelada");
+            setReservaActiva(null);
+            setForm({
+              nombre: "",
+              email: "",
+              telefono: "",
+              fecha: "",
+              hora: "",
+              direccion: "",
+              motivo: "",
+            });
+          } catch (err) {
+            console.error(err);
+            alert("No se pudo eliminar la cita.");
+          }
+        };
+
+
       if (!res.ok) throw new Error();
 
       confetti({ particleCount: 120, spread: 80, origin: { y: 0.6 } });
@@ -265,6 +295,16 @@ export default function Reservar() {
                 >
                   Continuar
                 </button>
+                {esActualizacion && (
+                  <button
+                    type="button"
+                    onClick={eliminarReserva}
+                    className="w-full py-3 bg-red-600 text-white rounded-xl font-semibold hover:bg-red-700"
+                  >
+                    Eliminar cita
+                  </button>
+                )}
+
               </form>
             )}
 

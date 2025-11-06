@@ -261,3 +261,32 @@ function escapeHtml(str) {
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#039;");
 }
+
+// --- Eliminar reserva ---
+export async function onRequestDelete({ request, env }) {
+  const headers = {
+    "Content-Type": "application/json",
+    "Access-Control-Allow-Origin": "*",
+  };
+
+  try {
+    const { codigo } = await request.json();
+    if (!codigo)
+      return new Response(JSON.stringify({ error: "Falta código" }), {
+        status: 400,
+        headers,
+      });
+
+    await env.DB.prepare("DELETE FROM reservas WHERE codigo = ?")
+      .bind(codigo)
+      .run();
+
+    return new Response(JSON.stringify({ ok: true }), { headers });
+  } catch (err) {
+    console.error("Error eliminando reserva:", err);
+    return new Response(
+      JSON.stringify({ error: "Error interno" }),
+      { status: 500, headers }
+    );
+  }
+}
