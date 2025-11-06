@@ -1,25 +1,44 @@
 // === /functions/api/reservas.js ===
 
 export async function onRequestGet({ request, env }) {
-  const headers = { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" };
-  const url = new URL(request.url);
-  const codigo = url.searchParams.get("codigo");
+  const headers = {
+    "Content-Type": "application/json",
+    "Access-Control-Allow-Origin": "*",
+  };
 
   try {
+    const url = new URL(request.url);
+    const codigo = url.searchParams.get("codigo");
+
     if (codigo) {
-      const { results } = await env.DB.prepare("SELECT * FROM reservas WHERE codigo = ?").bind(codigo).all();
-      if (results.length === 0)
-        return new Response(JSON.stringify({ error: "No encontrada" }), { status: 404, headers });
+      const { results } = await env.DB.prepare(
+        "SELECT * FROM reservas WHERE codigo = ?"
+      )
+        .bind(codigo)
+        .all();
+
+      if (results.length === 0) {
+        return new Response(JSON.stringify({ error: "No encontrada" }), {
+          status: 404,
+          headers,
+        });
+      }
+
       return new Response(JSON.stringify(results[0]), { headers });
     }
 
-    // listado general
+    // Si no se pasa código, devuelve todas
     const { results } = await env.DB.prepare(
       "SELECT * FROM reservas ORDER BY fecha DESC, hora ASC"
     ).all();
+
     return new Response(JSON.stringify(results), { headers });
   } catch (err) {
-    return new Response(JSON.stringify({ error: err.message }), { status: 500, headers });
+    console.error("Error leyendo reservas:", err);
+    return new Response(
+      JSON.stringify({ error: "Error al cargar las reservas" }),
+      { status: 500, headers }
+    );
   }
 }
 
