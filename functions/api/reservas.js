@@ -78,77 +78,82 @@ export async function onRequestPost({ request, env }) {
     );
   }
 
-  const DOMAIN = env.DOMAIN || "https://tctservices-pty.com";
-  const ADMIN_EMAIL = env.ADMIN_EMAIL || "contacto@tctservices-pty.com";
+  // --- URL base dinámica ---
+  const DOMAIN =
+    env.DOMAIN ||
+    (request.url.includes("localhost")
+      ? "http://127.0.0.1:8788"
+      : "https://tctservices-pty.com");
 
-  // --- Funciones utilitarias para fechas / base64 compatibles con Workers ---
-  const pad = (n) => String(n).padStart(2, "0");
-  const formatYMD = (d) => `${d.getUTCFullYear()}${pad(d.getUTCMonth() + 1)}${pad(d.getUTCDate())}`;
-  const formatDateTimeZ = (d) =>
-    `${formatYMD(d)}T${pad(d.getUTCHours())}${pad(d.getUTCMinutes())}${pad(d.getUTCSeconds())}Z`;
-
-  // Construir start / end usando UTC (end = +1h)
-  const startDate = new Date(`${fecha}T${hora}:00Z`); // fecha + hora en UTC
-  const endDate = new Date(startDate.getTime() + 60 * 60 * 1000);
-  const googleDates = `${formatDateTimeZ(startDate)}/${formatDateTimeZ(endDate)}`;
+  // --- Calendario Google ---
+  const makeYMD = (d) => {
+    const y = d.getUTCFullYear();
+    const m = String(d.getUTCMonth() + 1).padStart(2, "0");
+    const day = String(d.getUTCDate()).padStart(2, "0");
+    return `${y}${m}${day}`;
+  };
+  const startDt = new Date(fecha + "T00:00:00Z");
+  const endDt = new Date(startDt.getTime() + 60 * 60 * 1000); // +1 hora
+  const calendarDates = `${makeYMD(startDt)}T${hora.replace(
+    ":",
+    ""
+  )}00Z/${makeYMD(endDt)}T${hora.replace(":", "")}00Z`;
   const calendarUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(
     "Cita TCT Services"
-  )}&dates=${googleDates}&details=${encodeURIComponent("Cliente: " + nombre)}&location=${encodeURIComponent(
-    "TCT Services"
-  )}`;
-
-  // Base64 compatible con Cloudflare Workers / browsers
-  const base64Encode = (str) => {
-    // btoa requiere una cadena en latin1; preservamos unicode con encodeURIComponent+unescape
-    return btoa(unescape(encodeURIComponent(str)));
-  };
+  )}&dates=${calendarDates}&details=${encodeURIComponent(
+    "Cliente: " + nombre
+  )}&location=${encodeURIComponent("TCT Services")}`;
 
   // --- Crear archivo ICS (para iPhone / Outlook) ---
-  const eventoICS = `BEGIN:VCALENDAR
+  const eventoICS = `
+BEGIN:VCALENDAR
 VERSION:2.0
 PRODID:-//TCT Services//Reservas//ES
 BEGIN:VEVENT
 UID:${codigo}@tctservices-pty.com
 DTSTAMP:${new Date().toISOString().replace(/[-:]/g, "").split(".")[0]}Z
 DTSTART;TZID=America/Panama:${fecha.replace(/-/g, "")}T${hora.replace(":", "")}00
-DTEND;TZID=America/Panama:${new Date(endDate).toLocaleString("sv").slice(0,10).replace(/-/g,"") }T${hora.replace(":", "")}00
+DTEND;TZID=America/Panama:${fecha.replace(/-/g, "")}T${hora.replace(":", "")}00
 SUMMARY:Cita TCT Services
-DESCRIPTION:Cliente: ${escapeHtml(nombre)}\\nTel: ${escapeHtml(telefono)}\\nEmail: ${escapeHtml(email)}
+DESCRIPTION:Cliente: ${nombre}\\nTel: ${telefono}\\nEmail: ${email}
 LOCATION:TCT Services
 END:VEVENT
-END:VCALENDAR`;
-  const icsData = "data:text/calendar;base64," + base64Encode(eventoICS);
-  const redirectHref = `${DOMAIN}/calendar-redirect.html?g=${encodeURIComponent(calendarUrl)}&i=${encodeURIComponent(
-    icsData
-  )}`;
+END:VCALENDAR
+  `;
+  const eventoBase64 = Buffer.from(eventoICS).toString("base64");
+  const icsUrl = `data:text/calendar;base64,${eventoBase64}`;
 
   // --- Email al cliente ---
   const correoCliente = `
-     <div style="font-family:Arial,sans-serif;color:#0D3B66;
-     background:url('${DOMAIN}/images/fondo_inicio.jpg') no-repeat center/cover;
-     max-width:600px;margin:auto;">
+    <div style="font-family: Arial, sans-serif; color: #0D3B66;
+      background:url('${DOMAIN}/images/fondo_inicio.jpg') no-repeat center center / cover;
+      padding:0;margin:0;max-width:600px;margin:auto;">
       <div style="background-color:#ffffffdd;border-radius:16px;overflow:hidden;">
         <div style="background-color:#0D3B66;color:white;text-align:center;padding:20px;">
           <img src="${DOMAIN}/images/logo_tct.png" alt="TCT Services" style="max-width:120px;margin-bottom:10px;"/>
           <h2 style="margin:0;">Confirmación de Cita</h2>
         </div>
         <div style="padding:20px;">
-          <p>Hola <strong>${escapeHtml(nombre)}</strong>, tu cita fue registrada correctamente:</p>
+          <p>Hola <strong>${escapeHtml(nombre)}</strong>,</p>
+          <p>Tu cita ha sido registrada exitosamente:</p>
           <table style="width:100%;border-collapse:collapse;margin-top:10px;">
             <tr><td><strong>Fecha:</strong></td><td>${escapeHtml(fecha)}</td></tr>
             <tr><td><strong>Hora:</strong></td><td>${escapeHtml(hora)}</td></tr>
-            <tr><td><strong>Código:</strong></td><td style="color:#C1121F;">${escapeHtml(codigo)}</td></tr>
+            <tr><td><strong>Código:</strong></td><td style="font-family:monospace;color:#C1121F;">${escapeHtml(codigo)}</td></tr>
           </table>
 
           <div style="text-align:center;margin:25px 0;">
-            <a href="${DOMAIN}/#/reservar?codigo=${encodeURIComponent(escapeHtml(codigo))}&modo=buscar"
+            <a href="${DOMAIN}/#/reservar?codigo=${encodeURIComponent(codigo)}&modo=buscar"
               style="background:#C1121F;color:white;padding:12px 20px;border-radius:8px;text-decoration:none;font-weight:bold;">
-              Gestionar mi cita</a>
+              Gestionar mi cita
+            </a>
           </div>
 
           <div style="text-align:center;margin:25px 0;">
-            <a href="${redirectHref}" style="background:#FFD700;color:#0D3B66;padding:12px 20px;border-radius:8px;text-decoration:none;font-weight:bold;">
-           Agregar al calendario</a>
+            <a href="${DOMAIN}/calendar-redirect.html?fecha=${encodeURIComponent(fecha)}&hora=${encodeURIComponent(hora)}&codigo=${encodeURIComponent(codigo)}&nombre=${encodeURIComponent("Cita TCT Services")}&detalle=${encodeURIComponent("Confirmada con TCT Services, duración 1 hora")}"
+              style="background:#FFD700;color:#0D3B66;padding:12px 20px;border-radius:8px;text-decoration:none;font-weight:bold;">
+              Agregar al calendario
+            </a>
           </div>
 
           <p>Gracias por elegir <strong>TCT Services</strong>.</p>
@@ -162,19 +167,32 @@ END:VCALENDAR`;
 
   // --- Email al administrador ---
   const correoAdmin = `
-   <div style="font-family:Arial,sans-serif;color:#0D3B66;
-   background:url('${DOMAIN}/images/fondo_inicio.jpg') no-repeat center/cover;
-   max-width:600px;margin:auto;">
+    <div style="font-family:Arial,sans-serif;color:#0D3B66;
+      background:url('${DOMAIN}/images/fondo_inicio.jpg') no-repeat center center / cover;
+      padding:0;margin:0;max-width:600px;margin:auto;">
       <div style="background-color:#ffffffdd;border-radius:16px;overflow:hidden;padding:20px;">
         <h3>Nueva cita registrada</h3>
         <p><strong>Cliente:</strong> ${escapeHtml(nombre)}</p>
-        <p><strong>Fecha:</strong> ${escapeHtml(fecha)} - ${escapeHtml(hora)}</p>
+        <p><strong>Fecha:</strong> ${escapeHtml(fecha)} — <strong>Hora:</strong> ${escapeHtml(
+    hora
+  )}</p>
         <p><strong>Teléfono:</strong> ${escapeHtml(telefono)}</p>
         <p><strong>Email:</strong> ${escapeHtml(email)}</p>
         <p><strong>Dirección:</strong> ${escapeHtml(direccion)}</p>
         <p><strong>Motivo:</strong> ${escapeHtml(motivo)}</p>
         <p><strong>Código:</strong> ${escapeHtml(codigo)}</p>
-      </div></div>`;
+        <div style="margin-top:20px;text-align:center;">
+          <a href="${calendarUrl}" style="background:#0D3B66;color:white;padding:10px 18px;text-decoration:none;border-radius:6px;">Agregar al Google Calendar</a>
+        </div>
+        <div style="margin-top:10px;text-align:center;">
+          <a href="${icsUrl}" download="cita-${codigo}.ics"
+            style="background:#FFD700;color:#0D3B66;padding:10px 18px;text-decoration:none;border-radius:6px;">
+            Agregar al calendario (iPhone / Outlook)
+          </a>
+        </div>
+      </div>
+    </div>
+  `;
 
   // --- Envío con Resend ---
   try {
