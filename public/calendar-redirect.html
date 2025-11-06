@@ -98,23 +98,17 @@
         }catch(e){ console.error("download failed", e); }
       }
 
-      // Lógica de redirección:
-      try{
-        if(isIOS){
-          // iOS: preferir .ics (se abrirá en Calendario)
-          msg.textContent = "Abriendo archivo .ics para iPhone / iPad…";
-          // intentar abrir directamente (algunos navegadores requieren interacción)
-          setTimeout(()=>{ location.href = icsUrl; }, 400);
-        } else if(isAndroid){
-          // Android: abrir Google Calendar
+      // Lógica de redirección automática:
+      try {
+        if (isIOS) {
+          msg.textContent = "Abriendo Calendario en iPhone…";
+          window.location.replace(icsUrl);
+         } else if (isAndroid) {
+            msg.textContent = "Abriendo Google Calendar…";
+            window.location.replace(googleUrl);
+         } else {
           msg.textContent = "Abriendo Google Calendar…";
-          setTimeout(()=>{ location.href = googleUrl; }, 400);
-        } else {
-          // Desktop/otros: abrir Google Calendar en nueva pestaña y ofrecer descarga .ics
-          msg.textContent = "Abriendo Google Calendar en nueva pestaña. También puedes descargar el .ics.";
-          window.open(googleUrl, "_blank", "noopener");
-          // descargar .ics como fallback
-          setTimeout(()=> forceDownload(icsUrl), 500);
+          window.location.href = googleUrl;
         }
       }catch(e){
         console.error(e);
