@@ -13,7 +13,7 @@ export default function AdminReservas() {
 
   const CLAVE_ADMIN = "tctadmin2025";
 
-  // --- Obtener reservas desde el backend ---
+  // ✅ Obtener reservas
   async function obtenerReservas() {
     try {
       setCargando(true);
@@ -28,7 +28,7 @@ export default function AdminReservas() {
     }
   }
 
-  // --- Eliminar una reserva (hoisted) ---
+  // ✅ Eliminar reserva
   async function eliminarReserva(codigo) {
     if (!window.confirm(`¿Eliminar reserva ${codigo}?`)) return;
     try {
@@ -37,19 +37,21 @@ export default function AdminReservas() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ codigo }),
       });
-      if (!res.ok) throw new Error("DELETE failed");
+
+      if (!res.ok) throw new Error("Error eliminando");
+
       await obtenerReservas();
       alert("Reserva eliminada correctamente.");
     } catch (err) {
       console.error("Error al eliminar:", err);
-      alert("No se pudo eliminar la reserva.");
+      alert("No se pudo eliminar.");
     }
   }
 
-  // --- Editar una reserva (hoisted) ---
+  // ✅ Editar reserva (solo nombre)
   async function editarReserva(reserva) {
-    const nuevoNombre = prompt("Editar nombre del cliente:", reserva.nombre ?? "");
-    if (nuevoNombre === null) return; // cancelado
+    const nuevoNombre = prompt("Editar nombre del cliente:", reserva.nombre || "");
+    if (nuevoNombre === null) return;
 
     try {
       const res = await fetch("/api/reservas", {
@@ -57,16 +59,18 @@ export default function AdminReservas() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ ...reserva, nombre: nuevoNombre }),
       });
-      if (!res.ok) throw new Error("PUT failed");
+
+      if (!res.ok) throw new Error("PUT error");
+
       await obtenerReservas();
       alert("Reserva actualizada correctamente.");
     } catch (err) {
       console.error("Error al actualizar:", err);
-      alert("No se pudo actualizar la reserva.");
+      alert("No se pudo actualizar.");
     }
   }
 
-  // --- Filtrar resultados ---
+  // ✅ Filtro de búsqueda
   const reservasFiltradas = reservas.filter((r) => {
     const q = busqueda.toLowerCase();
     const coincideBusqueda =
@@ -77,15 +81,17 @@ export default function AdminReservas() {
     return coincideBusqueda && coincideFecha;
   });
 
-  // --- Exportar a Excel ---
+  // ✅ Exportar a Excel
   function exportarExcel() {
     if (reservasFiltradas.length === 0) {
       alert("No hay datos para exportar.");
       return;
     }
+
     const hoja = XLSX.utils.json_to_sheet(reservasFiltradas);
     const libro = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(libro, hoja, "Reservas");
+
     XLSX.writeFile(libro, "Reservas_TCT_Services.xlsx");
   }
 
@@ -93,9 +99,12 @@ export default function AdminReservas() {
     if (acceso) obtenerReservas();
   }, [acceso]);
 
-  const fade = useSpring({ from: { opacity: 0, y: 30 }, to: { opacity: 1, y: 0 } });
+  const fade = useSpring({
+    from: { opacity: 0, y: 30 },
+    to: { opacity: 1, y: 0 },
+  });
 
-  // --- Login simple ---
+  // ✅ Login antes de acceder
   if (!acceso) {
     return (
       <section className="min-h-screen bg-[#0D3B66] flex flex-col items-center justify-center text-white">
@@ -105,6 +114,7 @@ export default function AdminReservas() {
         >
           <FaCalendarCheck className="text-[#FFD700] text-5xl mx-auto mb-4" />
           <h2 className="text-2xl font-bold mb-4">Panel de Administración</h2>
+
           <input
             type="password"
             placeholder="Ingresa la clave de acceso"
@@ -112,6 +122,7 @@ export default function AdminReservas() {
             onChange={(e) => setClave(e.target.value)}
             className="w-full px-3 py-2 rounded-xl text-black mb-4 text-center"
           />
+
           <button
             onClick={() => {
               if (clave === CLAVE_ADMIN) setAcceso(true);
@@ -126,14 +137,14 @@ export default function AdminReservas() {
     );
   }
 
-  // --- Panel de reservas ---
+  // ✅ Panel principal
   return (
     <section className="min-h-screen bg-gradient-to-b from-[#0D3B66] to-[#1B4F72] text-white p-6">
       <animated.div
         style={fade}
         className="max-w-6xl mx-auto bg-white/10 backdrop-blur-lg rounded-3xl shadow-xl p-8"
       >
-        {/* Encabezado */}
+        {/* ✅ Encabezado */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6 gap-4">
           <h1 className="text-3xl font-bold">Reservas registradas</h1>
 
@@ -165,7 +176,7 @@ export default function AdminReservas() {
           </div>
         </div>
 
-        {/* Tabla de reservas */}
+        {/* ✅ Tabla */}
         {cargando ? (
           <p className="text-center text-gray-300">Cargando reservas...</p>
         ) : reservasFiltradas.length === 0 ? (
@@ -184,11 +195,14 @@ export default function AdminReservas() {
                   <th className="py-3 px-4 text-right">Acción</th>
                 </tr>
               </thead>
+
               <tbody>
                 {reservasFiltradas.map((r, idx) => (
                   <tr
                     key={r.codigo}
-                    className={`hover:bg-white/10 transition ${idx % 2 ? "bg-white/5" : "bg-transparent"}`}
+                    className={`hover:bg-white/10 transition ${
+                      idx % 2 ? "bg-white/5" : "bg-transparent"
+                    }`}
                   >
                     <td className="py-2 px-4 font-mono text-[#FFD700]">{r.codigo}</td>
                     <td className="py-2 px-4">{r.nombre}</td>
@@ -196,6 +210,7 @@ export default function AdminReservas() {
                     <td className="py-2 px-4">{r.telefono}</td>
                     <td className="py-2 px-4">{r.fecha}</td>
                     <td className="py-2 px-4">{r.hora}</td>
+
                     <td className="py-2 px-4 text-right space-x-3">
                       <button
                         onClick={() => editarReserva(r)}
@@ -204,6 +219,7 @@ export default function AdminReservas() {
                       >
                         <FaCalendarCheck />
                       </button>
+
                       <button
                         onClick={() => eliminarReserva(r.codigo)}
                         className="text-red-400 hover:text-red-600"
