@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Agregar al calendario</title>
+  <script>
+    function detectPlatform() {
+      const ua = navigator.userAgent.toLowerCase();
+      if (/iphone|ipad|ipod|mac/.test(ua)) return "ios";
+      if (/android/.test(ua)) return "android";
+      return "other";
+    }
+
+    function main() {
+      const params = new URLSearchParams(window.location.search);
+      const fecha = params.get("fecha");
+      const hora = params.get("hora");
+      const codigo = params.get("codigo");
+
+      const baseDate = fecha.replace(/-/g, "");
+      const time = hora.replace(":", "") + "00";
+
+      const googleUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=Cita+TCT+Services&dates=${baseDate}T${time}Z/${baseDate}T${time}Z&details=Código:+${codigo}&location=TCT+Services`;
+
+      const eventoICS = `
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//TCT Services//Reservas//ES
+BEGIN:VEVENT
+UID:${codigo}@tctservices-pty.com
+DTSTAMP:${new Date().toISOString().replace(/[-:]/g, '').split('.')[0]}Z
+DTSTART;TZID=America/Panama:${fecha.replace(/-/g, '')}T${hora.replace(':', '')}00
+DTEND;TZID=America/Panama:${fecha.replace(/-/g, '')}T${hora.replace(':', '')}00
+SUMMARY:Cita TCT Services
+DESCRIPTION:Código: ${codigo}
+LOCATION:TCT Services
+END:VEVENT
+END:VCALENDAR`;
+      const icsUrl = "data:text/calendar;charset=utf-8," + encodeURIComponent(eventoICS);
+
+      const platform = detectPlatform();
+      if (platform === "ios") {
+        window.location.href = icsUrl;
+      } else if (platform === "android") {
+        window.location.href = googleUrl;
+      } else {
+        // por defecto abrir Google Calendar
+        window.location.href = googleUrl;
+      }
+    }
+    window.onload = main;
+  </script>
+</head>
+<body style="text-align:center;margin-top:50px;font-family:sans-serif;">
+  <h3>Redirigiendo a tu calendario...</h3>
+</body>
+</html>
