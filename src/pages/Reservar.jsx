@@ -157,11 +157,33 @@ export default function Reservar() {
                 />
                 <div className="flex gap-2 mt-3">
                   <button
-                    onClick={() => alert("Función buscar pendiente")}
+                    onClick={async () => {
+                      if (!codigoBusqueda) return alert("Ingresa un código");
+                      try {
+                        const res = await fetch(`/api/reservas?codigo=${codigoBusqueda}`);
+                        if (!res.ok) throw new Error("No encontrada");
+                        const data = await res.json();
+                        setReservaActiva(data);
+                        setForm({
+                          nombre: data.nombre || "",
+                          email: data.email || "",
+                          telefono: data.telefono || "",
+                          fecha: data.fecha || "",
+                          hora: data.hora || "",
+                          direccion: data.direccion || "",
+                          motivo: data.motivo || "",
+                        });
+                        setModo("editar");
+                        setEsActualizacion(true);
+                      } catch {
+                        alert("No se encontró una reserva con ese código.");
+                      }
+                    }}
                     className="flex-1 bg-[#FFD700] text-[#0D3B66] py-2 rounded-xl font-semibold hover:bg-[#e5c100]"
                   >
                     Buscar
                   </button>
+
                   <button
                     onClick={() => setModo("nuevo")}
                     className="flex-1 bg-gray-300 text-black py-2 rounded-xl font-semibold hover:bg-gray-400"

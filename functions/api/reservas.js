@@ -1,23 +1,25 @@
 // === /functions/api/reservas.js ===
 
-export async function onRequestGet({ env }) {
-  const headers = {
-    "Content-Type": "application/json",
-    "Access-Control-Allow-Origin": "*",
-  };
+export async function onRequestGet({ request, env }) {
+  const headers = { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" };
+  const url = new URL(request.url);
+  const codigo = url.searchParams.get("codigo");
 
   try {
+    if (codigo) {
+      const { results } = await env.DB.prepare("SELECT * FROM reservas WHERE codigo = ?").bind(codigo).all();
+      if (results.length === 0)
+        return new Response(JSON.stringify({ error: "No encontrada" }), { status: 404, headers });
+      return new Response(JSON.stringify(results[0]), { headers });
+    }
+
+    // listado general
     const { results } = await env.DB.prepare(
       "SELECT * FROM reservas ORDER BY fecha DESC, hora ASC"
     ).all();
-
     return new Response(JSON.stringify(results), { headers });
   } catch (err) {
-    console.error("Error leyendo reservas:", err);
-    return new Response(
-      JSON.stringify({ error: "Error al cargar las reservas" }),
-      { status: 500, headers }
-    );
+    return new Response(JSON.stringify({ error: err.message }), { status: 500, headers });
   }
 }
 
