@@ -114,7 +114,7 @@ export default function CotizadorResumen() {
         {/* NOTA FINAL */}
         <div className="px-6 pb-5">
           <p className="text-xs text-slate-500 leading-snug">
-            Este monto representa una estimación basada en precios promedio del mercado en Panamá. 
+            Este monto representa una estimación basada en precios promedio. 
             Puede variar según materiales, tiempos y condiciones del sitio. 
             Para una evaluación precisa, se recomienda agendar una cita técnica.
           </p>

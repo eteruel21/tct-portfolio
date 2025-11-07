@@ -149,27 +149,11 @@ function calcular(items) {
     total
   };
 }
-var ITBMS, CATALOGO;
+var ITBMS;
 var init_catalogo = __esm({
   "lib/catalogo.js"() {
     init_functionsRoutes_0_8534298748811979();
     ITBMS = 0.07;
-    CATALOGO = [
-      // -------- SERVICIOS ESPECIALES --------
-      { id: "cctv_cam", categoria: "especiales", nombre: "C\xE1mara CCTV instalada", unidad: "unidad", precio: 45 },
-      { id: "cat6_mt", categoria: "especiales", nombre: "Cableado estructurado Cat6", unidad: "metro", precio: 2.8 },
-      { id: "alarma_inc", categoria: "especiales", nombre: "Sistema de alarma contra incendios", unidad: "sistema", precio: 1500 },
-      { id: "panel550", categoria: "especiales", nombre: "Panel solar 550W + instalaci\xF3n", unidad: "panel", precio: 310 },
-      { id: "mto_electrico_m2", categoria: "especiales", nombre: "Mantenimiento el\xE9ctrico residencial", unidad: "m\xB2", precio: 1.5 },
-      { id: "porton_auto", categoria: "especiales", nombre: "Automatizaci\xF3n de port\xF3n el\xE9ctrico", unidad: "unidad", precio: 850 },
-      // -------- CONSTRUCCIÓN --------
-      { id: "repello_m2", categoria: "construccion", nombre: "Repello de pared", unidad: "m\xB2", precio: 7.5 },
-      { id: "porcelanato_m2", categoria: "construccion", nombre: "Piso de porcelanato", unidad: "m\xB2", precio: 12 },
-      { id: "gypsum_m2", categoria: "construccion", nombre: "Cielo raso de gypsum", unidad: "m\xB2", precio: 9.8 },
-      { id: "pint_monocapa_m2", categoria: "construccion", nombre: "Pintura monocapa", unidad: "m\xB2", precio: 3.2 },
-      { id: "block_colocado", categoria: "construccion", nombre: "Block de concreto colocado", unidad: "unidad", precio: 2.4 },
-      { id: "losa_m3", categoria: "construccion", nombre: "Fundida de losa acabado liso", unidad: "m\xB3", precio: 68 }
-    ];
     __name(publicoSinPrecios, "publicoSinPrecios");
     __name(calcular, "calcular");
   }
@@ -9698,10 +9682,10 @@ var init_functionsRoutes_0_8534298748811979 = __esm({
   }
 });
 
-// ../.wrangler/tmp/bundle-5yYnZ7/middleware-loader.entry.ts
+// ../.wrangler/tmp/bundle-NJw2nE/middleware-loader.entry.ts
 init_functionsRoutes_0_8534298748811979();
 
-// ../.wrangler/tmp/bundle-5yYnZ7/middleware-insertion-facade.js
+// ../.wrangler/tmp/bundle-NJw2nE/middleware-insertion-facade.js
 init_functionsRoutes_0_8534298748811979();
 
 // ../node_modules/wrangler/templates/pages-template-worker.ts
@@ -10197,7 +10181,7 @@ var jsonError = /* @__PURE__ */ __name(async (request, env, _ctx, middlewareCtx)
 }, "jsonError");
 var middleware_miniflare3_json_error_default = jsonError;
 
-// ../.wrangler/tmp/bundle-5yYnZ7/middleware-insertion-facade.js
+// ../.wrangler/tmp/bundle-NJw2nE/middleware-insertion-facade.js
 var __INTERNAL_WRANGLER_MIDDLEWARE__ = [
   middleware_ensure_req_body_drained_default,
   middleware_miniflare3_json_error_default
@@ -10230,7 +10214,7 @@ function __facade_invoke__(request, env, ctx, dispatch, finalMiddleware) {
 }
 __name(__facade_invoke__, "__facade_invoke__");
 
-// ../.wrangler/tmp/bundle-5yYnZ7/middleware-loader.entry.ts
+// ../.wrangler/tmp/bundle-NJw2nE/middleware-loader.entry.ts
 var __Facade_ScheduledController__ = class ___Facade_ScheduledController__ {
   constructor(scheduledTime, cron, noRetry) {
     this.scheduledTime = scheduledTime;
