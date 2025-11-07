@@ -384,7 +384,7 @@ export function publicoSinPrecios() {
 
 export function calcular(items) {
   // items: [{id, cantidad}]
-  const index = new Map(CATALOGO.map(i => [i.id, i]));
+  const index = new Map(catalogo.map(i => [i.id, i]));
   const detalle = [];
   let subtotal = 0;
 
@@ -393,7 +393,7 @@ export function calcular(items) {
     if (!ref) continue;
     const cantidad = Number(it.cantidad) || 0;
     if (cantidad <= 0) continue;
-    const precio_unit = ref.precio;
+    const precio_unit = ref.precio_unit;
     const linea = precio_unit * cantidad;
     subtotal += linea;
     detalle.push({

@@ -134,7 +134,7 @@ function calcular(items) {
     if (!ref) continue;
     const cantidad = Number(it.cantidad) || 0;
     if (cantidad <= 0) continue;
-    const precio_unit = ref.precio;
+    const precio_unit = ref.precio_unit;
     const linea = precio_unit * cantidad;
     subtotal += linea;
     detalle.push({
