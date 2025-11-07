@@ -11,9 +11,9 @@ export default function Reservar() {
   // --- Selector de servicio (anexado) ---
   const [servicio, setServicio] = useState("");
   const seleccionarServicio = (id) => {
-  setServicio(id);
-  setForm((f) => ({ ...f, servicio: id }));
-};
+    setServicio(id);
+    setForm((f) => ({ ...f, servicio: id }));
+  };
   const servicios = [
     { id: "construccion", nombre: "Construcción", icono: <FaHome /> },
     { id: "sistemas", nombre: "Sistemas Especiales", icono: <FaShieldAlt /> },
@@ -45,12 +45,34 @@ export default function Reservar() {
   const [esActualizacion, setEsActualizacion] = useState(false);
   const [searchParams] = useSearchParams();
 
+  // === Detectar si viene desde Cotizador o modo buscar ===
   useEffect(() => {
     const codigoUrl = searchParams.get("codigo");
     const modoUrl = searchParams.get("modo");
+
+    // Si viene desde el panel "Gestionar cita"
     if (codigoUrl && modoUrl === "buscar") {
       setModo("buscar");
       setCodigoBusqueda(codigoUrl.toUpperCase());
+    }
+
+    // Si viene desde el CotizadorResumen
+    const nombreUrl = searchParams.get("nombre");
+    const emailUrl = searchParams.get("email");
+    const telefonoUrl = searchParams.get("telefono");
+    const motivoUrl = searchParams.get("motivo");
+    const cotizacionUrl = searchParams.get("codigo");
+
+    if (nombreUrl || emailUrl || motivoUrl) {
+      setModo("nuevo");
+      setForm((prev) => ({
+        ...prev,
+        nombre: nombreUrl || "",
+        email: emailUrl || "",
+        telefono: telefonoUrl || "",
+        motivo: motivoUrl || "",
+      }));
+      if (cotizacionUrl) setCodigo(cotizacionUrl);
     }
   }, []);
 
@@ -138,10 +160,9 @@ export default function Reservar() {
     }
   }
 
-  // ✅ FUNCIÓN ENVIAR RESERVA (ARREGLADA)
+  // ✅ FUNCIÓN ENVIAR RESERVA
   const enviarReserva = async () => {
     setEnviando(true);
-
     const nuevoCodigo = reservaActiva?.codigo || generarCodigo();
 
     try {
@@ -202,7 +223,7 @@ export default function Reservar() {
           <FaCalendarAlt className="text-[#FFD700]" /> Reservar cita
         </h1>
 
-        {/* --- UI selector de servicio anexado --- */}
+        {/* --- UI selector de servicio --- */}
         <div className="mb-4 text-left">
           <label className="block text-sm font-semibold mb-2 text-white/90">
             Selecciona un servicio
@@ -234,7 +255,7 @@ export default function Reservar() {
                 exit={{ opacity: 0 }}
                 className="mt-3 p-3 rounded-lg bg-white/5 text-sm text-white/90"
               >
-                Has seleccionado:
+                Has seleccionado:{" "}
                 <span className="font-semibold">
                   {servicios.find(s => s.id === servicio)?.nombre}
                 </span>
@@ -311,6 +332,13 @@ export default function Reservar() {
                     <span className="font-semibold">
                       {servicios.find((s) => s.id === form.servicio)?.nombre}
                     </span>
+                  </div>
+                )}
+
+                {codigo && (
+                  <div className="mb-3 p-2 rounded-lg bg-white/10 border border-white/20 text-sm">
+                    Código de cotización:{" "}
+                    <b className="text-[#FFD700]">{codigo}</b>
                   </div>
                 )}
 
@@ -474,7 +502,6 @@ export default function Reservar() {
                 </button>
               </div>
             )}
-
           </animated.div>
         ))}
       </animated.div>
