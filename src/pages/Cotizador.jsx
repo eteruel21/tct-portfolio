@@ -238,12 +238,11 @@ export default function Cotizador() {
                       <motion.div
                         whileHover={{ scale: 1.03 }}
                         key={item.id}
-                        className={`rounded-2xl p-5 backdrop-blur-xl border transition-all duration-300
-                          ${
-                            activo
-                              ? "border-emerald-400 bg-emerald-200/20 shadow-2xl"
-                              : "border-white/30 bg-white/15 shadow-lg hover:shadow-xl"
-                          }`}
+                        className={`rounded-2xl p-4 border transition-all duration-300 ${
+                          activo
+                            ? "border-indigo-400 bg-indigo-200/20 shadow-2xl"
+                            : "border-white/30 bg-white/15 shadow-lg hover:shadow-xl"
+                        }`}
                         style={{
                           boxShadow: activo
                             ? "0 6px 30px rgba(16, 185, 129, 0.35)"
