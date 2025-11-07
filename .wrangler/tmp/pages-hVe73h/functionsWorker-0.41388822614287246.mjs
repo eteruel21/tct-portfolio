@@ -124,7 +124,7 @@ function publicoSinPrecios() {
   }));
 }
 function calcular(items) {
-  const index = new Map(CATALOGO.map((i) => [i.id, i]));
+  const index = new Map(catalogo.map((i) => [i.id, i]));
   const detalle = [];
   let subtotal = 0;
   for (const it of items) {
