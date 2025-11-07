@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 export default function Cotizador() {
   const navigate = useNavigate();
   const [catalogo, setCatalogo] = useState([]);
-  const [filtro, setFiltro] = useState("especiales");
+  const [filtro, setFiltro] = useState("servicios_especiales");
   const [cargando, setCargando] = useState(true);
 
   const [cliente, setCliente] = useState({
@@ -42,7 +42,7 @@ export default function Cotizador() {
   }, []);
 
   const porCategoria = useMemo(() => ({
-    especiales: catalogo.filter(i => i.categoria === "especiales"),
+    servicios_especiales: catalogo.filter(i => i.categoria === "servicios_especiales"),
     construccion: catalogo.filter(i => i.categoria === "construccion"),
   }), [catalogo]);
 
@@ -102,9 +102,9 @@ export default function Cotizador() {
             </h1>
             <div className="hidden sm:flex gap-2">
               <button
-                onClick={() => setFiltro("especiales")}
+                onClick={() => setFiltro("servicios_especiales")}
                 className={`px-4 py-2 rounded-xl font-semibold transition ${
-                  filtro === "especiales"
+                  filtro === "servicios_especiales"
                     ? "bg-indigo-700 text-white"
                     : "bg-slate-200 hover:bg-slate-300 text-slate-700"
                 }`}
@@ -181,14 +181,14 @@ export default function Cotizador() {
           <div className="md:col-span-2">
             <div className="flex sm:hidden justify-center gap-2 mb-3">
               <button
-                onClick={() => setFiltro("especiales")}
+                onClick={() => setFiltro("servicios_especiales")}
                 className={`px-4 py-2 rounded-xl text-sm font-semibold transition ${
-                  filtro === "especiales"
+                  filtro === "servicios_especiales"
                     ? "bg-indigo-700 text-white"
                     : "bg-slate-200 text-slate-700"
                 }`}
               >
-                Especiales
+                Servicios Especiales
               </button>
               <button
                 onClick={() => setFiltro("construccion")}
