@@ -116,7 +116,12 @@ var init_contacto = __esm({
 
 // lib/catalogo.js
 function publicoSinPrecios() {
-  return CATALOGO.map(({ id, categoria, nombre, unidad }) => ({ id, categoria, nombre, unidad }));
+  return catalogo.map(({ id, categoria, nombre, unidad }) => ({
+    id,
+    categoria,
+    nombre,
+    unidad
+  }));
 }
 function calcular(items) {
   const index = new Map(CATALOGO.map((i) => [i.id, i]));
@@ -149,11 +154,390 @@ function calcular(items) {
     total
   };
 }
-var ITBMS;
+var ITBMS, catalogo;
 var init_catalogo = __esm({
   "lib/catalogo.js"() {
     init_functionsRoutes_0_8534298748811979();
     ITBMS = 0.07;
+    catalogo = [
+      // ================================
+      // SERVICIOS ESPECIALES
+      // ================================
+      {
+        id: "sys_cam_unidad",
+        categoria: "servicios_especiales",
+        nombre: "Instalaci\xF3n de c\xE1mara de seguridad (unidad)",
+        unidad: "unidad",
+        precio_unit: 150
+      },
+      {
+        id: "sys_cam_kit4",
+        categoria: "servicios_especiales",
+        nombre: "Kit residencial 4 c\xE1maras + grabaci\xF3n",
+        unidad: "sistema",
+        precio_unit: 350
+      },
+      {
+        id: "sys_alarma_basic",
+        categoria: "servicios_especiales",
+        nombre: "Sistema de alarma b\xE1sico (residencial)",
+        unidad: "sistema",
+        precio_unit: 300
+      },
+      {
+        id: "sys_automacion_ligera",
+        categoria: "servicios_especiales",
+        nombre: "Automatizaci\xF3n ligera (iluminaci\xF3n + acceso inteligente)",
+        unidad: "sistema",
+        precio_unit: 500
+      },
+      {
+        id: "sys_cctv_comercial",
+        categoria: "servicios_especiales",
+        nombre: "Sistema CCTV comercial (varias c\xE1maras)",
+        unidad: "proyecto",
+        precio_unit: 1500
+      },
+      {
+        id: "sys_control_acceso",
+        categoria: "servicios_especiales",
+        nombre: "Control de acceso biom\xE9trico o lector de tarjetas",
+        unidad: "punto",
+        precio_unit: 250
+      },
+      {
+        id: "sys_redes_cableado",
+        categoria: "servicios_especiales",
+        nombre: "Instalaci\xF3n de redes y cableado estructurado",
+        unidad: "lote",
+        precio_unit: 750
+      },
+      {
+        id: "sys_alarma_incendio",
+        categoria: "servicios_especiales",
+        nombre: "Sistema de alarma contra incendio",
+        unidad: "sistema",
+        precio_unit: 1200
+      },
+      {
+        id: "sys_fuentes_respaldo",
+        categoria: "servicios_especiales",
+        nombre: "Fuente de poder o UPS para sistemas de seguridad",
+        unidad: "unidad",
+        precio_unit: 180
+      },
+      {
+        id: "sys_monitoring_servicio",
+        categoria: "servicios_especiales",
+        nombre: "Servicio de monitoreo mensual de seguridad",
+        unidad: "mes",
+        precio_unit: 45
+      },
+      {
+        id: "sys_sensor_movimiento",
+        categoria: "servicios_especiales",
+        nombre: "Sensor de movimiento para sistema de alarma",
+        unidad: "unidad",
+        precio_unit: 90
+      },
+      {
+        id: "sys_videoportero",
+        categoria: "servicios_especiales",
+        nombre: "Videoportero con control remoto y c\xE1mara integrada",
+        unidad: "unidad",
+        precio_unit: 220
+      },
+      {
+        id: "sys_iluminacion_seguridad",
+        categoria: "servicios_especiales",
+        nombre: "Iluminaci\xF3n exterior de seguridad LED con sensor",
+        unidad: "lote",
+        precio_unit: 400
+      },
+      {
+        id: "sys_domotica_residencial",
+        categoria: "servicios_especiales",
+        nombre: "Sistema dom\xF3tico residencial completo",
+        unidad: "sistema",
+        precio_unit: 800
+      },
+      {
+        id: "sys_automatizacion_comercial",
+        categoria: "servicios_especiales",
+        nombre: "Automatizaci\xF3n comercial (integraci\xF3n de sistemas)",
+        unidad: "proyecto",
+        precio_unit: 2e3
+      },
+      {
+        id: "sys_cableado_videosurv",
+        categoria: "servicios_especiales",
+        nombre: "Cableado para video vigilancia (por c\xE1mara)",
+        unidad: "unidad",
+        precio_unit: 60
+      },
+      {
+        id: "sys_antena_externa_cam",
+        categoria: "servicios_especiales",
+        nombre: "Antena externa para c\xE1mara remota",
+        unidad: "unidad",
+        precio_unit: 120
+      },
+      {
+        id: "sys_sensor_magnetico",
+        categoria: "servicios_especiales",
+        nombre: "Sensor magn\xE9tico de apertura de puerta o ventana",
+        unidad: "unidad",
+        precio_unit: 80
+      },
+      {
+        id: "sys_intercom_general",
+        categoria: "servicios_especiales",
+        nombre: "Intercomunicador general con videoportero",
+        unidad: "unidad",
+        precio_unit: 300
+      },
+      {
+        id: "sys_red_wifi_piso",
+        categoria: "servicios_especiales",
+        nombre: "Red Wi-Fi institucional por piso",
+        unidad: "piso",
+        precio_unit: 900
+      },
+      {
+        id: "sys_control_clima_intel",
+        categoria: "servicios_especiales",
+        nombre: "Control clim\xE1tico inteligente (HVAC conectado)",
+        unidad: "sistema",
+        precio_unit: 650
+      },
+      {
+        id: "sys_panel_solar_seg",
+        categoria: "servicios_especiales",
+        nombre: "Integraci\xF3n de panel solar para respaldo de seguridad",
+        unidad: "sistema",
+        precio_unit: 1100
+      },
+      {
+        id: "sys_mantenimiento_seguridad",
+        categoria: "servicios_especiales",
+        nombre: "Mantenimiento anual de sistema de seguridad",
+        unidad: "a\xF1o",
+        precio_unit: 150
+      },
+      {
+        id: "sys_inspeccion_tecnica",
+        categoria: "servicios_especiales",
+        nombre: "Inspecci\xF3n t\xE9cnica de sistemas especiales",
+        unidad: "servicio",
+        precio_unit: 200
+      },
+      // ================================
+      // CONSTRUCCIÓN
+      // ================================
+      {
+        id: "con_obra_gris",
+        categoria: "construccion",
+        nombre: "Obra gris b\xE1sica",
+        unidad: "m\xB2",
+        precio_unit: 550
+      },
+      {
+        id: "con_acabados_medios",
+        categoria: "construccion",
+        nombre: "Construcci\xF3n con acabados medios",
+        unidad: "m\xB2",
+        precio_unit: 800
+      },
+      {
+        id: "con_acabados_altos",
+        categoria: "construccion",
+        nombre: "Construcci\xF3n con acabados de lujo",
+        unidad: "m\xB2",
+        precio_unit: 1300
+      },
+      {
+        id: "con_pintura_monocapa",
+        categoria: "construccion",
+        nombre: "Pintura monocapa exterior",
+        unidad: "m\xB2",
+        precio_unit: 4
+      },
+      {
+        id: "con_repello_muro",
+        categoria: "construccion",
+        nombre: "Repello de muro interior/exterior",
+        unidad: "m\xB2",
+        precio_unit: 6
+      },
+      {
+        id: "con_demolicion",
+        categoria: "construccion",
+        nombre: "Demolici\xF3n controlada",
+        unidad: "m\xB2",
+        precio_unit: 15
+      },
+      {
+        id: "con_baldosa_estandar",
+        categoria: "construccion",
+        nombre: "Colocaci\xF3n de baldosas est\xE1ndar",
+        unidad: "m\xB2",
+        precio_unit: 10
+      },
+      {
+        id: "con_hormigon_piso",
+        categoria: "construccion",
+        nombre: "Sustrato de hormig\xF3n para piso",
+        unidad: "m\xB2",
+        precio_unit: 30
+      },
+      {
+        id: "con_vidrio_ventana",
+        categoria: "construccion",
+        nombre: "Instalaci\xF3n de vidrio templado o ventana",
+        unidad: "unidad",
+        precio_unit: 120
+      },
+      {
+        id: "con_carpinteria_madera",
+        categoria: "construccion",
+        nombre: "Carpinter\xEDa en madera (puertas, closets, molduras)",
+        unidad: "metro lineal",
+        precio_unit: 50
+      },
+      {
+        id: "con_techo_metalico",
+        categoria: "construccion",
+        nombre: "Techo met\xE1lico o de l\xE1mina con estructura",
+        unidad: "m\xB2",
+        precio_unit: 45
+      },
+      {
+        id: "con_plomeria_basica",
+        categoria: "construccion",
+        nombre: "Instalaci\xF3n de plomer\xEDa b\xE1sica",
+        unidad: "lote",
+        precio_unit: 500
+      },
+      {
+        id: "con_electricidad_basica",
+        categoria: "construccion",
+        nombre: "Instalaci\xF3n el\xE9ctrica b\xE1sica",
+        unidad: "m\xB2",
+        precio_unit: 20
+      },
+      {
+        id: "con_electricidad_avanzada",
+        categoria: "construccion",
+        nombre: "Instalaci\xF3n el\xE9ctrica avanzada",
+        unidad: "m\xB2",
+        precio_unit: 35
+      },
+      {
+        id: "con_impermeabilizacion",
+        categoria: "construccion",
+        nombre: "Impermeabilizaci\xF3n de techo o terraza",
+        unidad: "m\xB2",
+        precio_unit: 8
+      },
+      {
+        id: "con_aire_acondicionado",
+        categoria: "construccion",
+        nombre: "Instalaci\xF3n de aire acondicionado tipo split",
+        unidad: "unidad",
+        precio_unit: 450
+      },
+      {
+        id: "con_fachada_pintura",
+        categoria: "construccion",
+        nombre: "Pintura de fachada premium",
+        unidad: "m\xB2",
+        precio_unit: 6.5
+      },
+      {
+        id: "con_bano_completo",
+        categoria: "construccion",
+        nombre: "Renovaci\xF3n de ba\xF1o completo est\xE1ndar",
+        unidad: "proyecto",
+        precio_unit: 2500
+      },
+      {
+        id: "con_cocina_completa",
+        categoria: "construccion",
+        nombre: "Renovaci\xF3n de cocina completa est\xE1ndar",
+        unidad: "proyecto",
+        precio_unit: 4e3
+      },
+      {
+        id: "con_piso_lujo",
+        categoria: "construccion",
+        nombre: "Acabado de lujo en piso (m\xE1rmol o granito)",
+        unidad: "m\xB2",
+        precio_unit: 120
+      },
+      {
+        id: "con_tuberia_galvanizada",
+        categoria: "construccion",
+        nombre: "Instalaci\xF3n de tuber\xEDa galvanizada",
+        unidad: "metro lineal",
+        precio_unit: 18
+      },
+      {
+        id: "con_ventanas_doblevidrio",
+        categoria: "construccion",
+        nombre: "Instalaci\xF3n de ventanas doble vidrio",
+        unidad: "unidad",
+        precio_unit: 300
+      },
+      {
+        id: "con_rejas_seguridad",
+        categoria: "construccion",
+        nombre: "Instalaci\xF3n de rejas de seguridad est\xE1ndar",
+        unidad: "metro lineal",
+        precio_unit: 75
+      },
+      {
+        id: "con_paisajismo_basico",
+        categoria: "construccion",
+        nombre: "Paisajismo b\xE1sico y jardiner\xEDa",
+        unidad: "lote",
+        precio_unit: 1200
+      },
+      {
+        id: "con_drenaje_pluvial",
+        categoria: "construccion",
+        nombre: "Sistema de drenaje pluvial",
+        unidad: "metro lineal",
+        precio_unit: 40
+      },
+      {
+        id: "con_puerta_seguridad",
+        categoria: "construccion",
+        nombre: "Instalaci\xF3n de puerta de seguridad met\xE1lica",
+        unidad: "unidad",
+        precio_unit: 550
+      },
+      {
+        id: "con_tablaroca_division",
+        categoria: "construccion",
+        nombre: "Construcci\xF3n de muro divisorio de tablaroca",
+        unidad: "m\xB2",
+        precio_unit: 25
+      },
+      {
+        id: "con_escaleras_metalicas",
+        categoria: "construccion",
+        nombre: "Instalaci\xF3n de escaleras met\xE1licas decorativas",
+        unidad: "proyecto",
+        precio_unit: 3500
+      },
+      {
+        id: "con_galeria_cristal",
+        categoria: "construccion",
+        nombre: "Galer\xEDa de cristal o aluminio",
+        unidad: "m\xB2",
+        precio_unit: 180
+      }
+    ];
     __name(publicoSinPrecios, "publicoSinPrecios");
     __name(calcular, "calcular");
   }
@@ -9682,10 +10066,10 @@ var init_functionsRoutes_0_8534298748811979 = __esm({
   }
 });
 
-// ../.wrangler/tmp/bundle-tCZDm6/middleware-loader.entry.ts
+// ../.wrangler/tmp/bundle-uUIicM/middleware-loader.entry.ts
 init_functionsRoutes_0_8534298748811979();
 
-// ../.wrangler/tmp/bundle-tCZDm6/middleware-insertion-facade.js
+// ../.wrangler/tmp/bundle-uUIicM/middleware-insertion-facade.js
 init_functionsRoutes_0_8534298748811979();
 
 // ../node_modules/wrangler/templates/pages-template-worker.ts
@@ -10181,7 +10565,7 @@ var jsonError = /* @__PURE__ */ __name(async (request, env, _ctx, middlewareCtx)
 }, "jsonError");
 var middleware_miniflare3_json_error_default = jsonError;
 
-// ../.wrangler/tmp/bundle-tCZDm6/middleware-insertion-facade.js
+// ../.wrangler/tmp/bundle-uUIicM/middleware-insertion-facade.js
 var __INTERNAL_WRANGLER_MIDDLEWARE__ = [
   middleware_ensure_req_body_drained_default,
   middleware_miniflare3_json_error_default
@@ -10214,7 +10598,7 @@ function __facade_invoke__(request, env, ctx, dispatch, finalMiddleware) {
 }
 __name(__facade_invoke__, "__facade_invoke__");
 
-// ../.wrangler/tmp/bundle-tCZDm6/middleware-loader.entry.ts
+// ../.wrangler/tmp/bundle-uUIicM/middleware-loader.entry.ts
 var __Facade_ScheduledController__ = class ___Facade_ScheduledController__ {
   constructor(scheduledTime, cron, noRetry) {
     this.scheduledTime = scheduledTime;
