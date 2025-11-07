@@ -28,9 +28,10 @@ export default function Cotizador() {
         const data = await res.json();
         setCatalogo(data.items || []);
       } catch {
+        // fallback local mínimo
         setCatalogo([
-          { id: "cam", categoria: "especiales", nombre: "Cámaras de seguridad", unidad: "unidad" },
-          { id: "alarma", categoria: "especiales", nombre: "Sistema de alarma", unidad: "sistema" },
+          { id: "cam", categoria: "servicios_especiales", nombre: "Cámaras de seguridad", unidad: "unidad" },
+          { id: "alarma", categoria: "servicios_especiales", nombre: "Sistema de alarma", unidad: "sistema" },
           { id: "repello", categoria: "construccion", nombre: "Repello de pared", unidad: "m²" },
           { id: "pintura", categoria: "construccion", nombre: "Pintura monocapa", unidad: "m²" },
         ]);
@@ -40,10 +41,13 @@ export default function Cotizador() {
     })();
   }, []);
 
-  const porCategoria = useMemo(() => ({
-    servicios_especiales: catalogo.filter(i => i.categoria === "servicios_especiales"),
-    construccion: catalogo.filter(i => i.categoria === "construccion"),
-  }), [catalogo]);
+  const porCategoria = useMemo(
+    () => ({
+      servicios_especiales: catalogo.filter((i) => i.categoria === "servicios_especiales"),
+      construccion: catalogo.filter((i) => i.categoria === "construccion"),
+    }),
+    [catalogo]
+  );
 
   const seleccion = useMemo(() => {
     return Object.entries(cantidades)
@@ -81,119 +85,147 @@ export default function Cotizador() {
 
   function setCantidad(id, val) {
     const n = Math.max(0, Number(val));
-    setCantidades(prev => ({ ...prev, [id]: n }));
+    setCantidades((prev) => ({ ...prev, [id]: n }));
   }
 
   return (
     <section
-      className="min-h-screen bg-cover bg-center bg-no-repeat relative"
-      style={{ backgroundImage: "url('/images/fondo_inicio.jpg')" }}
+      className="min-h-screen relative flex"
+      style={{
+        backgroundImage:
+          "linear-gradient(to bottom, #0D3B66 0%, #1B4F72 100%)",
+      }}
     >
-      <div className="absolute inset-0 bg-black/40 backdrop-blur-[1px]" />
+      {/* capa */}
+      <div className="absolute inset-0 pointer-events-none" />
 
-      <div className="relative z-10">
-        {/* Barra superior */}
-        <div className="sticky top-0 z-20 backdrop-blur-md bg-white/80 border-b border-slate-200 shadow-sm">
+      <div className="relative z-10 w-full">
+        {/* Encabezado vidrio */}
+        <div className="sticky top-0 z-20 backdrop-blur-xl bg-[#0D3B66]/50 border-b border-white/20 shadow-lg">
           <div className="max-w-6xl mx-auto flex items-center justify-between px-5 py-3">
-            <h1 className="text-xl sm:text-2xl font-bold text-slate-800 tracking-tight">
-              Cotizador <span className="text-indigo-700">TCT Services</span>
+            <h1 className="text-lg sm:text-xl font-semibold text-white tracking-tight">
+              Cotizador
             </h1>
+
+            {/* Tabs categoría */}
             <div className="hidden sm:flex gap-2">
-              {["servicios_especiales", "construccion"].map((cat) => (
+              {[
+                { key: "servicios_especiales", label: "Servicios Especiales" },
+                { key: "construccion", label: "Construcción" },
+              ].map((cat) => (
                 <button
-                  key={cat}
-                  onClick={() => setFiltro(cat)}
-                  className={`px-4 py-2 rounded-2xl font-semibold transition ${
-                    filtro === cat
-                      ? "bg-gradient-to-r from-indigo-600 to-blue-500 text-white shadow-lg"
-                      : "bg-slate-200 hover:bg-slate-300 text-slate-700"
+                  key={cat.key}
+                  onClick={() => setFiltro(cat.key)}
+                  className={`px-3 py-2 rounded-2xl text-sm font-semibold transition border ${
+                    filtro === cat.key
+                      ? "bg-[#FFD700] text-[#0D3B66] border-[#FFD700] shadow-md"
+                      : "bg-white/10 text-white border-white/20 hover:bg-white/20"
                   }`}
                 >
-                  {cat === "servicios_especiales" ? "Servicios Especiales" : "Construcción"}
+                  {cat.label}
                 </button>
               ))}
             </div>
           </div>
         </div>
 
-        {/* Cuerpo principal */}
-        <div className="max-w-6xl mx-auto px-5 py-6 grid md:grid-cols-3 gap-6">
-          {/* Panel del cliente */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="backdrop-blur-2xl bg-white/10 border border-white/20 shadow-2xl rounded-3xl p-6 text-white"
-          >
-            <h2 className="text-lg sm:text-xl font-semibold mb-4 text-white drop-shadow-sm">
-              Información del cliente
-            </h2>
-            <div className="space-y-4">
-              {[
-                { name: "nombre", label: "Nombre completo", type: "text", required: true },
-                { name: "email", label: "Correo electrónico", type: "email", required: true },
-                { name: "telefono", label: "Teléfono", type: "text" },
-                { name: "ubicacion", label: "Ubicación / Ciudad", type: "text" },
-              ].map((c) => (
-                <div key={c.name}>
-                  <label className="block text-sm font-medium mb-1 text-white/90">
-                    {c.label}
+        {/* Contenido */}
+        <motion.div
+          initial={{ opacity: 0, y: 18 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.35 }}
+          className="max-w-6xl mx-auto px-5 py-6 grid md:grid-cols-3 gap-6"
+        >
+          {/* Panel cliente: vidrio azul */}
+          <div className="md:col-span-1">
+            <div className="bg-[#0D3B66]/40 backdrop-blur-xl border border-white/20 rounded-3xl shadow-2xl p-5 text-white">
+              <h2 className="text-base sm:text-lg font-semibold mb-4">Información del cliente</h2>
+
+              <div className="space-y-4 text-sm">
+                {[
+                  { name: "nombre", label: "Nombre completo", type: "text", required: true },
+                  { name: "email", label: "Correo electrónico", type: "email", required: true },
+                  { name: "telefono", label: "Teléfono", type: "text" },
+                  { name: "ubicacion", label: "Ubicación / Ciudad", type: "text" },
+                ].map((c) => (
+                  <div key={c.name}>
+                    <label className="block text-[13px] font-medium mb-1 text-white/90">
+                      {c.label}
+                    </label>
+                    <input
+                      type={c.type}
+                      required={c.required}
+                      className="w-full px-3 py-2 rounded-xl bg-white/15 border border-white/25 text-white placeholder-white/70 focus:ring-2 focus:ring-[#FFD700] outline-none"
+                      value={cliente[c.name] || ""}
+                      placeholder={c.label}
+                      onChange={(e) => setCliente((prev) => ({ ...prev, [c.name]: e.target.value }))}
+                    />
+                  </div>
+                ))}
+
+                <div>
+                  <label className="block text-[13px] font-medium mb-1 text-white/90">
+                    Tipo de instalación
                   </label>
-                  <input
-                    type={c.type}
-                    required={c.required}
-                    className="w-full px-4 py-2.5 rounded-xl bg-white/20 border border-white/30 text-white placeholder-white/70 focus:ring-2 focus:ring-indigo-400 outline-none"
-                    value={cliente[c.name] || ""}
-                    placeholder={c.label}
-                    onChange={(e) =>
-                      setCliente((prev) => ({ ...prev, [c.name]: e.target.value }))
-                    }
+                  <select
+                    className="w-full px-3 py-2 rounded-xl bg-white/15 border border-white/25 text-white focus:ring-2 focus:ring-[#FFD700] outline-none"
+                    value={cliente.tipo}
+                    onChange={(e) => setCliente((prev) => ({ ...prev, tipo: e.target.value }))}
+                  >
+                    <option value="">Seleccione</option>
+                    <option value="Residencial">Residencial</option>
+                    <option value="Comercial">Comercial</option>
+                    <option value="Industrial">Industrial</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-[13px] font-medium mb-1 text-white/90">
+                    Mensaje adicional
+                  </label>
+                  <textarea
+                    className="w-full px-3 py-2 rounded-xl bg-white/15 border border-white/25 text-white placeholder-white/70 focus:ring-2 focus:ring-[#FFD700] outline-none h-24 resize-none"
+                    value={cliente.mensaje}
+                    placeholder="Detalle adicional…"
+                    onChange={(e) => setCliente((prev) => ({ ...prev, mensaje: e.target.value }))}
                   />
                 </div>
-              ))}
-
-              <div>
-                <label className="block text-sm font-medium mb-1 text-white/90">
-                  Tipo de instalación
-                </label>
-                <select
-                  className="w-full px-4 py-2.5 rounded-xl bg-white/20 border border-white/30 text-white focus:ring-2 focus:ring-indigo-400 outline-none"
-                  value={cliente.tipo}
-                  onChange={(e) => setCliente((prev) => ({ ...prev, tipo: e.target.value }))}
-                >
-                  <option value="">Seleccione</option>
-                  <option value="Residencial">Residencial</option>
-                  <option value="Comercial">Comercial</option>
-                  <option value="Industrial">Industrial</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium mb-1 text-white/90">
-                  Mensaje adicional
-                </label>
-                <textarea
-                  className="w-full px-4 py-2.5 rounded-xl bg-white/20 border border-white/30 text-white placeholder-white/70 focus:ring-2 focus:ring-indigo-400 outline-none h-24 resize-none"
-                  value={cliente.mensaje}
-                  placeholder="Escriba algún detalle adicional…"
-                  onChange={(e) =>
-                    setCliente((prev) => ({ ...prev, mensaje: e.target.value }))
-                  }
-                />
               </div>
             </div>
-          </motion.div>
+          </div>
 
-          {/* Catálogo */}
+          {/* Catálogo vidrio + selección verde */}
           <div className="md:col-span-2">
+            {/* Tabs en móvil */}
+            <div className="sm:hidden mb-3 flex justify-center gap-2">
+              {[
+                { key: "servicios_especiales", label: "Servicios Especiales" },
+                { key: "construccion", label: "Construcción" },
+              ].map((cat) => (
+                <button
+                  key={cat.key}
+                  onClick={() => setFiltro(cat.key)}
+                  className={`px-3 py-2 rounded-2xl text-xs font-semibold transition border ${
+                    filtro === cat.key
+                      ? "bg-[#FFD700] text-[#0D3B66] border-[#FFD700] shadow-md"
+                      : "bg-white/10 text-white border-white/20 hover:bg-white/20"
+                  }`}
+                >
+                  {cat.label}
+                </button>
+              ))}
+            </div>
+
             {cargando ? (
-              <div className="text-slate-200 text-center py-10">Cargando servicios...</div>
+              <div className="text-white/80 text-center py-10">Cargando servicios…</div>
             ) : (
               <AnimatePresence mode="wait">
                 <motion.div
                   key={filtro}
-                  initial={{ opacity: 0, y: 20 }}
+                  initial={{ opacity: 0, y: 14 }}
                   animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -20 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ duration: 0.25 }}
                   className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4"
                 >
                   {porCategoria[filtro].map((item) => {
@@ -202,18 +234,23 @@ export default function Cotizador() {
 
                     return (
                       <motion.div
-                        whileHover={{ scale: 1.03 }}
                         key={item.id}
-                        className={`rounded-2xl p-4 border transition-all duration-300 ${
-                          activo
-                            ? "border-indigo-400 bg-indigo-200/20 shadow-2xl"
-                            : "border-white/20 bg-white/10 shadow-lg hover:shadow-xl"
-                        }`}
+                        whileHover={{ scale: 1.02 }}
+                        className={[
+                          "rounded-2xl p-4 transition-all duration-300 border",
+                          "bg-white/10 backdrop-blur-lg text-white",
+                          "border-white/20 shadow-xl",
+                          activo &&
+                            "border-emerald-400 bg-emerald-500/20 shadow-[0_0_24px_rgba(16,185,129,0.55)]",
+                        ]
+                          .filter(Boolean)
+                          .join(" ")}
                       >
-                        <div className="flex items-start justify-between">
-                          <h3 className="font-semibold text-white leading-snug text-sm sm:text-base drop-shadow-sm">
+                        <div className="flex items-start justify-between gap-3">
+                          <h3 className="font-semibold leading-snug text-[15px]">
                             {item.nombre}
                           </h3>
+
                           <button
                             onClick={() =>
                               setCantidades((prev) => ({
@@ -221,17 +258,18 @@ export default function Cotizador() {
                                 [item.id]: activo ? 0 : 1,
                               }))
                             }
-                            className={`px-2 py-1 text-xs rounded-lg font-semibold transition ${
+                            className={`px-2 py-1 text-[12px] rounded-lg font-semibold transition border ${
                               activo
-                                ? "bg-emerald-500 text-white shadow-md"
-                                : "bg-white/30 text-white hover:bg-white/50"
+                                ? "bg-emerald-500 text-white border-emerald-500"
+                                : "bg-white/10 text-white border-white/20 hover:bg-white/20"
                             }`}
+                            title={activo ? "Quitar" : "Agregar"}
                           >
                             {activo ? "✓" : "Agregar"}
                           </button>
                         </div>
 
-                        <label className="block text-xs text-white/80 mt-3">
+                        <label className="block text-[12px] text-white/85 mt-3">
                           Cantidad ({item.unidad})
                         </label>
                         <input
@@ -240,9 +278,20 @@ export default function Cotizador() {
                           step="1"
                           value={qty}
                           onChange={(e) => setCantidad(item.id, e.target.value)}
-                          className="w-full px-3 py-2 mt-1 rounded-xl bg-white/20 border border-white/30 text-white placeholder-white/70 focus:ring-2 focus:ring-indigo-400 outline-none"
+                          className={[
+                            "w-full px-3 py-2 mt-1 rounded-xl outline-none",
+                            "bg-white/15 border border-white/25 text-white placeholder-white/70",
+                            "focus:ring-2 focus:ring-[#FFD700]",
+                            activo && "border-emerald-400 bg-emerald-500/15",
+                          ]
+                            .filter(Boolean)
+                            .join(" ")}
                           placeholder="0"
                         />
+
+                        <p className="text-[11px] text-white/75 mt-2 italic">
+                          Los precios se mostrarán en el resumen final.
+                        </p>
                       </motion.div>
                     );
                   })}
@@ -250,19 +299,19 @@ export default function Cotizador() {
               </AnimatePresence>
             )}
           </div>
-        </div>
+        </motion.div>
 
-        {/* Botón fijo inferior */}
-        <div className="fixed bottom-0 left-0 right-0 bg-white/90 border-t border-slate-200 shadow-md backdrop-blur-md px-5 py-3">
+        {/* Barra acción fija inferior vidrio */}
+        <div className="fixed bottom-0 left-0 right-0 backdrop-blur-xl bg-[#0D3B66]/70 border-t border-white/20 shadow-lg px-5 py-3">
           <div className="max-w-6xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-3">
-            <p className="text-sm text-slate-700">
+            <p className="text-[13px] sm:text-sm text-white/90">
               {totalSeleccionados === 0
                 ? "Selecciona los servicios que deseas cotizar."
                 : `${totalSeleccionados} servicio${totalSeleccionados > 1 ? "s" : ""} seleccionado${totalSeleccionados > 1 ? "s" : ""}.`}
             </p>
             <button
               onClick={cotizarAhora}
-              className="w-full sm:w-auto px-6 py-3 rounded-2xl font-semibold bg-gradient-to-r from-indigo-600 to-blue-500 text-white hover:from-indigo-700 hover:to-blue-600 shadow-lg transition"
+              className="w-full sm:w-auto px-6 py-3 rounded-2xl font-semibold bg-[#FFD700] text-[#0D3B66] hover:bg-[#e5c100] transition shadow-md"
             >
               Cotizar ahora
             </button>
