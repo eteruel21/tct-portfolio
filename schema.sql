@@ -58,6 +58,16 @@ CREATE TABLE cotizacion_items (
 CREATE INDEX idx_cotizaciones_codigo ON cotizaciones (codigo);
 CREATE INDEX idx_cotizaciones_email  ON cotizaciones (email);
 
--- ======================================================
---   FIN DEL SCHEMA
--- ======================================================
+-- =======================================================
+--   TABLA CATALOGO DE SERVICIOS — TCT SERVICES
+-- =======================================================
+
+DROP TABLE IF EXISTS catalogo_servicios;
+
+CREATE TABLE catalogo_servicios (
+  id TEXT PRIMARY KEY,
+  categoria TEXT NOT NULL,
+  nombre TEXT NOT NULL,
+  unidad TEXT NOT NULL,
+  precio_unit REAL NOT NULL
+);
