@@ -126,39 +126,50 @@ export default function Cotizador() {
         </div>
 
         <div className="max-w-6xl mx-auto px-5 py-6 grid md:grid-cols-3 gap-6">
-          {/* Panel cliente */}
+          {/* Panel cliente (flotante estilo vidrio) */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-white/90 rounded-2xl shadow-md border border-slate-200 p-6 backdrop-blur"
+            className="backdrop-blur-2xl bg-white/20 border border-white/30 shadow-2xl rounded-3xl p-6 text-white transition-all duration-300"
+            style={{
+              boxShadow: "0 10px 40px rgba(0,0,0,0.25)",
+            }}
           >
-            <h2 className="text-lg font-semibold text-slate-800 mb-4">
+            <h2 className="text-lg sm:text-xl font-semibold mb-4 text-white drop-shadow-sm">
               Información del cliente
             </h2>
-            <div className="space-y-3">
+            <div className="space-y-4">
               {[
                 { name: "nombre", label: "Nombre completo", type: "text", required: true },
                 { name: "email", label: "Correo electrónico", type: "email", required: true },
                 { name: "telefono", label: "Teléfono", type: "text" },
                 { name: "ubicacion", label: "Ubicación / Ciudad", type: "text" },
-              ].map(c => (
+              ].map((c) => (
                 <div key={c.name}>
-                  <label className="block text-sm font-semibold mb-1 text-slate-600">{c.label}</label>
+                  <label className="block text-sm font-medium mb-1 text-white/90">
+                    {c.label}
+                  </label>
                   <input
                     type={c.type}
                     required={c.required}
-                    className="w-full px-3 py-2 rounded-xl border border-slate-300 focus:ring-2 focus:ring-indigo-600 outline-none"
+                    className="w-full px-4 py-2.5 rounded-xl bg-white/25 border border-white/40 text-white placeholder-white/70 focus:ring-2 focus:ring-indigo-400 outline-none"
                     value={cliente[c.name] || ""}
-                    onChange={e => setCliente(prev => ({ ...prev, [c.name]: e.target.value }))}
+                    placeholder={c.label}
+                    onChange={(e) =>
+                      setCliente((prev) => ({ ...prev, [c.name]: e.target.value }))
+                    }
                   />
                 </div>
               ))}
+
               <div>
-                <label className="block text-sm font-semibold mb-1 text-slate-600">Tipo de instalación</label>
+                <label className="block text-sm font-medium mb-1 text-white/90">
+                  Tipo de instalación
+                </label>
                 <select
-                  className="w-full px-3 py-2 rounded-xl border border-slate-300 focus:ring-2 focus:ring-indigo-600"
+                  className="w-full px-4 py-2.5 rounded-xl bg-white/25 border border-white/40 text-white focus:ring-2 focus:ring-indigo-400 outline-none"
                   value={cliente.tipo}
-                  onChange={e => setCliente(prev => ({ ...prev, tipo: e.target.value }))}
+                  onChange={(e) => setCliente((prev) => ({ ...prev, tipo: e.target.value }))}
                 >
                   <option value="">Seleccione</option>
                   <option value="Residencial">Residencial</option>
@@ -166,12 +177,18 @@ export default function Cotizador() {
                   <option value="Industrial">Industrial</option>
                 </select>
               </div>
+
               <div>
-                <label className="block text-sm font-semibold mb-1 text-slate-600">Mensaje adicional</label>
+                <label className="block text-sm font-medium mb-1 text-white/90">
+                  Mensaje adicional
+                </label>
                 <textarea
-                  className="w-full px-3 py-2 rounded-xl border border-slate-300 focus:ring-2 focus:ring-indigo-600 h-24 resize-none"
+                  className="w-full px-4 py-2.5 rounded-xl bg-white/25 border border-white/40 text-white placeholder-white/70 focus:ring-2 focus:ring-indigo-400 outline-none h-24 resize-none"
                   value={cliente.mensaje}
-                  onChange={e => setCliente(prev => ({ ...prev, mensaje: e.target.value }))}
+                  placeholder="Escriba algún detalle adicional…"
+                  onChange={(e) =>
+                    setCliente((prev) => ({ ...prev, mensaje: e.target.value }))
+                  }
                 />
               </div>
             </div>
@@ -213,40 +230,48 @@ export default function Cotizador() {
                   exit={{ opacity: 0, y: -20 }}
                   className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4"
                 >
-                  {porCategoria[filtro].map(item => {
+                  {porCategoria[filtro].map((item) => {
                     const qty = cantidades[item.id] || 0;
                     const activo = qty > 0;
+
                     return (
                       <motion.div
-                        whileHover={{ scale: 1.02 }}
+                        whileHover={{ scale: 1.03 }}
                         key={item.id}
-                        className={`rounded-2xl p-4 border ${
-                          activo
-                            ? "border-emerald-500 bg-emerald-50 shadow-md"
-                            : "border-slate-200 bg-white/90 shadow-sm"
-                        } transition-all`}
+                        className={`rounded-2xl p-5 backdrop-blur-xl border transition-all duration-300
+                          ${
+                            activo
+                              ? "border-emerald-400 bg-emerald-200/20 shadow-2xl"
+                              : "border-white/30 bg-white/15 shadow-lg hover:shadow-xl"
+                          }`}
+                        style={{
+                          boxShadow: activo
+                            ? "0 6px 30px rgba(16, 185, 129, 0.35)"
+                            : "0 4px 20px rgba(0,0,0,0.15)",
+                        }}
                       >
                         <div className="flex items-start justify-between">
-                          <h3 className="font-semibold text-slate-800 leading-snug text-sm sm:text-base">
+                          <h3 className="font-semibold text-white leading-snug text-sm sm:text-base drop-shadow-sm">
                             {item.nombre}
                           </h3>
                           <button
                             onClick={() =>
-                              setCantidades(prev => ({
+                              setCantidades((prev) => ({
                                 ...prev,
                                 [item.id]: activo ? 0 : 1,
                               }))
                             }
-                            className={`px-2 py-1 text-xs rounded-lg font-semibold ${
+                            className={`px-2 py-1 text-xs rounded-lg font-semibold transition ${
                               activo
-                                ? "bg-emerald-600 text-white"
-                                : "bg-slate-200 text-slate-700"
+                                ? "bg-emerald-500 text-white shadow-md"
+                                : "bg-white/30 text-white hover:bg-white/50"
                             }`}
                           >
                             {activo ? "✓" : "Agregar"}
                           </button>
                         </div>
-                        <label className="block text-xs text-slate-500 mt-3">
+
+                        <label className="block text-xs text-white/80 mt-3">
                           Cantidad ({item.unidad})
                         </label>
                         <input
@@ -254,10 +279,12 @@ export default function Cotizador() {
                           min="0"
                           step="1"
                           value={qty}
-                          onChange={e => setCantidad(item.id, e.target.value)}
-                          className="w-full px-3 py-2 mt-1 rounded-xl border border-slate-300 focus:ring-2 focus:ring-indigo-600 outline-none"
+                          onChange={(e) => setCantidad(item.id, e.target.value)}
+                          className="w-full px-3 py-2 mt-1 rounded-xl bg-white/20 border border-white/40 text-white placeholder-white/70 focus:ring-2 focus:ring-indigo-400 outline-none"
+                          placeholder="0"
                         />
-                        <p className="text-[11px] text-slate-400 mt-2">
+
+                        <p className="text-[11px] text-white/70 mt-2 italic">
                           Los precios se mostrarán en el resumen final.
                         </p>
                       </motion.div>
