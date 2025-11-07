@@ -1,204 +1,130 @@
-import { useState, useEffect } from "react";
-import { useSearchParams } from "react-router-dom";
+// === src/pages/Cotizador.jsx ===
+import { useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 export default function Cotizador() {
-  const [searchParams] = useSearchParams();
-  const mensajeInicial = searchParams.get("mensaje") || "";
-  const BASE = import.meta.env.BASE_URL || "/";
+  const navigate = useNavigate();
+  const [catalogo, setCatalogo] = useState([]);
+  const [filtro, setFiltro] = useState("especiales"); // 'especiales' | 'construccion'
+  const [cargando, setCargando] = useState(true);
 
-  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
-  useEffect(() => {
-    const handleResize = () => setIsMobile(window.innerWidth < 768);
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
-
-  const [formData, setFormData] = useState({
+  // Datos del cliente
+  const [cliente, setCliente] = useState({
     nombre: "",
     email: "",
     telefono: "",
-    servicio: "",
     ubicacion: "",
     tipo: "",
-    mensaje: mensajeInicial,
+    mensaje: "",
   });
 
+  // Selección del usuario: { [itemId]: cantidad }
+  const [cantidades, setCantidades] = useState({});
+
   useEffect(() => {
-    if (mensajeInicial) {
-      setFormData((prev) => ({ ...prev, mensaje: mensajeInicial }));
-    }
-  }, [mensajeInicial]);
+    let cancel = false;
+    (async () => {
+      setCargando(true);
+      try {
+        const res = await fetch("/api/cotizaciones?catalogo=public");
+        const data = await res.json();
+        if (!cancel) setCatalogo(data.items || []);
+      } catch (e) {
+        console.error(e);
+      } finally {
+        if (!cancel) setCargando(false);
+      }
+    })();
+    return () => { cancel = true; };
+  }, []);
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
+  const porCategoria = useMemo(() => {
+    return {
+      especiales: catalogo.filter(i => i.categoria === "especiales"),
+      construccion: catalogo.filter(i => i.categoria === "construccion"),
+    };
+  }, [catalogo]);
 
-  const numero = "50761163672";
+  function setCantidad(id, val) {
+    const n = Math.max(0, Number(val));
+    setCantidades(prev => ({ ...prev, [id]: n }));
+  }
 
-  const generarMensaje = () => `
-Hola, soy ${formData.nombre || "un cliente interesado"}.
-Quisiera cotizar el servicio de ${formData.servicio || "TCT Services"}.
-Ubicación: ${formData.ubicacion || "No especificada"}.
-Tipo de instalación: ${formData.tipo || "No especificado"}.
-Mensaje: ${formData.mensaje || "N/A"}.
-Correo: ${formData.email || "No indicado"}.
-Teléfono: ${formData.telefono || "No indicado"}.
-`;
+  function toggleAgregar(id) {
+    setCantidades(prev => {
+      const cur = prev[id] || 0;
+      return { ...prev, [id]: cur > 0 ? 0 : 1 };
+    });
+  }
 
-  const handleWhatsApp = () => {
-    const texto = generarMensaje();
-    const url = `https://wa.me/${numero}?text=${encodeURIComponent(texto)}`;
-    window.open(url, "_blank");
-  };
+  const seleccion = useMemo(() => {
+    // Solo ítems con cantidad > 0
+    return Object.entries(cantidades)
+      .filter(([, q]) => Number(q) > 0)
+      .map(([id, cantidad]) => ({ id, cantidad: Number(cantidad) }));
+  }, [cantidades]);
 
-  // === Envío con Resend ===
-  const handleSubmit = async (e) => {
+  async function cotizarAhora(e) {
     e.preventDefault();
+    if (seleccion.length === 0) {
+      alert("Selecciona al menos un servicio y cantidad.");
+      return;
+    }
+    if (!cliente.nombre || !cliente.email) {
+      alert("Completa al menos Nombre y Correo.");
+      return;
+    }
     try {
-      const res = await fetch("/api/resend-email", {
+      const res = await fetch("/api/cotizaciones", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({ cliente, items: seleccion }),
       });
-
-      if (!res.ok) throw new Error("Error al enviar el correo");
-      alert("✅ Solicitud enviada correctamente. Pronto te contactaremos.");
-      setFormData({
-        nombre: "",
-        email: "",
-        telefono: "",
-        servicio: "",
-        ubicacion: "",
-        tipo: "",
-        mensaje: "",
-      });
-    } catch (err) {
-      console.error(err);
-      alert("❌ No se pudo enviar el correo. Inténtalo nuevamente.");
+      const data = await res.json();
+      if (!res.ok) {
+        console.error(data);
+        alert(data.error || "No se pudo generar la cotización");
+        return;
+      }
+      navigate(`/cotizador/resumen?codigo=${encodeURIComponent(data.codigo)}`);
+    } catch (e) {
+      console.error(e);
+      alert("Error al enviar la cotización");
     }
-  };
+  }
+
+  const lista = filtro === "especiales" ? porCategoria.especiales : porCategoria.construccion;
 
   return (
-    <section
-      className="relative min-h-screen flex items-center justify-center px-4 py-12"
-      style={{
-        backgroundImage: `url(${BASE}images/fondo_inicio.jpg)`,
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-      }}
-    >
-      <div className="absolute inset-0 bg-black/45"></div>
-
-      <div
-        className={`relative z-10 max-w-3xl w-full 
-          bg-white/80 backdrop-blur-lg p-10 rounded-2xl border border-white/30
-          shadow-[0_10px_30px_rgba(0,0,0,0.3)]
-          ${isMobile ? "animate-fadeInUpSlow" : "animate-fadeInUp"}
-          transition-all duration-700 ease-out`}
-      >
-        <h1 className="text-3xl font-bold mb-3 text-[#0D3B66] text-center">
-          Solicitud de Cotización
-        </h1>
-        <p className="text-gray-700 text-center mb-6">
-          Completa el formulario o contáctanos directamente por WhatsApp.
-        </p>
-
-        <div className="flex justify-center mb-6">
-          <a
-            href={`https://wa.me/${numero}?text=${encodeURIComponent(
-              "Hola, deseo información sobre los servicios de TCT Services."
-            )}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center justify-center gap-2 px-5 py-2 rounded-xl bg-[#25D366] text-white font-semibold hover:bg-[#1DA851] transition"
-          >
-            💬 Atención inmediata por WhatsApp
-          </a>
-        </div>
-
-        {/* Formulario principal */}
-        <form
-          onSubmit={handleSubmit}
-          className="space-y-4 bg-white shadow-md rounded-xl p-6 border border-gray-200"
-        >
-          <div>
-            <label className="block text-sm font-semibold mb-1">Nombre completo</label>
-            <input
-              type="text"
-              name="nombre"
-              value={formData.nombre}
-              onChange={handleChange}
-              required
-              className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-[#0D3B66]"
-            />
-          </div>
-
-          <div className="grid md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-semibold mb-1">Correo electrónico</label>
-              <input
-                type="email"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-                required
-                className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-[#0D3B66]"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-semibold mb-1">Teléfono</label>
-              <input
-                type="text"
-                name="telefono"
-                value={formData.telefono}
-                onChange={handleChange}
-                required
-                className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-[#0D3B66]"
-              />
-            </div>
-          </div>
-
-          <div>
-            <label className="block text-sm font-semibold mb-1">Tipo de servicio</label>
-            <select
-              name="servicio"
-              value={formData.servicio}
-              onChange={handleChange}
-              required
-              className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-[#0D3B66]"
-            >
-              <option value="">Seleccione una opción</option>
-              <option value="Sistema de Parking">Sistema de Parking</option>
-              <option value="Control de Acceso">Control de Acceso</option>
-              <option value="CCTV">CCTV</option>
-              <option value="Alarma de Incendio">Alarma de Incendio</option>
-              <option value="Alarma de Robo">Alarma de Robo</option>
-              <option value="Automatización / Casa Inteligente">
-                Automatización / Casa Inteligente
-              </option>
-            </select>
-          </div>
-
-          <div className="grid md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-semibold mb-1">Ubicación / Ciudad</label>
-              <input
-                type="text"
-                name="ubicacion"
-                value={formData.ubicacion}
-                onChange={handleChange}
-                required
-                className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-[#0D3B66]"
-              />
-            </div>
+    <section className="min-h-screen bg-slate-50 py-10 px-4">
+      <div className="max-w-6xl mx-auto grid md:grid-cols-3 gap-8">
+        {/* Columna izquierda: datos cliente */}
+        <div className="md:col-span-1 bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
+          <h2 className="text-xl font-bold text-slate-800 mb-3">Tus datos</h2>
+          <div className="space-y-3">
+            {[
+              { name: "nombre", label: "Nombre completo", type: "text", required: true },
+              { name: "email", label: "Correo", type: "email", required: true },
+              { name: "telefono", label: "Teléfono", type: "text" },
+              { name: "ubicacion", label: "Ubicación / Ciudad", type: "text" },
+            ].map(c => (
+              <div key={c.name}>
+                <label className="block text-sm font-semibold mb-1">{c.label}</label>
+                <input
+                  type={c.type}
+                  required={c.required}
+                  className="w-full px-3 py-2 rounded-xl border border-slate-300 focus:ring-2 focus:ring-indigo-600"
+                  value={cliente[c.name] || ""}
+                  onChange={e => setCliente(prev => ({ ...prev, [c.name]: e.target.value }))}
+                />
+              </div>
+            ))}
             <div>
               <label className="block text-sm font-semibold mb-1">Tipo de instalación</label>
               <select
-                name="tipo"
-                value={formData.tipo}
-                onChange={handleChange}
-                className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-[#0D3B66]"
+                className="w-full px-3 py-2 rounded-xl border border-slate-300 focus:ring-2 focus:ring-indigo-600"
+                value={cliente.tipo}
+                onChange={e => setCliente(prev => ({ ...prev, tipo: e.target.value }))}
               >
                 <option value="">Seleccione</option>
                 <option value="Residencial">Residencial</option>
@@ -206,36 +132,85 @@ Teléfono: ${formData.telefono || "No indicado"}.
                 <option value="Industrial">Industrial</option>
               </select>
             </div>
-          </div>
+            <div>
+              <label className="block text-sm font-semibold mb-1">Mensaje</label>
+              <textarea
+                className="w-full px-3 py-2 rounded-xl border border-slate-300 focus:ring-2 focus:ring-indigo-600 h-28"
+                value={cliente.mensaje}
+                onChange={e => setCliente(prev => ({ ...prev, mensaje: e.target.value }))}
+              />
+            </div>
 
-          <div>
-            <label className="block text-sm font-semibold mb-1">Mensaje adicional</label>
-            <textarea
-              name="mensaje"
-              value={formData.mensaje}
-              onChange={handleChange}
-              className="w-full border rounded-lg px-3 py-2 h-32 focus:ring-2 focus:ring-[#0D3B66]"
-            />
-          </div>
-
-          <div className="flex flex-col md:flex-row gap-4 mt-6">
             <button
-              type="submit"
-              className="flex-1 bg-[#0D3B66] text-white py-3 rounded-xl font-semibold hover:bg-[#1B4F72] transition"
+              onClick={cotizarAhora}
+              className="w-full mt-2 bg-indigo-700 hover:bg-indigo-800 text-white font-semibold py-3 rounded-xl"
             >
-              Enviar por correo
+              Cotizar ahora
             </button>
+          </div>
+        </div>
+
+        {/* Columna derecha: catálogo sin precios */}
+        <div className="md:col-span-2">
+          <div className="flex items-center gap-2 mb-4">
             <button
+              className={`px-4 py-2 rounded-xl border ${filtro === "especiales" ? "bg-indigo-700 text-white border-indigo-700" : "bg-white border-slate-300"}`}
+              onClick={() => setFiltro("especiales")}
               type="button"
-              onClick={handleWhatsApp}
-              className="flex-1 bg-[#25D366] text-white py-3 rounded-xl font-semibold hover:bg-[#1DA851] transition"
             >
-              {formData.servicio
-                ? `Enviar cotización de ${formData.servicio}`
-                : "Enviar por WhatsApp"}
+              Servicios Especiales
+            </button>
+            <button
+              className={`px-4 py-2 rounded-xl border ${filtro === "construccion" ? "bg-indigo-700 text-white border-indigo-700" : "bg-white border-slate-300"}`}
+              onClick={() => setFiltro("construccion")}
+              type="button"
+            >
+              Construcción
             </button>
           </div>
-        </form>
+
+          {cargando ? (
+            <div className="text-slate-600">Cargando servicios…</div>
+          ) : (
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {lista.map(item => {
+                const qty = cantidades[item.id] || 0;
+                return (
+                  <div key={item.id} className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
+                    <div className="flex items-start justify-between gap-3">
+                      <div>
+                        <h3 className="font-semibold text-slate-800">{item.nombre}</h3>
+                        <p className="text-xs text-slate-500">Unidad: {item.unidad}</p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => toggleAgregar(item.id)}
+                        className={`px-3 py-1 rounded-lg text-sm font-semibold ${qty > 0 ? "bg-emerald-600 text-white" : "bg-slate-200 text-slate-800"}`}
+                        title={qty > 0 ? "Quitar" : "Agregar"}
+                      >
+                        {qty > 0 ? "✓" : "+"}
+                      </button>
+                    </div>
+                    <div className="mt-3">
+                      <label className="block text-sm text-slate-700 mb-1">Cantidad</label>
+                      <input
+                        type="number"
+                        min="0"
+                        step="1"
+                        value={qty}
+                        onChange={(e) => setCantidad(item.id, e.target.value)}
+                        className="w-full px-3 py-2 rounded-xl border border-slate-300 focus:ring-2 focus:ring-indigo-600"
+                      />
+                    </div>
+                    <p className="text-[11px] text-slate-400 mt-2">
+                      El precio no se muestra aquí. Se calculará al generar la cotización.
+                    </p>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
       </div>
     </section>
   );

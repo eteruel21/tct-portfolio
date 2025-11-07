@@ -9,6 +9,7 @@ import {
 
 import Inicio from "./pages/Inicio.jsx";
 import Cotizador from "./pages/Cotizador.jsx";
+import CotizadorResumen from "./pages/CotizadorResumen";
 import PortfolioGaleria from "./PortfolioGaleria.jsx";
 import Nosotros from "./pages/Nosotros.jsx";
 import Contacto from "./pages/Contacto.jsx";
@@ -191,6 +192,7 @@ export default function App() {
             <Route path="/" element={<Inicio />} />
             <Route path="/portafolio" element={<PortfolioGaleria />} />
             <Route path="/cotizador" element={<Cotizador />} />
+            <Route path="/cotizador/resumen" element={<CotizadorResumen />} />
             <Route path="/nosotros" element={<Nosotros />} />
             <Route path="/faqs" element={<FAQs />} />
             <Route path="/contacto" element={<Contacto />} />
