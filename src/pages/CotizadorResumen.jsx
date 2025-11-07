@@ -1,27 +1,24 @@
 import { useEffect, useState } from "react";
-import { useSearchParams, useNavigate, Link } from "react-router-dom";
+import { useSearchParams, Link } from "react-router-dom";
 import { motion } from "framer-motion";
 
 export default function CotizadorResumen() {
   const [sp] = useSearchParams();
-  const navigate = useNavigate();
   const codigo = sp.get("codigo") || "";
   const [data, setData] = useState(null);
   const [err, setErr] = useState("");
 
   useEffect(() => {
-    let cancel = false;
     (async () => {
       try {
         const res = await fetch(`/api/cotizaciones?codigo=${encodeURIComponent(codigo)}`);
         const json = await res.json();
         if (!res.ok) throw new Error(json.error || "No se pudo cargar");
-        if (!cancel) setData(json);
+        setData(json);
       } catch (e) {
-        if (!cancel) setErr(e.message);
+        setErr(e.message);
       }
     })();
-    return () => { cancel = true; };
   }, [codigo]);
 
   if (!codigo)
@@ -33,27 +30,20 @@ export default function CotizadorResumen() {
 
   const { cliente, resumen } = data;
 
-  // === Manejar redirección a Reservar ===
-  function agendarCita() {
-    const params = new URLSearchParams({
-      nombre: cliente.nombre,
-      email: cliente.email,
-      telefono: cliente.telefono || "",
-      motivo: `Cotización ${data.codigo}`,
-      codigo: data.codigo,
-    });
-    navigate(`/reservar?${params.toString()}`);
-  }
-
   return (
-    <section className="min-h-screen bg-gradient-to-b from-slate-100 to-slate-200 py-10 px-4">
+    <section
+      className="min-h-screen bg-cover bg-center bg-no-repeat relative py-10 px-4"
+      style={{ backgroundImage: "url('/images/fondo_inicio.jpg')" }}
+    >
+      <div className="absolute inset-0 bg-black/40 backdrop-blur-[1px]" />
+
       <motion.div
         initial={{ opacity: 0, y: 25 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3 }}
-        className="max-w-5xl mx-auto bg-white/90 backdrop-blur-md border border-slate-200 rounded-3xl shadow-xl overflow-hidden"
+        className="relative z-10 max-w-5xl mx-auto bg-white/90 backdrop-blur-md border border-slate-200 rounded-3xl shadow-xl overflow-hidden"
       >
-        {/* Encabezado */}
+        {/* ENCABEZADO */}
         <header className="bg-indigo-700 text-white px-6 py-5 flex flex-col sm:flex-row sm:items-center sm:justify-between">
           <h1 className="text-xl sm:text-2xl font-bold">
             Cotización <span className="text-yellow-300">{data.codigo}</span>
@@ -63,7 +53,7 @@ export default function CotizadorResumen() {
           </p>
         </header>
 
-        {/* Datos cliente */}
+        {/* DATOS DEL CLIENTE + RESUMEN */}
         <div className="grid md:grid-cols-2 gap-6 p-6">
           <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4">
             <h2 className="font-semibold text-slate-700 mb-2">Datos del cliente</h2>
@@ -78,16 +68,16 @@ export default function CotizadorResumen() {
           <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4">
             <h2 className="font-semibold text-slate-700 mb-2">Resumen económico</h2>
             <ul className="text-sm text-slate-600 space-y-1">
-              <li><b>Subtotal:</b> ${resumen.subtotal.toFixed(2)}</li>
-              <li><b>ITBMS (7%):</b> ${resumen.itbms.toFixed(2)}</li>
+              <li><b>Subtotal:</b> B/. {resumen.subtotal.toFixed(2)}</li>
+              <li><b>ITBMS (7%):</b> B/. {resumen.itbms.toFixed(2)}</li>
               <li className="text-lg font-bold text-slate-800 mt-2">
-                Total: ${resumen.total.toFixed(2)}
+                Total: B/. {resumen.total.toFixed(2)}
               </li>
             </ul>
           </div>
         </div>
 
-        {/* Detalle */}
+        {/* DETALLE DE SERVICIOS */}
         <div className="overflow-x-auto px-6 pb-6">
           <table className="w-full text-sm border-collapse rounded-xl overflow-hidden shadow-sm">
             <thead className="bg-slate-100 text-slate-700 font-semibold">
@@ -113,15 +103,15 @@ export default function CotizadorResumen() {
                   </td>
                   <td className="p-3 text-slate-800">{d.nombre}</td>
                   <td className="p-3 text-right">{d.cantidad}</td>
-                  <td className="p-3 text-right">${d.precio_unit.toFixed(2)}</td>
-                  <td className="p-3 text-right">${d.subtotal.toFixed(2)}</td>
+                  <td className="p-3 text-right">B/. {d.precio_unit.toFixed(2)}</td>
+                  <td className="p-3 text-right">B/. {d.subtotal.toFixed(2)}</td>
                 </motion.tr>
               ))}
             </tbody>
           </table>
         </div>
 
-        {/* Nota final */}
+        {/* NOTA FINAL */}
         <div className="px-6 pb-5">
           <p className="text-xs text-slate-500 leading-snug">
             Este monto representa una estimación basada en precios promedio del mercado en Panamá. 
@@ -130,7 +120,7 @@ export default function CotizadorResumen() {
           </p>
         </div>
 
-        {/* Botones inferiores */}
+        {/* BOTONES INFERIORES */}
         <div className="border-t border-slate-200 bg-slate-50 px-6 py-4 flex flex-col sm:flex-row gap-3 justify-between items-center">
           <Link
             to="/cotizador"
@@ -139,12 +129,12 @@ export default function CotizadorResumen() {
             Nueva cotización
           </Link>
 
-          <button
-            onClick={agendarCita}
+          <Link
+            to={`/reservar?nombre=${encodeURIComponent(cliente.nombre)}&email=${encodeURIComponent(cliente.email)}&telefono=${encodeURIComponent(cliente.telefono)}&motivo=${encodeURIComponent("Cotización " + data.codigo)}&codigo=${encodeURIComponent(data.codigo)}`}
             className="w-full sm:w-auto text-center px-6 py-3 bg-indigo-700 hover:bg-indigo-800 text-white font-semibold rounded-xl shadow-md transition"
           >
             Agendar cita técnica
-          </button>
+          </Link>
         </div>
       </motion.div>
     </section>

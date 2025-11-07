@@ -27,30 +27,42 @@ function codigoCotizacion() {
 }
 
 function emailHTML({ codigo, cliente, resumen, dominioBase }) {
-  // dominioBase: incluyendo https://, por ejemplo https://tctservices-pty.com/
   const logo = `${dominioBase}images/logo_tct.png`;
-  const filas = resumen.detalle.map(d => `
-    <tr>
-      <td style="padding:8px;border-bottom:1px solid #eee">${d.nombre} (${d.unidad})</td>
-      <td style="padding:8px;border-bottom:1px solid #eee;text-align:right">${d.cantidad}</td>
-      <td style="padding:8px;border-bottom:1px solid #eee;text-align:right">$${d.precio_unit.toFixed(2)}</td>
-      <td style="padding:8px;border-bottom:1px solid #eee;text-align:right">$${d.subtotal.toFixed(2)}</td>
-    </tr>
-  `).join("");
+
+  const filas = resumen.detalle
+    .map(
+      (d) => `
+      <tr>
+        <td style="padding:8px;border-bottom:1px solid #eee">${d.nombre} (${d.unidad})</td>
+        <td style="padding:8px;border-bottom:1px solid #eee;text-align:right">${d.cantidad}</td>
+        <td style="padding:8px;border-bottom:1px solid #eee;text-align:right">B/. ${d.precio_unit.toFixed(2)}</td>
+        <td style="padding:8px;border-bottom:1px solid #eee;text-align:right">B/. ${d.subtotal.toFixed(2)}</td>
+      </tr>`
+    )
+    .join("");
 
   const urlResumen = `${dominioBase}#/cotizador/resumen?codigo=${encodeURIComponent(codigo)}`;
 
+  // 🔧 Configuración de contacto
+  const correoEmpresa = "contacto@tctservices-pty.com";
+  const numeroWhatsapp = "50761163672"; // coloca tu número sin signos ni espacios
+  const enlaceWhatsapp = `https://wa.me/${numeroWhatsapp}?text=Hola,%20he%20recibido%20mi%20cotización%20(${codigo})%20y%20quisiera%20más%20información.`;
+
   return `
   <div style="font-family:Arial,Helvetica,sans-serif;max-width:680px;margin:0 auto;border:1px solid #e5e7eb;border-radius:12px;overflow:hidden">
+    <!-- Encabezado -->
     <div style="background:#0D3B66;padding:16px 20px;color:#fff;display:flex;align-items:center;gap:12px">
       <img src="${logo}" alt="TCT Services" height="36" style="display:block"/>
       <div style="font-weight:700;font-size:18px">Confirmación de cotización — ${codigo}</div>
     </div>
+
+    <!-- Cuerpo -->
     <div style="padding:20px;background:#fff">
       <p style="margin:0 0 8px 0"><b>Cliente:</b> ${cliente.nombre}</p>
-      <p style="margin:0 0 8px 0"><b>Contacto:</b> ${cliente.email} · ${cliente.telefono}</p>
+      <p style="margin:0 0 8px 0"><b>Correo:</b> ${cliente.email} · ${cliente.telefono || "N/D"}</p>
       <p style="margin:0 0 16px 0"><b>Ubicación:</b> ${cliente.ubicacion || "N/D"} · <b>Tipo:</b> ${cliente.tipo || "N/D"}</p>
 
+      <!-- Tabla -->
       <table style="width:100%;border-collapse:collapse;font-size:14px">
         <thead>
           <tr>
@@ -64,29 +76,43 @@ function emailHTML({ codigo, cliente, resumen, dominioBase }) {
         <tfoot>
           <tr>
             <td colspan="3" style="padding:8px;text-align:right"><b>Subtotal</b></td>
-            <td style="padding:8px;text-align:right"><b>$${resumen.subtotal.toFixed(2)}</b></td>
+            <td style="padding:8px;text-align:right"><b>B/. ${resumen.subtotal.toFixed(2)}</b></td>
           </tr>
           <tr>
             <td colspan="3" style="padding:8px;text-align:right">ITBMS 7%</td>
-            <td style="padding:8px;text-align:right">$${resumen.itbms.toFixed(2)}</td>
+            <td style="padding:8px;text-align:right">B/. ${resumen.itbms.toFixed(2)}</td>
           </tr>
           <tr>
             <td colspan="3" style="padding:8px;text-align:right;font-size:16px"><b>Total</b></td>
-            <td style="padding:8px;text-align:right;font-size:16px"><b>$${resumen.total.toFixed(2)}</b></td>
+            <td style="padding:8px;text-align:right;font-size:16px"><b>B/. ${resumen.total.toFixed(2)}</b></td>
           </tr>
         </tfoot>
       </table>
 
+      <!-- Nota -->
       <p style="margin:16px 0 0 0;font-size:12px;color:#6b7280">
-        Este monto es un aproximado sujeto a verificación en sitio. 
-        Para una cifra precisa, agenda una visita técnica.
+        Este monto representa un valor aproximado sujeto a revisión técnica. 
+        Para una cotización definitiva, agenda una visita o contáctanos.
       </p>
 
-      <div style="margin-top:16px">
+      <!-- Botones -->
+      <div style="margin-top:24px;display:flex;flex-wrap:wrap;gap:10px;justify-content:center">
         <a href="${urlResumen}" 
-           style="display:inline-block;background:#0D3B66;color:#fff;text-decoration:none;padding:10px 14px;border-radius:10px;font-weight:600">
-          Ver resumen y agendar
+           style="display:inline-block;background:#0D3B66;color:#fff;text-decoration:none;padding:10px 16px;border-radius:10px;font-weight:600">
+          Ver resumen y agendar cita
         </a>
+        <a href="mailto:${correoEmpresa}?subject=Cotización%20${codigo}&body=Hola,%20he%20recibido%20mi%20cotización%20y%20quisiera%20contactarles."
+           style="display:inline-block;background:#C1121F;color:#fff;text-decoration:none;padding:10px 16px;border-radius:10px;font-weight:600">
+          Contactar por correo
+        </a>
+        <a href="${enlaceWhatsapp}" 
+           style="display:inline-block;background:#25D366;color:#fff;text-decoration:none;padding:10px 16px;border-radius:10px;font-weight:600">
+          Contactar por WhatsApp
+        </a>
+      </div>
+
+      <div style="margin-top:20px;text-align:center;font-size:12px;color:#6b7280">
+        © ${new Date().getFullYear()} TCT Services — Panamá
       </div>
     </div>
   </div>
