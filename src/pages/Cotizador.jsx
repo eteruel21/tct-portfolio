@@ -6,7 +6,6 @@ export default function Cotizador() {
   const mensajeInicial = searchParams.get("mensaje") || "";
   const BASE = import.meta.env.BASE_URL || "/";
 
-  // Detectar si es móvil
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth < 768);
@@ -53,6 +52,33 @@ Teléfono: ${formData.telefono || "No indicado"}.
     window.open(url, "_blank");
   };
 
+  // === Envío con Resend ===
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const res = await fetch("/api/resend-email", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+
+      if (!res.ok) throw new Error("Error al enviar el correo");
+      alert("✅ Solicitud enviada correctamente. Pronto te contactaremos.");
+      setFormData({
+        nombre: "",
+        email: "",
+        telefono: "",
+        servicio: "",
+        ubicacion: "",
+        tipo: "",
+        mensaje: "",
+      });
+    } catch (err) {
+      console.error(err);
+      alert("❌ No se pudo enviar el correo. Inténtalo nuevamente.");
+    }
+  };
+
   return (
     <section
       className="relative min-h-screen flex items-center justify-center px-4 py-12"
@@ -62,10 +88,8 @@ Teléfono: ${formData.telefono || "No indicado"}.
         backgroundPosition: "center",
       }}
     >
-      {/* Capa oscura */}
       <div className="absolute inset-0 bg-black/45"></div>
 
-      {/* Contenedor */}
       <div
         className={`relative z-10 max-w-3xl w-full 
           bg-white/80 backdrop-blur-lg p-10 rounded-2xl border border-white/30
@@ -80,7 +104,6 @@ Teléfono: ${formData.telefono || "No indicado"}.
           Completa el formulario o contáctanos directamente por WhatsApp.
         </p>
 
-        {/* Botón WhatsApp rápido */}
         <div className="flex justify-center mb-6">
           <a
             href={`https://wa.me/${numero}?text=${encodeURIComponent(
@@ -96,18 +119,9 @@ Teléfono: ${formData.telefono || "No indicado"}.
 
         {/* Formulario principal */}
         <form
-          action="https://formsubmit.co/tctservice19@gmail.com"
-          method="POST"
+          onSubmit={handleSubmit}
           className="space-y-4 bg-white shadow-md rounded-xl p-6 border border-gray-200"
         >
-          <input
-            type="hidden"
-            name="_next"
-            value="https://eteruel21.github.io/tct-portfolio/gracias.html"
-          />
-          <input type="hidden" name="_captcha" value="false" />
-
-          {/* Campos */}
           <div>
             <label className="block text-sm font-semibold mb-1">Nombre completo</label>
             <input
@@ -204,7 +218,6 @@ Teléfono: ${formData.telefono || "No indicado"}.
             />
           </div>
 
-          {/* Botones */}
           <div className="flex flex-col md:flex-row gap-4 mt-6">
             <button
               type="submit"
