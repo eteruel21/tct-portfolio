@@ -28,7 +28,6 @@ export default function Cotizador() {
         const data = await res.json();
         setCatalogo(data.items || []);
       } catch {
-        // catálogo de prueba local
         setCatalogo([
           { id: "cam", categoria: "especiales", nombre: "Cámaras de seguridad", unidad: "unidad" },
           { id: "alarma", categoria: "especiales", nombre: "Sistema de alarma", unidad: "sistema" },
@@ -88,52 +87,42 @@ export default function Cotizador() {
   return (
     <section
       className="min-h-screen bg-cover bg-center bg-no-repeat relative"
-      style={{
-        backgroundImage: "url('/images/fondo_inicio.jpg')",
-      }}
+      style={{ backgroundImage: "url('/images/fondo_inicio.jpg')" }}
     >
       <div className="absolute inset-0 bg-black/40 backdrop-blur-[1px]" />
 
       <div className="relative z-10">
+        {/* Barra superior */}
         <div className="sticky top-0 z-20 backdrop-blur-md bg-white/80 border-b border-slate-200 shadow-sm">
           <div className="max-w-6xl mx-auto flex items-center justify-between px-5 py-3">
             <h1 className="text-xl sm:text-2xl font-bold text-slate-800 tracking-tight">
-              Cotizador TCT <span className="text-indigo-700">Services</span>
+              Cotizador <span className="text-indigo-700">TCT Services</span>
             </h1>
             <div className="hidden sm:flex gap-2">
-              <button
-                onClick={() => setFiltro("servicios_especiales")}
-                className={`px-4 py-2 rounded-xl font-semibold transition ${
-                  filtro === "servicios_especiales"
-                    ? "bg-indigo-700 text-white"
-                    : "bg-slate-200 hover:bg-slate-300 text-slate-700"
-                }`}
-              >
-                Servicios Especiales
-              </button>
-              <button
-                onClick={() => setFiltro("construccion")}
-                className={`px-4 py-2 rounded-xl font-semibold transition ${
-                  filtro === "construccion"
-                    ? "bg-indigo-700 text-white"
-                    : "bg-slate-200 hover:bg-slate-300 text-slate-700"
-                }`}
-              >
-                Construcción
-              </button>
+              {["servicios_especiales", "construccion"].map((cat) => (
+                <button
+                  key={cat}
+                  onClick={() => setFiltro(cat)}
+                  className={`px-4 py-2 rounded-2xl font-semibold transition ${
+                    filtro === cat
+                      ? "bg-gradient-to-r from-indigo-600 to-blue-500 text-white shadow-lg"
+                      : "bg-slate-200 hover:bg-slate-300 text-slate-700"
+                  }`}
+                >
+                  {cat === "servicios_especiales" ? "Servicios Especiales" : "Construcción"}
+                </button>
+              ))}
             </div>
           </div>
         </div>
 
+        {/* Cuerpo principal */}
         <div className="max-w-6xl mx-auto px-5 py-6 grid md:grid-cols-3 gap-6">
-          {/* Panel cliente (flotante estilo vidrio) */}
+          {/* Panel del cliente */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="backdrop-blur-2xl bg-white/20 border border-white/30 shadow-2xl rounded-3xl p-6 text-white transition-all duration-300"
-            style={{
-              boxShadow: "0 10px 40px rgba(0,0,0,0.25)",
-            }}
+            className="backdrop-blur-2xl bg-white/10 border border-white/20 shadow-2xl rounded-3xl p-6 text-white"
           >
             <h2 className="text-lg sm:text-xl font-semibold mb-4 text-white drop-shadow-sm">
               Información del cliente
@@ -152,7 +141,7 @@ export default function Cotizador() {
                   <input
                     type={c.type}
                     required={c.required}
-                    className="w-full px-4 py-2.5 rounded-xl bg-white/25 border border-white/40 text-white placeholder-white/70 focus:ring-2 focus:ring-indigo-400 outline-none"
+                    className="w-full px-4 py-2.5 rounded-xl bg-white/20 border border-white/30 text-white placeholder-white/70 focus:ring-2 focus:ring-indigo-400 outline-none"
                     value={cliente[c.name] || ""}
                     placeholder={c.label}
                     onChange={(e) =>
@@ -167,7 +156,7 @@ export default function Cotizador() {
                   Tipo de instalación
                 </label>
                 <select
-                  className="w-full px-4 py-2.5 rounded-xl bg-white/25 border border-white/40 text-white focus:ring-2 focus:ring-indigo-400 outline-none"
+                  className="w-full px-4 py-2.5 rounded-xl bg-white/20 border border-white/30 text-white focus:ring-2 focus:ring-indigo-400 outline-none"
                   value={cliente.tipo}
                   onChange={(e) => setCliente((prev) => ({ ...prev, tipo: e.target.value }))}
                 >
@@ -183,7 +172,7 @@ export default function Cotizador() {
                   Mensaje adicional
                 </label>
                 <textarea
-                  className="w-full px-4 py-2.5 rounded-xl bg-white/25 border border-white/40 text-white placeholder-white/70 focus:ring-2 focus:ring-indigo-400 outline-none h-24 resize-none"
+                  className="w-full px-4 py-2.5 rounded-xl bg-white/20 border border-white/30 text-white placeholder-white/70 focus:ring-2 focus:ring-indigo-400 outline-none h-24 resize-none"
                   value={cliente.mensaje}
                   placeholder="Escriba algún detalle adicional…"
                   onChange={(e) =>
@@ -196,29 +185,6 @@ export default function Cotizador() {
 
           {/* Catálogo */}
           <div className="md:col-span-2">
-            <div className="flex sm:hidden justify-center gap-2 mb-3">
-              <button
-                onClick={() => setFiltro("servicios_especiales")}
-                className={`px-4 py-2 rounded-xl text-sm font-semibold transition ${
-                  filtro === "servicios_especiales"
-                    ? "bg-indigo-700 text-white"
-                    : "bg-slate-200 text-slate-700"
-                }`}
-              >
-                Servicios Especiales
-              </button>
-              <button
-                onClick={() => setFiltro("construccion")}
-                className={`px-4 py-2 rounded-xl text-sm font-semibold transition ${
-                  filtro === "construccion"
-                    ? "bg-indigo-700 text-white"
-                    : "bg-slate-200 text-slate-700"
-                }`}
-              >
-                Construcción
-              </button>
-            </div>
-
             {cargando ? (
               <div className="text-slate-200 text-center py-10">Cargando servicios...</div>
             ) : (
@@ -241,13 +207,8 @@ export default function Cotizador() {
                         className={`rounded-2xl p-4 border transition-all duration-300 ${
                           activo
                             ? "border-indigo-400 bg-indigo-200/20 shadow-2xl"
-                            : "border-white/30 bg-white/15 shadow-lg hover:shadow-xl"
+                            : "border-white/20 bg-white/10 shadow-lg hover:shadow-xl"
                         }`}
-                        style={{
-                          boxShadow: activo
-                            ? "0 6px 30px rgba(16, 185, 129, 0.35)"
-                            : "0 4px 20px rgba(0,0,0,0.15)",
-                        }}
                       >
                         <div className="flex items-start justify-between">
                           <h3 className="font-semibold text-white leading-snug text-sm sm:text-base drop-shadow-sm">
@@ -279,13 +240,9 @@ export default function Cotizador() {
                           step="1"
                           value={qty}
                           onChange={(e) => setCantidad(item.id, e.target.value)}
-                          className="w-full px-3 py-2 mt-1 rounded-xl bg-white/20 border border-white/40 text-white placeholder-white/70 focus:ring-2 focus:ring-indigo-400 outline-none"
+                          className="w-full px-3 py-2 mt-1 rounded-xl bg-white/20 border border-white/30 text-white placeholder-white/70 focus:ring-2 focus:ring-indigo-400 outline-none"
                           placeholder="0"
                         />
-
-                        <p className="text-[11px] text-white/70 mt-2 italic">
-                          Los precios se mostrarán en el resumen final.
-                        </p>
                       </motion.div>
                     );
                   })}
@@ -305,7 +262,7 @@ export default function Cotizador() {
             </p>
             <button
               onClick={cotizarAhora}
-              className="w-full sm:w-auto px-6 py-3 rounded-xl font-semibold bg-indigo-700 text-white hover:bg-indigo-800 transition"
+              className="w-full sm:w-auto px-6 py-3 rounded-2xl font-semibold bg-gradient-to-r from-indigo-600 to-blue-500 text-white hover:from-indigo-700 hover:to-blue-600 shadow-lg transition"
             >
               Cotizar ahora
             </button>
