@@ -28,7 +28,6 @@ export default function Cotizador() {
         const data = await res.json();
         setCatalogo(data.items || []);
       } catch {
-        // fallback local mínimo
         setCatalogo([
           { id: "cam", categoria: "servicios_especiales", nombre: "Cámaras de seguridad", unidad: "unidad" },
           { id: "alarma", categoria: "servicios_especiales", nombre: "Sistema de alarma", unidad: "sistema" },
@@ -84,30 +83,26 @@ export default function Cotizador() {
   }
 
   function setCantidad(id, val) {
-    const n = Math.max(0, Number(val));
-    setCantidades((prev) => ({ ...prev, [id]: n }));
+    const num = val === "" ? "" : Math.max(0, Number(val));
+    setCantidades((prev) => ({ ...prev, [id]: num }));
   }
 
   return (
     <section
       className="min-h-screen relative flex"
       style={{
-        backgroundImage:
-          "linear-gradient(to bottom, #0D3B66 0%, #1B4F72 100%)",
+        backgroundImage: "linear-gradient(to bottom, #0D3B66 0%, #1B4F72 100%)",
       }}
     >
-      {/* capa */}
       <div className="absolute inset-0 pointer-events-none" />
 
       <div className="relative z-10 w-full">
-        {/* Encabezado vidrio */}
+        {/* Encabezado */}
         <div className="sticky top-0 z-20 backdrop-blur-xl bg-[#0D3B66]/50 border-b border-white/20 shadow-lg">
           <div className="max-w-6xl mx-auto flex items-center justify-between px-5 py-3">
             <h1 className="text-lg sm:text-xl font-semibold text-white tracking-tight">
               Cotizador
             </h1>
-
-            {/* Tabs categoría */}
             <div className="hidden sm:flex gap-2">
               {[
                 { key: "servicios_especiales", label: "Servicios Especiales" },
@@ -131,15 +126,17 @@ export default function Cotizador() {
 
         {/* Contenido */}
         <motion.div
-          initial={{ opacity: 0, y: 18 }}
+          initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.35 }}
+          transition={{ duration: 0.4 }}
           className="max-w-6xl mx-auto px-5 py-6 grid md:grid-cols-3 gap-6"
         >
-          {/* Panel cliente: vidrio azul */}
+          {/* Panel cliente */}
           <div className="md:col-span-1">
             <div className="bg-[#0D3B66]/40 backdrop-blur-xl border border-white/20 rounded-3xl shadow-2xl p-5 text-white">
-              <h2 className="text-base sm:text-lg font-semibold mb-4">Información del cliente</h2>
+              <h2 className="text-base sm:text-lg font-semibold mb-4">
+                Información del cliente
+              </h2>
 
               <div className="space-y-4 text-sm">
                 {[
@@ -158,7 +155,9 @@ export default function Cotizador() {
                       className="w-full px-3 py-2 rounded-xl bg-white/15 border border-white/25 text-white placeholder-white/70 focus:ring-2 focus:ring-[#FFD700] outline-none"
                       value={cliente[c.name] || ""}
                       placeholder={c.label}
-                      onChange={(e) => setCliente((prev) => ({ ...prev, [c.name]: e.target.value }))}
+                      onChange={(e) =>
+                        setCliente((prev) => ({ ...prev, [c.name]: e.target.value }))
+                      }
                     />
                   </div>
                 ))}
@@ -187,35 +186,17 @@ export default function Cotizador() {
                     className="w-full px-3 py-2 rounded-xl bg-white/15 border border-white/25 text-white placeholder-white/70 focus:ring-2 focus:ring-[#FFD700] outline-none h-24 resize-none"
                     value={cliente.mensaje}
                     placeholder="Detalle adicional…"
-                    onChange={(e) => setCliente((prev) => ({ ...prev, mensaje: e.target.value }))}
+                    onChange={(e) =>
+                      setCliente((prev) => ({ ...prev, mensaje: e.target.value }))
+                    }
                   />
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Catálogo vidrio + selección verde */}
+          {/* Catálogo */}
           <div className="md:col-span-2">
-            {/* Tabs en móvil */}
-            <div className="sm:hidden mb-3 flex justify-center gap-2">
-              {[
-                { key: "servicios_especiales", label: "Servicios Especiales" },
-                { key: "construccion", label: "Construcción" },
-              ].map((cat) => (
-                <button
-                  key={cat.key}
-                  onClick={() => setFiltro(cat.key)}
-                  className={`px-3 py-2 rounded-2xl text-xs font-semibold transition border ${
-                    filtro === cat.key
-                      ? "bg-[#FFD700] text-[#0D3B66] border-[#FFD700] shadow-md"
-                      : "bg-white/10 text-white border-white/20 hover:bg-white/20"
-                  }`}
-                >
-                  {cat.label}
-                </button>
-              ))}
-            </div>
-
             {cargando ? (
               <div className="text-white/80 text-center py-10">Cargando servicios…</div>
             ) : (
@@ -229,22 +210,24 @@ export default function Cotizador() {
                   className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4"
                 >
                   {porCategoria[filtro].map((item) => {
-                    const qty = cantidades[item.id] || 0;
-                    const activo = qty > 0;
+                    const qty = cantidades[item.id] ?? "";
+                    const activo = Number(qty) > 0;
 
                     return (
                       <motion.div
                         key={item.id}
-                        whileHover={{ scale: 1.02 }}
-                        className={[
-                          "rounded-2xl p-4 transition-all duration-300 border",
-                          "bg-white/10 backdrop-blur-lg text-white",
-                          "border-white/20 shadow-xl",
-                          activo &&
-                            "border-emerald-400 bg-emerald-500/20 shadow-[0_0_24px_rgba(16,185,129,0.55)]",
-                        ]
-                          .filter(Boolean)
-                          .join(" ")}
+                        whileHover={{
+                          scale: 1.02,
+                          boxShadow: activo
+                            ? "0 0 25px #708238aa"
+                            : "0 0 15px #1E90FF66",
+                        }}
+                        transition={{ duration: 0.4 }}
+                        className={`rounded-2xl p-4 border backdrop-blur-lg transition-all duration-300 ${
+                          activo
+                            ? "bg-[#708238]/30 border-[#708238] shadow-[0_0_25px_#708238aa] text-[#1B1B1B]"
+                            : "bg-white/10 border-white/20 text-white shadow-xl"
+                        }`}
                       >
                         <div className="flex items-start justify-between gap-3">
                           <h3 className="font-semibold leading-snug text-[15px]">
@@ -255,21 +238,17 @@ export default function Cotizador() {
                             onClick={() =>
                               setCantidades((prev) => ({
                                 ...prev,
-                                [item.id]: activo ? 0 : 1,
+                                [item.id]: activo ? "" : 1,
                               }))
                             }
-                            className={`px-2 py-1 text-[12px] rounded-lg font-semibold transition border ${
-                              activo
-                                ? "bg-emerald-500 text-white border-emerald-500"
-                                : "bg-white/10 text-white border-white/20 hover:bg-white/20"
-                            }`}
+                            className="px-2 py-1 text-[12px] rounded-lg font-semibold border border-white/20 bg-white/10 hover:bg-white/20 text-white transition"
                             title={activo ? "Quitar" : "Agregar"}
                           >
                             {activo ? "✓" : "Agregar"}
                           </button>
                         </div>
 
-                        <label className="block text-[12px] text-white/85 mt-3">
+                        <label className="block text-[12px] mt-3">
                           Cantidad ({item.unidad})
                         </label>
                         <input
@@ -278,18 +257,19 @@ export default function Cotizador() {
                           step="1"
                           value={qty}
                           onChange={(e) => setCantidad(item.id, e.target.value)}
-                          className={[
-                            "w-full px-3 py-2 mt-1 rounded-xl outline-none",
-                            "bg-white/15 border border-white/25 text-white placeholder-white/70",
-                            "focus:ring-2 focus:ring-[#FFD700]",
-                            activo && "border-emerald-400 bg-emerald-500/15",
-                          ]
-                            .filter(Boolean)
-                            .join(" ")}
+                          className={`w-full px-3 py-2 mt-1 rounded-xl outline-none border ${
+                            activo
+                              ? "bg-white/70 border-[#708238] text-[#1B1B1B]"
+                              : "bg-white/15 border-white/25 text-white placeholder-white/70"
+                          } focus:ring-2 focus:ring-[#FFD700]`}
                           placeholder="0"
                         />
 
-                        <p className="text-[11px] text-white/75 mt-2 italic">
+                        <p
+                          className={`text-[11px] mt-2 italic ${
+                            activo ? "text-[#1B1B1B]/70" : "text-white/75"
+                          }`}
+                        >
                           Los precios se mostrarán en el resumen final.
                         </p>
                       </motion.div>
@@ -301,7 +281,7 @@ export default function Cotizador() {
           </div>
         </motion.div>
 
-        {/* Barra acción fija inferior vidrio */}
+        {/* Barra inferior */}
         <div className="fixed bottom-0 left-0 right-0 backdrop-blur-xl bg-[#0D3B66]/70 border-t border-white/20 shadow-lg px-5 py-3">
           <div className="max-w-6xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-3">
             <p className="text-[13px] sm:text-sm text-white/90">
