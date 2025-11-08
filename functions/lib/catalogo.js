@@ -359,28 +359,41 @@ export const catalogo = [
     precio_unit: 40.0,
   },
   {
-    id: "con_puerta_seguridad", categoria: "construccion", nombre: "Instalación de puerta de seguridad metálica", unidad: "unidad",
+    id: "con_puerta_seguridad",
+    categoria: "construccion",
+    nombre: "Instalación de puerta de seguridad metálica",
+    unidad: "unidad",
     precio_unit: 550.0,
   },
   {
-    id: "con_tablaroca_division", categoria: "construccion", nombre: "Construcción de muro divisorio de tablaroca", unidad: "m²",
+    id: "con_tablaroca_division",
+    categoria: "construccion",
+    nombre: "Construcción de muro divisorio de tablaroca",
+    unidad: "m²",
     precio_unit: 25.0,
   },
   {
-    id: "con_escaleras_metalicas", categoria: "construccion", nombre: "Instalación de escaleras metálicas decorativas", unidad: "proyecto",
+    id: "con_escaleras_metalicas", 
+    categoria: "construccion",
+    nombre: "Instalación de escaleras metálicas decorativas",
+    unidad: "proyecto",
     precio_unit: 3500.0,
   },
   {
-    id: "con_galeria_cristal", categoria: "construccion", nombre: "Galería de cristal o aluminio", unidad: "m²",
+    id: "con_galeria_cristal",
+    categoria: "construccion",
+    nombre: "Galería de cristal o aluminio",
+    unidad: "m²",
     precio_unit: 180.0,
   }
 ];
 
 export function publicoSinPrecios() {
-  return catalogo.map(({ id, categoria, nombre, unidad }) => ({
+  return catalogo.map(({ id, categoria, nombre, obcervacion, unidad }) => ({
     id,
     categoria,
     nombre,
+    obcervacion,
     unidad,
   }));
 }
