@@ -52,10 +52,16 @@ export const catalogo = [
     precio_unit: 250.0,
   },
   {
-    id: "sys_redes_cableado",
+    id: "sys_punto_red",
     categoria: "servicios_especiales",
     nombre: "Instalación de punto de red estructurada (cableado, conectorización, prueba)", unidad: "unidad",
     precio_unit: 95.0,
+  },
+  {
+    id: "sys_redes_cableado",
+    categoria: "servicios_especiales",
+    nombre: "Instalacion de cableado de red estructural", unidad: "metro lineal",
+    precio_unit: 4.5,
   },
   {
     id: "sys_alarma_incendio",
