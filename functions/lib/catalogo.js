@@ -36,8 +36,9 @@ export const catalogo = [
   {
     id: "sys_automacion_ligera", categoria: "servicios_especiales",
     nombre: "Automatización de luces y tomacorrientes (iluminación + acceso inteligente) por unidad",
-    obcervacion: "Si requiere mas de 2 unidades, cotizar como sistema completo", unidad: "sistema",
+    unidad: "sistema",
     precio_unit: 55.0,
+    observacion: "Si requiere mas de 2 unidades, cotizar como sistema completo",
   },
   {
     id: "sys_cctv_comercial",
@@ -389,7 +390,7 @@ export const catalogo = [
 ];
 
 export function publicoSinPrecios() {
-  return catalogo.map(({ id, categoria, nombre, obcervacion, unidad }) => ({
+  return catalogo.map(({ id, categoria, nombre, unidad }) => ({
     id,
     categoria,
     nombre,
@@ -415,7 +416,6 @@ export function calcular(items) {
     detalle.push({
       item_id: ref.id,
       nombre: ref.nombre,
-      obcervacion: ref.obcervacion,
       unidad: ref.unidad,
       cantidad,
       precio_unit,
