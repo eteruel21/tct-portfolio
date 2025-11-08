@@ -390,12 +390,12 @@ export const catalogo = [
 ];
 
 export function publicoSinPrecios() {
-  return catalogo.map(({ id, categoria, nombre, unidad, observacion }) => ({
-    id,
-    categoria,
-    nombre,
-    unidad,
-    observacion,
+  return catalogo.map(i => ({
+    id: i.id,
+    categoria: i.categoria,
+    nombre: i.nombre,
+    unidad: i.unidad,
+    observacion: i.observacion || "",
   }));
 }
 
