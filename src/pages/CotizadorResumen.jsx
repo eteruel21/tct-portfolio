@@ -82,6 +82,7 @@ export default function CotizadorResumen() {
               <tr>
                 <th className="p-3 text-left">Categoría</th>
                 <th className="p-3 text-left">Servicio</th>
+                <th className="p-3 text-left">Observación</th>
                 <th className="p-3 text-right">Cantidad</th>
                 <th className="p-3 text-right">Precio</th>
                 <th className="p-3 text-right">Subtotal</th>
@@ -100,6 +101,7 @@ export default function CotizadorResumen() {
                     {d.categoria === "servicios_especiales" ? "Servicios Especiales" : "Construcción"}
                   </td>
                   <td className="p-3 text-slate-900">{d.nombre}</td>
+                  <td className="p-3 text-slate-600 italic">{d.observacion || "—"}</td>
                   <td className="p-3 text-right text-slate-800">{d.cantidad}</td>
                   <td className="p-3 text-right text-slate-800">B/. {d.precio_unit.toFixed(2)}</td>
                   <td className="p-3 text-right text-slate-900 font-semibold">B/. {d.subtotal.toFixed(2)}</td>
