@@ -394,7 +394,6 @@ export function publicoSinPrecios() {
     id,
     categoria,
     nombre,
-    obcervacion,
     unidad,
   }));
 }
