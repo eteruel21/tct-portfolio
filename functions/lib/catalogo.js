@@ -390,11 +390,12 @@ export const catalogo = [
 ];
 
 export function publicoSinPrecios() {
-  return catalogo.map(({ id, categoria, nombre, unidad }) => ({
+  return catalogo.map(({ id, categoria, nombre, unidad, observacion }) => ({
     id,
     categoria,
     nombre,
     unidad,
+    observacion,
   }));
 }
 
@@ -416,6 +417,7 @@ export function calcular(items) {
       item_id: ref.id,
       nombre: ref.nombre,
       unidad: ref.unidad,
+      observacion: ref.observacion || "",
       cantidad,
       precio_unit,
       subtotal: Number(linea.toFixed(2)),
