@@ -265,7 +265,7 @@ export default function Cotizador() {
                           placeholder="0"
                         />
 
-                        <p className={`text-[11px] mt-2 italic ${activo ? "text-[#1B1B1B]/50" : "text-white/45"}`}>
+                        <p className={`text-[11px] mt-2 italic ${activo ? "text-[#1B1B1B]/100" : "text-white/95"}`}>
                           {item.observacion || "Sin observación disponible"}
                         </p>
 
