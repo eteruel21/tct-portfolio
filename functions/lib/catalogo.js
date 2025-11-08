@@ -38,7 +38,7 @@ export const catalogo = [
     nombre: "Automatización de luces y tomacorrientes (iluminación + acceso inteligente) por unidad",
     unidad: "sistema",
     precio_unit: 55.0,
-    observacion: observacion || "Si requiere mas de 2 unidades, cotizar como sistema completo",
+    observacion: "Si requiere mas de 2 unidades, cotizar como sistema completo",
   },
   {
     id: "sys_cctv_comercial",
