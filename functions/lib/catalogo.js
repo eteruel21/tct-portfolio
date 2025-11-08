@@ -38,14 +38,14 @@ export const catalogo = [
     nombre: "Automatización de luces y tomacorrientes (iluminación + acceso inteligente) por unidad",
     unidad: "sistema",
     precio_unit: 55.0,
-    observacion: "Si requiere mas de 2 unidades, cotizar como sistema completo",
+    observacion: "Si requiere mas de 2 unidades, el precio es menor, cotizar como sistema completo",
   },
   {
     id: "sys_cctv_comercial",
     categoria: "servicios_especiales",
-    nombre: "Sistema CCTV comercial (varias cámaras)",
+    nombre: "Kit comercial 32 cámaras + DVR de 32 canales + accesorios básicos + disco duro de 4TB + instalación",
     unidad: "proyecto",
-    precio_unit: 1500.0,
+    precio_unit: 3650.0,
   },
   {
     id: "sys_control_acceso",
