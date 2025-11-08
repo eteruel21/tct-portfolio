@@ -19,12 +19,12 @@ export const catalogo = [
     precio_unit: 650.00,
   },
   {
-    id: "sys_cam_kit4", categoria: "servicios_especiales",
+    id: "sys_cam_kit8", categoria: "servicios_especiales",
     nombre: "Kit residencial 8 cámaras + DVR de 8 canales + accesorios básicos + instalación", unidad: "sistema",
     precio_unit: 1160.00,
   },
   {
-    id: "sys_cam_kit4", categoria: "servicios_especiales",
+    id: "sys_cam_equipo", categoria: "servicios_especiales",
     nombre: "Revision tecnica o formateo de equipo o configuracion de equipos CCTV", unidad: "sistema",
     precio_unit: 75.00,
   },
