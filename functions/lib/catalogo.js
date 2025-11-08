@@ -415,6 +415,7 @@ export function calcular(items) {
     detalle.push({
       item_id: ref.id,
       nombre: ref.nombre,
+      obcervacion: ref.obcervacion,
       unidad: ref.unidad,
       cantidad,
       precio_unit,
