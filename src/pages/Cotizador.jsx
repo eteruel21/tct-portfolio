@@ -276,6 +276,13 @@ export default function Cotizador() {
                         >
                           Los precios se mostrarán en el resumen final.
                         </p>
+                        <p
+                          className={`text-[11px] mt-2 italic ${
+                            activo ? "text-[#1B1B1B]/70" : "text-white/75"
+                          }`}
+                        >
+                          Todos los servicios incluyen equipos, materiales y mano de obre.
+                        </p>
                       </motion.div>
                     );
                   })}
